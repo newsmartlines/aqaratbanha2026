@@ -1,0 +1,98 @@
+import { Switch, Route, Router as WouterRouter, useLocation } from "wouter";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Toaster } from "@/components/ui/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronUp } from "lucide-react";
+import NotFound from "@/pages/not-found";
+import Home from "@/pages/home";
+import Search from "@/pages/search";
+import Property from "@/pages/property";
+import MapPage from "@/pages/map";
+import LoginPage from "@/pages/login";
+import RegisterPage from "@/pages/register";
+import AddPropertyPage from "@/pages/add-property";
+import { LanguageProvider, useLanguage } from "@/contexts/LanguageContext";
+
+const queryClient = new QueryClient();
+
+function ScrollToTop() {
+  const [location] = useLocation();
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [location]);
+  return null;
+}
+
+function BackToTopButton() {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setVisible(window.scrollY > 350);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  return (
+    <AnimatePresence>
+      {visible && (
+        <motion.button
+          initial={{ opacity: 0, scale: 0.7, y: 16 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.7, y: 16 }}
+          transition={{ duration: 0.22 }}
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          aria-label="العودة للأعلى"
+          className="fixed bottom-24 right-4 z-[99] w-11 h-11 rounded-full shadow-xl flex items-center justify-center border border-white/20 hover:scale-110 active:scale-95 transition-transform"
+          style={{ background: "linear-gradient(135deg, #123C79, #1EBFD5)" }}
+        >
+          <ChevronUp className="w-5 h-5 text-white" />
+        </motion.button>
+      )}
+    </AnimatePresence>
+  );
+}
+
+function Router() {
+  return (
+    <>
+      <ScrollToTop />
+      <Switch>
+        <Route path="/" component={Home} />
+        <Route path="/search" component={Search} />
+        <Route path="/map" component={MapPage} />
+        <Route path="/property/:id" component={Property} />
+        <Route path="/login" component={LoginPage} />
+        <Route path="/register" component={RegisterPage} />
+        <Route path="/add-property" component={AddPropertyPage} />
+        <Route component={NotFound} />
+      </Switch>
+    </>
+  );
+}
+
+function AppInner() {
+  const { isRTL, lang } = useLanguage();
+  return (
+    <div dir={isRTL ? "rtl" : "ltr"} lang={lang}>
+      <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+        <Router />
+      </WouterRouter>
+      <Toaster />
+      <BackToTopButton />
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <LanguageProvider>
+          <AppInner />
+        </LanguageProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+}
+
+export default App;
