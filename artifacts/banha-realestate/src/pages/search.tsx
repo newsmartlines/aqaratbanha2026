@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useHoverScroll } from "@/hooks/useHoverScroll";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
 import { PROPERTIES } from "@/data/properties";
@@ -317,6 +318,8 @@ function PropertyCard({ prop, view }: { prop: typeof MOCK_PROPERTIES[0]; view: "
 
 export default function SearchPage() {
   const [, navigate] = useLocation();
+  const sidebarRef = useHoverScroll<HTMLElement>();
+  const resultsRef = useHoverScroll<HTMLElement>();
   const [view, setView] = useState<"grid" | "list">("grid");
   const [sort, setSort] = useState("newest");
   const [sortOpen, setSortOpen] = useState(false);
@@ -644,14 +647,22 @@ export default function SearchPage() {
           <div className="flex gap-6">
 
             {/* ─── RIGHT SIDEBAR (Filters) ──────────────────── */}
-            <aside className="hidden md:block w-72 flex-shrink-0">
-              <div className="sticky top-20 bg-white rounded-2xl border border-gray-100 p-5">
+            <aside
+              ref={sidebarRef}
+              className="hidden md:block w-72 flex-shrink-0 overflow-y-auto scroll-subtle rounded-2xl"
+              style={{ maxHeight: "calc(100vh - 8rem)" }}
+            >
+              <div className="bg-white rounded-2xl border border-gray-100 p-5">
                 <FilterPanel />
               </div>
             </aside>
 
             {/* ─── RESULTS ──────────────────────────────────── */}
-            <main className="flex-1 min-w-0">
+            <main
+              ref={resultsRef}
+              className="flex-1 min-w-0 overflow-y-auto scroll-subtle"
+              style={{ maxHeight: "calc(100vh - 8rem)" }}
+            >
 
               {/* Active filter chips — above the cards */}
               {activeFiltersCount > 0 && (

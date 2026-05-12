@@ -111,3 +111,39 @@
     @apply font-sans antialiased bg-background text-foreground;
   }
 }
+
+/* ── Hover Scroll — hidden scrollbar, smooth & clean ── */
+.scroll-hidden {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scroll-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+/* subtle scrollbar that appears on hover */
+.scroll-subtle {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.3s;
+}
+.scroll-subtle:hover {
+  scrollbar-color: rgba(30, 191, 213, 0.35) transparent;
+}
+.scroll-subtle::-webkit-scrollbar {
+  width: 4px;
+}
+.scroll-subtle::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scroll-subtle::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 99px;
+  transition: background 0.3s;
+}
+.scroll-subtle:hover::-webkit-scrollbar-thumb {
+  background: rgba(30, 191, 213, 0.35);
+}
+.scroll-subtle:hover::-webkit-scrollbar-thumb:hover {
+  background: rgba(30, 191, 213, 0.65);
+}

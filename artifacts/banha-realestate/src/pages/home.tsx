@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useHoverScroll } from "@/hooks/useHoverScroll";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
 import { PROPERTIES } from "@/data/properties";
@@ -245,6 +246,7 @@ export default function HomePage() {
   const [, navigate] = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const { t } = useLanguage();
+  const propertiesRef = useHoverScroll<HTMLDivElement>();
 
   const [searchTab, setSearchTab] = useState<"buy" | "rent">("buy");
   const [searchKeyword, setSearchKeyword] = useState("");
@@ -644,6 +646,11 @@ export default function HomePage() {
           </div>
 
           {/* 4-col grid, up to 3 rows = 12 cards */}
+          <div
+            ref={propertiesRef}
+            className="overflow-y-auto scroll-subtle rounded-xl"
+            style={{ maxHeight: "680px" }}
+          >
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {filteredProperties.slice(0, 12).map((prop, index) => (
               <motion.div
@@ -725,6 +732,7 @@ export default function HomePage() {
                 </div>
               </motion.div>
             ))}
+          </div>
           </div>
 
           {filteredProperties.length === 0 && (
