@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
 import {
   MapPin, BedDouble, Bath, Maximize2, X, Heart,
-  ChevronDown, Bell, SlidersHorizontal, List,
+  ChevronDown, ChevronRight, Bell, SlidersHorizontal, List,
   Star, CheckCircle, Phone, Search,
 } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
@@ -322,7 +322,18 @@ export default function MapPage() {
 
       {/* ── TOP HEADER ── */}
       <header className="bg-white border-b border-gray-200 flex-shrink-0 z-[1500]">
-        <div className="flex items-center gap-3 px-4 py-3">
+        {/* Breadcrumb row */}
+        <div className="px-4 pt-2.5 pb-1 border-b border-gray-100">
+          <button
+            onClick={() => navigate("/search")}
+            className="inline-flex items-center gap-1 text-[#1EBFD5] text-sm font-bold hover:underline transition-colors"
+          >
+            الرجوع للقائمة
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div className="flex items-center gap-3 px-4 py-2.5">
           {/* Save search */}
           <button
             onClick={() => setSavedSearch(v => !v)}
@@ -353,15 +364,6 @@ export default function MapPage() {
               </button>
             )}
           </div>
-
-          {/* Back to list */}
-          <button
-            onClick={() => navigate("/search")}
-            className="flex items-center gap-1.5 text-sm font-bold text-gray-600 hover:text-[#123C79] border border-gray-200 rounded-lg px-3 py-2 hover:border-gray-300 transition-all whitespace-nowrap"
-          >
-            <List className="w-4 h-4" />
-            الرجوع للقائمة
-          </button>
         </div>
 
         {/* ── FILTER BAR ── */}

@@ -659,9 +659,15 @@ export default function SearchPage() {
 
         {/* ─── MAIN LAYOUT ────────────────────────────────────── */}
         <div className="container mx-auto px-4 md:px-6 py-6">
-          <div>
+          <div className="flex gap-6 items-start">
+
+            {/* ─── FILTERS SIDEBAR ─────────────────────────── */}
+            <aside className="w-72 flex-shrink-0 bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sticky top-20 hidden lg:block">
+              <FilterPanel />
+            </aside>
+
             {/* ─── RESULTS ──────────────────────────────────── */}
-            <main className="w-full">
+            <main className="flex-1 min-w-0">
 
               {sorted.length === 0 ? (
                 <motion.div
