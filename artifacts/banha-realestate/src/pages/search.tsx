@@ -234,10 +234,6 @@ function PropertyCard({ prop, view }: { prop: typeof MOCK_PROPERTIES[0]; view: "
             </div>
           </div>
           <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
-            <div className="flex items-center gap-2.5">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${prop.agent.color}`}>{prop.agent.initials}</div>
-              <span className="text-sm font-semibold text-gray-700">{prop.agent.name}</span>
-            </div>
             <div className="flex gap-2">
               <button onClick={e => e.stopPropagation()} className="w-8 h-8 rounded-full bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-500 hover:text-white transition-colors"><FaWhatsapp className="w-4 h-4" /></button>
               <button onClick={e => e.stopPropagation()} className="w-8 h-8 rounded-full bg-[#123C79]/5 text-[#123C79] flex items-center justify-center hover:bg-[#123C79] hover:text-white transition-colors"><Phone className="w-3.5 h-3.5" /></button>
@@ -302,10 +298,6 @@ function PropertyCard({ prop, view }: { prop: typeof MOCK_PROPERTIES[0]; view: "
           <span className="flex items-center gap-1 text-xs text-gray-600 flex-1 justify-center"><Maximize2 className="w-3.5 h-3.5 text-gray-400" />{prop.area} م²</span>
         </div>
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-xs ${prop.agent.color}`}>{prop.agent.initials}</div>
-            <span className="text-xs font-semibold text-gray-600">{prop.agent.name}</span>
-          </div>
           <div className="flex gap-1.5">
             <button onClick={e => e.stopPropagation()} className="w-7 h-7 rounded-full bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-500 hover:text-white transition-colors"><FaWhatsapp className="w-3.5 h-3.5" /></button>
             <button onClick={e => e.stopPropagation()} className="w-7 h-7 rounded-full bg-[#123C79]/5 text-[#123C79] flex items-center justify-center hover:bg-[#123C79] hover:text-white transition-colors"><Phone className="w-3 h-3" /></button>
