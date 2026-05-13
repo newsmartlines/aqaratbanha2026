@@ -99,13 +99,13 @@ function ImageSlider({ images, alt, onClick }: { images: string[]; alt: string; 
         <>
           <button
             onClick={prev}
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/40 backdrop-blur-sm text-white flex items-center justify-center opacity-0 group-hover/slider:opacity-100 transition-opacity hover:bg-black/60 z-10"
+            className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white border border-gray-200 shadow-md text-gray-700 flex items-center justify-center opacity-0 group-hover/slider:opacity-100 transition-opacity hover:bg-gray-50 active:scale-95 z-10"
           >
             <ChevronRight className="w-4 h-4" />
           </button>
           <button
             onClick={next}
-            className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/40 backdrop-blur-sm text-white flex items-center justify-center opacity-0 group-hover/slider:opacity-100 transition-opacity hover:bg-black/60 z-10"
+            className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white border border-gray-200 shadow-md text-gray-700 flex items-center justify-center opacity-0 group-hover/slider:opacity-100 transition-opacity hover:bg-gray-50 active:scale-95 z-10"
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
@@ -114,7 +114,7 @@ function ImageSlider({ images, alt, onClick }: { images: string[]; alt: string; 
               <button
                 key={i}
                 onClick={e => { e.stopPropagation(); setIdx(i); }}
-                className={`rounded-full transition-all duration-200 ${i === idx ? "w-4 h-1.5 bg-white" : "w-1.5 h-1.5 bg-white/55 hover:bg-white/80"}`}
+                className={`rounded-full transition-all duration-200 ${i === idx ? "w-4 h-1.5 bg-white shadow-sm" : "w-1.5 h-1.5 bg-white/60 hover:bg-white/85"}`}
               />
             ))}
           </div>
@@ -414,6 +414,7 @@ export default function SearchPage() {
   const [, navigate] = useLocation();
   const [sort, setSort] = useState("newest");
   const [sortOpen, setSortOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<"single" | "grid">("single");
 
   // Filters state
   const [txType, setTxType] = useState<"" | "للبيع" | "للإيجار">("");
@@ -723,6 +724,24 @@ export default function SearchPage() {
                   </AnimatePresence>
                 </div>
 
+                {/* View mode toggle */}
+                <div className="flex items-center rounded-xl border-2 border-gray-200 overflow-hidden">
+                  <button
+                    onClick={() => setViewMode("single")}
+                    title="عمود واحد"
+                    className={`flex items-center justify-center w-9 h-9 transition-colors ${viewMode === "single" ? "bg-[#123C79] text-white" : "text-gray-500 hover:bg-gray-100"}`}
+                  >
+                    <LayoutList className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode("grid")}
+                    title="عمودين"
+                    className={`flex items-center justify-center w-9 h-9 border-r-2 border-gray-200 transition-colors ${viewMode === "grid" ? "bg-[#123C79] text-white" : "text-gray-500 hover:bg-gray-100"}`}
+                  >
+                    <LayoutGrid className="w-4 h-4" />
+                  </button>
+                </div>
+
                 {/* Map view button */}
                 <button
                   onClick={() => navigate("/map")}
@@ -769,7 +788,7 @@ export default function SearchPage() {
                 </motion.div>
               ) : (
                 <>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div className={`grid gap-5 ${viewMode === "grid" ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1"}`}>
                     {sorted.map((prop, i) => (
                       <motion.div
                         key={prop.id}
