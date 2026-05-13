@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useHoverScroll } from "@/hooks/useHoverScroll";
+
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
 import { PROPERTIES } from "@/data/properties";
@@ -322,12 +322,8 @@ function PropertyCard({ prop, view }: { prop: typeof MOCK_PROPERTIES[0]; view: "
 
 export default function SearchPage() {
   const [, navigate] = useLocation();
-  const sidebarRef = useHoverScroll<HTMLElement>();
-  const resultsRef = useHoverScroll<HTMLElement>();
-  const [view, setView] = useState<"grid" | "list">("grid");
   const [sort, setSort] = useState("newest");
   const [sortOpen, setSortOpen] = useState(false);
-  const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
   // Filters state
   const [txType, setTxType] = useState<"" | "للبيع" | "للإيجار">("");
@@ -576,20 +572,6 @@ export default function SearchPage() {
             </div>
 
             <div className="flex items-center gap-2">
-              {/* Mobile filter */}
-              <button
-                onClick={() => setMobileFilterOpen(true)}
-                className="md:hidden flex items-center gap-2 border-2 border-gray-200 rounded-xl px-3 py-2 text-sm font-bold text-gray-700 hover:border-[#123C79] transition-colors"
-              >
-                <Filter className="w-4 h-4" />
-                الفلاتر
-                {activeFiltersCount > 0 && (
-                  <span className="bg-[#123C79] text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
-                    {activeFiltersCount}
-                  </span>
-                )}
-              </button>
-
               {/* Sort dropdown */}
               <div className="relative">
                 <button
@@ -633,94 +615,15 @@ export default function SearchPage() {
                 <span className="hidden sm:inline">عرض الخريطة</span>
               </button>
 
-              {/* View toggle */}
-              <div className="flex bg-gray-100 rounded-xl p-1 gap-1">
-                <button onClick={() => setView("grid")} className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${view === "grid" ? "bg-white text-[#123C79]" : "text-gray-400 hover:text-gray-600"}`}>
-                  <LayoutGrid className="w-4 h-4" />
-                </button>
-                <button onClick={() => setView("list")} className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${view === "list" ? "bg-white text-[#123C79]" : "text-gray-400 hover:text-gray-600"}`}>
-                  <LayoutList className="w-4 h-4" />
-                </button>
-              </div>
             </div>
           </div>
         </div>
 
         {/* ─── MAIN LAYOUT ────────────────────────────────────── */}
         <div className="container mx-auto px-4 md:px-6 py-6">
-          <div className="flex gap-6">
-
-            {/* ─── RIGHT SIDEBAR (Filters) ──────────────────── */}
-            <aside
-              ref={sidebarRef}
-              className="hidden md:block w-72 flex-shrink-0 overflow-y-auto scroll-subtle rounded-2xl"
-              style={{ maxHeight: "calc(100vh - 8rem)" }}
-            >
-              <div className="bg-white rounded-2xl border border-gray-100 p-5">
-                <FilterPanel />
-              </div>
-            </aside>
-
+          <div>
             {/* ─── RESULTS ──────────────────────────────────── */}
-            <main
-              ref={resultsRef}
-              className="flex-1 min-w-0 overflow-y-auto scroll-subtle"
-              style={{ maxHeight: "calc(100vh - 8rem)" }}
-            >
-
-              {/* Active filter chips — above the cards */}
-              {activeFiltersCount > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: -8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  className="mb-4 flex flex-wrap items-center gap-2"
-                >
-                  <span className="text-xs text-gray-500 font-medium flex-shrink-0">الفلاتر النشطة:</span>
-                  {txType && (
-                    <span className="inline-flex items-center gap-1.5 bg-[#123C79]/10 text-[#123C79] text-xs font-bold px-3 py-1.5 rounded-full">
-                      {txType}
-                      <button onClick={() => setTxType("")} className="hover:text-[#123C79]/60 transition-colors"><X className="w-3 h-3" /></button>
-                    </span>
-                  )}
-                  {selectedCategories.map(c => (
-                    <span key={c} className="inline-flex items-center gap-1.5 bg-[#123C79]/10 text-[#123C79] text-xs font-bold px-3 py-1.5 rounded-full">
-                      {c}
-                      <button onClick={() => toggleCategory(c)} className="hover:text-[#123C79]/60 transition-colors"><X className="w-3 h-3" /></button>
-                    </span>
-                  ))}
-                  {selectedSubTypes.map(s => (
-                    <span key={s} className="inline-flex items-center gap-1.5 bg-[#123C79]/10 text-[#123C79] text-xs font-bold px-3 py-1.5 rounded-full">
-                      {s}
-                      <button onClick={() => toggleArr(selectedSubTypes, s, setSelectedSubTypes)} className="hover:text-[#123C79]/60 transition-colors"><X className="w-3 h-3" /></button>
-                    </span>
-                  ))}
-                  {selectedAreas.map(a => (
-                    <span key={a} className="inline-flex items-center gap-1.5 bg-[#1EBFD5]/15 text-[#0d8fa3] text-xs font-bold px-3 py-1.5 rounded-full">
-                      {a}
-                      <button onClick={() => toggleArr(selectedAreas, a, setSelectedAreas)} className="hover:text-[#0d8fa3]/60 transition-colors"><X className="w-3 h-3" /></button>
-                    </span>
-                  ))}
-                  {(priceMin || priceMax) && (
-                    <span className="inline-flex items-center gap-1.5 bg-[#123C79]/10 text-[#123C79] text-xs font-bold px-3 py-1.5 rounded-full">
-                      السعر
-                      <button onClick={() => { setPriceMin(""); setPriceMax(""); }} className="hover:text-[#123C79]/60 transition-colors"><X className="w-3 h-3" /></button>
-                    </span>
-                  )}
-                  {minBeds > 0 && (
-                    <span className="inline-flex items-center gap-1.5 bg-[#123C79]/10 text-[#123C79] text-xs font-bold px-3 py-1.5 rounded-full">
-                      {minBeds}+ غرف
-                      <button onClick={() => setMinBeds(-1)} className="hover:text-[#123C79]/60 transition-colors"><X className="w-3 h-3" /></button>
-                    </span>
-                  )}
-                  <button
-                    onClick={clearAll}
-                    className="text-xs text-red-500 font-bold hover:text-red-700 border border-red-200 hover:border-red-400 px-3 py-1.5 rounded-full transition-colors"
-                  >
-                    مسح الكل
-                  </button>
-                </motion.div>
-              )}
+            <main className="w-full">
 
               {sorted.length === 0 ? (
                 <motion.div
@@ -742,7 +645,7 @@ export default function SearchPage() {
                 </motion.div>
               ) : (
                 <>
-                  <div className={`grid gap-5 ${view === "grid" ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" : "grid-cols-1"}`}>
+                  <div className="grid grid-cols-1 gap-5">
                     {sorted.map((prop, i) => (
                       <motion.div
                         key={prop.id}
@@ -750,7 +653,7 @@ export default function SearchPage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.35, delay: Math.min(i * 0.05, 0.4) }}
                       >
-                        <PropertyCard prop={prop} view={view} />
+                        <PropertyCard prop={prop} view="list" />
                       </motion.div>
                     ))}
                   </div>
@@ -783,37 +686,6 @@ export default function SearchPage() {
         </div>
       </div>
 
-      {/* ─── MOBILE FILTER DRAWER ───────────────────────────── */}
-      <AnimatePresence>
-        {mobileFilterOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setMobileFilterOpen(false)}
-              className="fixed inset-0 bg-black/50 z-50 md:hidden"
-            />
-            <motion.div
-              initial={{ x: "100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 h-full w-[85vw] max-w-sm bg-white z-50 shadow-2xl md:hidden overflow-y-auto"
-            >
-              <div className="flex items-center justify-between p-5 border-b border-gray-100 sticky top-0 bg-white z-10">
-                <span className="font-black text-gray-900 text-lg">الفلاتر</span>
-                <button onClick={() => setMobileFilterOpen(false)} className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 hover:bg-gray-200">
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              <div className="p-5">
-                <FilterPanel />
-              </div>
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
       <Footer />
     </div>
   );
