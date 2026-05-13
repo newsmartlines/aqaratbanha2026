@@ -14,6 +14,7 @@ import { PROPERTIES } from "@/data/properties";
 import PropertyImage from "@/components/PropertyImage";
 import { useHoverScroll } from "@/hooks/useHoverScroll";
 import Navbar from "@/components/Navbar";
+import Breadcrumb from "@/components/Breadcrumb";
 
 const BANHA_CENTER: [number, number] = [30.4632, 31.1847];
 
@@ -327,6 +328,9 @@ export default function MapPage() {
 
       {/* ── TOP HEADER ── */}
       <header className="bg-white border-b border-gray-200 flex-shrink-0 z-[1500]">
+        <div className="px-4 pt-1">
+          <Breadcrumb items={[{ label: "عرض الخريطة" }]} />
+        </div>
         <div className="flex items-center gap-3 px-4 py-2.5">
           {/* Save search */}
           <button

@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 import PropertyImage from "@/components/PropertyImage";
+import Breadcrumb from "@/components/Breadcrumb";
 
 const PROPERTY_TYPES: Record<string, string[]> = {
   سكني: ["شقة", "دوبلكس", "بنتهاوس", "فيلا", "استوديو", "استراحة"],
@@ -702,6 +703,13 @@ export default function SearchPage() {
         {/* ─── BREADCRUMB + TITLE BAR ─────────────────────── */}
         <div className="bg-white border-b border-gray-100">
           <div className="container mx-auto px-4 md:px-6">
+
+            {/* Breadcrumb */}
+            <Breadcrumb items={[
+              { label: "نتائج البحث", href: "/search" },
+              ...(selectedCategories.length === 1 ? [{ label: selectedCategories[0], href: "/search" }] : []),
+              ...(selectedSubTypes.length === 1 ? [{ label: selectedSubTypes[0] }] : []),
+            ]} />
 
             {/* Row 2: title + sort + count */}
             <div className="py-3 flex items-center justify-between gap-4 flex-wrap">

@@ -12,6 +12,7 @@ import { FaWhatsapp } from "react-icons/fa";
 import { PROPERTIES, getSimilarProperties, getProperty } from "@/data/properties";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
+import Breadcrumb from "@/components/Breadcrumb";
 import PropertyImage from "@/components/PropertyImage";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { ImageOff } from "lucide-react";
@@ -275,30 +276,11 @@ export default function PropertyPage() {
         <div className="container mx-auto px-4 md:px-6 py-8">
 
           {/* Breadcrumb — above gallery */}
-          <div className="mb-3 flex items-center gap-1.5 text-xs font-semibold whitespace-nowrap overflow-x-auto scrollbar-none">
-            <button onClick={() => navigate("/")} className="flex items-center gap-1 text-gray-500 hover:text-[#123C79] transition-colors flex-shrink-0">
-              <Home className="w-3 h-3" />
-              <span>{t("home")}</span>
-            </button>
-            <ChevronLeft className="w-3 h-3 flex-shrink-0 text-gray-300" />
-            <button onClick={() => navigate("/search")} className="text-gray-500 hover:text-[#123C79] transition-colors flex-shrink-0">
-              {t("searchResults")}
-            </button>
-            <ChevronLeft className="w-3 h-3 flex-shrink-0 text-gray-300" />
-            <button onClick={() => navigate("/search")} className="text-gray-500 hover:text-[#123C79] transition-colors flex-shrink-0">
-              {property.category}
-            </button>
-            <ChevronLeft className="w-3 h-3 flex-shrink-0 text-gray-300" />
-            <button onClick={() => navigate("/search")} className="text-gray-500 hover:text-[#123C79] transition-colors flex-shrink-0">
-              {property.type}
-            </button>
-            <ChevronLeft className="w-3 h-3 flex-shrink-0 text-gray-300" />
-            <button onClick={() => navigate("/search")} className="text-gray-500 hover:text-[#123C79] transition-colors flex-shrink-0">
-              {property.area}
-            </button>
-            <ChevronLeft className="w-3 h-3 flex-shrink-0 text-gray-300" />
-            <span className="text-[#123C79] font-bold truncate">{property.title}</span>
-          </div>
+          <Breadcrumb items={[
+            { label: "نتائج البحث", href: "/search" },
+            { label: property.category, href: "/search" },
+            { label: property.title },
+          ]} />
 
           {/* Gallery */}
           <div className="mb-0 relative">
