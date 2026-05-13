@@ -55,6 +55,10 @@ const MOCK_PROPERTIES = PROPERTIES.map(p => ({
   images: p.images,
   featured: p.featured,
   daysAgo: p.daysAgo,
+  description: p.description,
+  views: p.views,
+  floor: p.floor,
+  totalFloors: p.totalFloors,
 }));
 
 function formatDaysAgo(days: number): string {
@@ -255,75 +259,105 @@ function PropertyCard({ prop, view }: { prop: typeof MOCK_PROPERTIES[0]; view: "
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        whileHover={{ y: -2 }}
         data-testid={`card-property-${prop.id}`}
         onClick={() => navigate(`/property/${prop.id}`)}
-        className="bg-white rounded-2xl overflow-hidden border border-gray-100 transition-all group flex cursor-pointer"
+        className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow group flex cursor-pointer"
       >
-        <div className="relative w-64 flex-shrink-0 overflow-hidden">
-          <PropertyImage src={prop.image} alt={prop.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-          <div className="absolute top-3 right-3 flex flex-col gap-1.5">
-            <span className={`text-[10px] font-black px-2.5 py-1 rounded-full text-white shadow-md backdrop-blur-sm ${prop.type === "للبيع" ? "bg-[#123C79]/90" : "bg-[#1EBFD5]/90"}`}>
+        {/* ── RIGHT: image (first in DOM = right side in RTL) ── */}
+        <div className="relative w-36 sm:w-48 flex-shrink-0 self-stretch">
+          <ImageSlider images={prop.images?.length ? prop.images : [prop.image]} alt={prop.title} />
+
+          {/* Badges */}
+          <div className="absolute top-2 right-2 flex flex-col gap-1 z-10 pointer-events-none">
+            <span className={`text-[9px] font-black px-2 py-0.5 rounded-full text-white shadow ${prop.type === "للبيع" ? "bg-[#123C79]/90" : "bg-[#1EBFD5]/90"}`}>
               {prop.type}
             </span>
-            {prop.featured && (
-              <span className="flex items-center gap-1 text-[10px] font-black px-2.5 py-1 rounded-full text-white shadow-md backdrop-blur-sm"
-                style={{ background: "linear-gradient(135deg,#f59e0b,#d97706)" }}>
-                <Star className="w-2.5 h-2.5 fill-white text-white" /> مميز
+            {prop.badge === "موثق" && (
+              <span className="flex items-center gap-1 text-[9px] font-black px-2 py-0.5 rounded-full text-white shadow"
+                style={{ background: "linear-gradient(135deg,#0f2d5e,#1EBFD5)" }}>
+                <ShieldCheck className="w-2.5 h-2.5" /> موثق
               </span>
             )}
-            {prop.badge && prop.badge !== "مميز" && (
-              prop.badge === "موثق" ? (
-                <span className="flex items-center gap-1.5 text-xs font-black px-3 py-1.5 rounded-xl text-white ring-2 ring-white/30"
-                  style={{ background: "linear-gradient(135deg,#0f2d5e,#1EBFD5)", boxShadow: "0 4px 15px rgba(30,191,213,0.45)" }}>
-                  <ShieldCheck className="w-3.5 h-3.5 fill-white/20 stroke-white" />
-                  موثق
-                </span>
-              ) : (
-                <span className="text-[10px] font-black px-2.5 py-1 rounded-full text-white shadow-md backdrop-blur-sm"
-                  style={{
-                    background: prop.badge === "جديد" ? "linear-gradient(135deg,#1EBFD5,#0e8fa3)"
-                      : prop.badge === "فرصة" ? "linear-gradient(135deg,#f97316,#ea580c)"
-                      : "linear-gradient(135deg,#6b7280,#4b5563)",
-                  }}>
-                  {prop.badge}
-                </span>
-              )
+            {prop.badge && prop.badge !== "مميز" && prop.badge !== "موثق" && (
+              <span className="text-[9px] font-black px-2 py-0.5 rounded-full text-white shadow"
+                style={{
+                  background: prop.badge === "جديد" ? "linear-gradient(135deg,#1EBFD5,#0e8fa3)"
+                    : prop.badge === "فرصة" ? "linear-gradient(135deg,#f97316,#ea580c)"
+                    : "linear-gradient(135deg,#6b7280,#4b5563)",
+                }}>
+                {prop.badge}
+              </span>
+            )}
+            {prop.featured && (
+              <span className="flex items-center gap-0.5 text-[9px] font-black px-2 py-0.5 rounded-full text-white shadow"
+                style={{ background: "linear-gradient(135deg,#f59e0b,#d97706)" }}>
+                <Star className="w-2 h-2 fill-white" /> مميز
+              </span>
             )}
           </div>
-        </div>
-        <div className="flex-1 p-5 flex flex-col justify-between">
-          <div>
-            <div className="mb-2">
-              <p className="text-xl font-black text-[#123C79] mb-1">{prop.priceLabel}</p>
-              <h3 className="text-lg font-bold text-gray-900 group-hover:text-[#123C79] transition-colors">{prop.title}</h3>
-              <div className="flex items-center text-gray-500 mt-1 text-sm">
-                <MapPin className="w-3.5 h-3.5 ml-1 text-[#1EBFD5]" />{prop.location}
-              </div>
-            </div>
-            <div className="flex items-center gap-4 mt-3">
-              {prop.beds > 0 && <span className="flex items-center gap-1.5 text-sm text-gray-600"><BedDouble className="w-4 h-4 text-gray-400" />{prop.beds} غرف</span>}
-              {prop.baths > 0 && <span className="flex items-center gap-1.5 text-sm text-gray-600"><Bath className="w-4 h-4 text-gray-400" />{prop.baths} حمام</span>}
-              <span className="flex items-center gap-1.5 text-sm text-gray-600"><Maximize2 className="w-4 h-4 text-gray-400" />{prop.area} م²</span>
-              <span className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full">{prop.category}</span>
-            </div>
+
+          {/* Days ago */}
+          <div className="absolute bottom-2 left-2 z-10">
+            <span className="text-[10px] bg-black/50 text-white px-1.5 py-0.5 rounded-md backdrop-blur-sm">
+              {formatDaysAgo(prop.daysAgo ?? 0)}
+            </span>
           </div>
-          <div className="flex border-t border-gray-100 mt-4">
+        </div>
+
+        {/* ── LEFT: details ─────────────────────────────── */}
+        <div className="flex-1 min-w-0 p-4 flex flex-col gap-2">
+
+          {/* Action icons */}
+          <div className="flex items-center gap-2">
             <button
-              onClick={e => e.stopPropagation()}
-              className="flex-1 flex items-center justify-center gap-2 py-3 text-sm font-bold text-[#1EBFD5] hover:bg-[#1EBFD5]/5 transition-colors rounded-bl-none rounded-br-2xl"
+              onClick={e => { e.stopPropagation(); setSaved(!saved); }}
+              className={`w-8 h-8 rounded-full border flex items-center justify-center transition-colors ${saved ? "border-rose-400 bg-rose-50 text-rose-500" : "border-gray-200 text-gray-400 hover:border-rose-300 hover:text-rose-400"}`}
             >
-              <FaWhatsapp className="w-4 h-4" />
-              واتساب
+              <Heart className={`w-4 h-4 ${saved ? "fill-current" : ""}`} />
             </button>
-            <div className="w-px bg-gray-100 my-2" />
-            <button
-              onClick={e => e.stopPropagation()}
-              className="flex-1 flex items-center justify-center gap-2 py-3 text-sm font-bold text-[#123C79] hover:bg-[#123C79]/5 transition-colors"
-            >
-              <Phone className="w-4 h-4" />
-              اتصال
+            <button onClick={e => e.stopPropagation()} className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center hover:border-gray-300 transition-colors">
+              <FaWhatsapp className="w-4 h-4 text-green-500" />
             </button>
+            <button onClick={e => e.stopPropagation()} className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center hover:border-gray-300 transition-colors">
+              <Phone className="w-3.5 h-3.5 text-[#123C79]" />
+            </button>
+          </div>
+
+          {/* Specs */}
+          <div className="flex items-center flex-wrap gap-x-3 gap-y-1 text-sm text-gray-600">
+            {prop.beds > 0 && <span className="flex items-center gap-1"><BedDouble className="w-4 h-4 text-gray-400" />{prop.beds}</span>}
+            {prop.baths > 0 && <span className="flex items-center gap-1"><Bath className="w-4 h-4 text-gray-400" />{prop.baths}</span>}
+            <span className="flex items-center gap-1"><Maximize2 className="w-4 h-4 text-gray-400" />{prop.area} م²</span>
+            {prop.floor != null && prop.totalFloors != null && (
+              <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">دور {prop.floor} من {prop.totalFloors}</span>
+            )}
+          </div>
+
+          {/* Title */}
+          <h3 className="text-base font-bold text-gray-900 group-hover:text-[#123C79] transition-colors leading-snug line-clamp-2">
+            {prop.title}
+          </h3>
+
+          {/* Location */}
+          <div className="flex items-center gap-1 text-xs text-gray-500">
+            <MapPin className="w-3.5 h-3.5 text-[#1EBFD5] flex-shrink-0" />
+            <span>{prop.location}</span>
+            {prop.agent?.name && (
+              <><span className="mx-1 text-gray-300">·</span><span className="text-gray-400">{prop.agent.name}</span></>
+            )}
+          </div>
+
+          {/* Description */}
+          {prop.description && (
+            <p className="text-xs text-gray-500 leading-relaxed line-clamp-2">{prop.description}</p>
+          )}
+
+          {/* Price + views */}
+          <div className="flex items-center justify-between mt-auto pt-2 border-t border-gray-100">
+            <p className="text-base font-black text-[#123C79]">{prop.priceLabel}</p>
+            {prop.views != null && (
+              <span className="text-xs text-gray-400">{prop.views.toLocaleString()} مشاهدات</span>
+            )}
           </div>
         </div>
       </motion.div>
@@ -796,7 +830,7 @@ export default function SearchPage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.35, delay: Math.min(i * 0.05, 0.4) }}
                       >
-                        <PropertyCard prop={prop} view="grid" />
+                        <PropertyCard prop={prop} view={viewMode === "single" ? "list" : "grid"} />
                       </motion.div>
                     ))}
                   </div>
