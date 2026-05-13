@@ -239,12 +239,22 @@ function PropertyCard({ prop, view }: { prop: typeof MOCK_PROPERTIES[0]; view: "
               <span className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full">{prop.category}</span>
             </div>
           </div>
-          <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
-            <div className="flex gap-2">
-              <button onClick={e => e.stopPropagation()} className="w-8 h-8 rounded-full bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-500 hover:text-white transition-colors"><FaWhatsapp className="w-4 h-4" /></button>
-              <button onClick={e => e.stopPropagation()} className="w-8 h-8 rounded-full bg-[#123C79]/5 text-[#123C79] flex items-center justify-center hover:bg-[#123C79] hover:text-white transition-colors"><Phone className="w-3.5 h-3.5" /></button>
-              <button onClick={e => { e.stopPropagation(); setSaved(!saved); }} className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${saved ? "bg-rose-500 text-white" : "bg-gray-50 text-gray-400 hover:bg-rose-500 hover:text-white"}`}><Heart className={`w-3.5 h-3.5 ${saved ? "fill-current" : ""}`} /></button>
-            </div>
+          <div className="flex border-t border-gray-100 mt-4">
+            <button
+              onClick={e => e.stopPropagation()}
+              className="flex-1 flex items-center justify-center gap-2 py-3 text-sm font-bold text-[#1EBFD5] hover:bg-[#1EBFD5]/5 transition-colors rounded-bl-none rounded-br-2xl"
+            >
+              <FaWhatsapp className="w-4 h-4" />
+              واتساب
+            </button>
+            <div className="w-px bg-gray-100 my-2" />
+            <button
+              onClick={e => e.stopPropagation()}
+              className="flex-1 flex items-center justify-center gap-2 py-3 text-sm font-bold text-[#123C79] hover:bg-[#123C79]/5 transition-colors"
+            >
+              <Phone className="w-4 h-4" />
+              اتصال
+            </button>
           </div>
         </div>
       </motion.div>
