@@ -13,6 +13,7 @@ import { FaWhatsapp } from "react-icons/fa";
 import { PROPERTIES } from "@/data/properties";
 import PropertyImage from "@/components/PropertyImage";
 import { useHoverScroll } from "@/hooks/useHoverScroll";
+import Navbar from "@/components/Navbar";
 
 const BANHA_CENTER: [number, number] = [30.4632, 31.1847];
 
@@ -319,6 +320,10 @@ export default function MapPage() {
 
   return (
     <div className="h-screen flex flex-col font-sans overflow-hidden bg-gray-50" dir="rtl">
+
+      {/* ── MAIN NAVBAR ── */}
+      <Navbar showSearch={true} />
+      <div className="flex-shrink-0 h-[60px]" />
 
       {/* ── TOP HEADER ── */}
       <header className="bg-white border-b border-gray-200 flex-shrink-0 z-[1500]">
