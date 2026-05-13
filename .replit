@@ -25,12 +25,12 @@ name = "Start application"
 author = "agent"
 
 [workflows.workflow.metadata]
-outputType = "webview"
+outputType = "console"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "PORT=5000 BASE_PATH=/ pnpm --filter @workspace/banha-realestate run dev"
-waitForPort = 5000
+args = "PORT=24749 BASE_PATH=/ pnpm --filter @workspace/banha-realestate run dev"
+waitForPort = 24749
 
 [agent]
 stack = "BEST_EFFORT_FALLBACK"
