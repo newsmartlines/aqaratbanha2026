@@ -52,8 +52,77 @@ const MOCK_PROPERTIES = PROPERTIES.map(p => ({
   badge: p.badge,
   agent: p.agent,
   image: p.image,
+  images: p.images,
   featured: p.featured,
+  daysAgo: p.daysAgo,
 }));
+
+function formatDaysAgo(days: number): string {
+  if (days === 0) return "اليوم";
+  if (days === 1) return "منذ يوم";
+  if (days === 2) return "منذ يومين";
+  if (days <= 10) return `منذ ${days} أيام`;
+  if (days <= 30) return `منذ ${days} يوماً`;
+  return `منذ أكثر من شهر`;
+}
+
+function ImageSlider({ images, alt, onClick }: { images: string[]; alt: string; onClick?: (e: React.MouseEvent) => void }) {
+  const [idx, setIdx] = useState(0);
+  const total = images?.length || 1;
+
+  const prev = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIdx(i => (i - 1 + total) % total);
+  };
+  const next = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIdx(i => (i + 1) % total);
+  };
+
+  return (
+    <div className="relative w-full h-full overflow-hidden group/slider" onClick={onClick}>
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.img
+          key={idx}
+          src={images?.[idx] || images?.[0]}
+          alt={alt}
+          className="w-full h-full object-cover"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.25 }}
+          loading="lazy"
+        />
+      </AnimatePresence>
+
+      {total > 1 && (
+        <>
+          <button
+            onClick={prev}
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/40 backdrop-blur-sm text-white flex items-center justify-center opacity-0 group-hover/slider:opacity-100 transition-opacity hover:bg-black/60 z-10"
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+          <button
+            onClick={next}
+            className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-black/40 backdrop-blur-sm text-white flex items-center justify-center opacity-0 group-hover/slider:opacity-100 transition-opacity hover:bg-black/60 z-10"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 flex items-center gap-1 z-10">
+            {images.map((_, i) => (
+              <button
+                key={i}
+                onClick={e => { e.stopPropagation(); setIdx(i); }}
+                className={`rounded-full transition-all duration-200 ${i === idx ? "w-4 h-1.5 bg-white" : "w-1.5 h-1.5 bg-white/55 hover:bg-white/80"}`}
+              />
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 
 function FilterSection({
   title,
@@ -270,9 +339,12 @@ function PropertyCard({ prop, view }: { prop: typeof MOCK_PROPERTIES[0]; view: "
       onClick={() => navigate(`/property/${prop.id}`)}
       className="bg-white rounded-2xl overflow-hidden border border-gray-100 transition-all group cursor-pointer"
     >
-      <div className="relative aspect-[4/3] overflow-hidden">
-        <PropertyImage src={prop.image} alt={prop.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
-        <div className="absolute top-3 right-3 flex flex-col gap-1.5">
+      {/* Image slider — taller */}
+      <div className="relative h-56 overflow-hidden">
+        <ImageSlider images={prop.images?.length ? prop.images : [prop.image]} alt={prop.title} />
+
+        {/* Badges top-right */}
+        <div className="absolute top-3 right-3 flex flex-col gap-1.5 z-10 pointer-events-none">
           <span className={`text-[10px] font-black px-2.5 py-1 rounded-full text-white shadow-md backdrop-blur-sm ${prop.type === "للبيع" ? "bg-[#123C79]/90" : "bg-[#1EBFD5]/90"}`}>
             {prop.type}
           </span>
@@ -284,7 +356,7 @@ function PropertyCard({ prop, view }: { prop: typeof MOCK_PROPERTIES[0]; view: "
           )}
           {prop.badge && prop.badge !== "مميز" && (
             prop.badge === "موثق" ? (
-              <span className="flex items-center gap-1.5 text-xs font-black px-3 py-1.5 rounded-xl text-white ring-2 ring-white/30"
+              <span className="flex items-center gap-1.5 text-xs font-black px-3 py-1.5 rounded-xl text-white ring-2 ring-white/30 pointer-events-none"
                 style={{ background: "linear-gradient(135deg,#0f2d5e,#1EBFD5)", boxShadow: "0 4px 15px rgba(30,191,213,0.45)" }}>
                 <ShieldCheck className="w-3.5 h-3.5 fill-white/20 stroke-white" />
                 موثق
@@ -301,15 +373,23 @@ function PropertyCard({ prop, view }: { prop: typeof MOCK_PROPERTIES[0]; view: "
             )
           )}
         </div>
+
+        {/* Save button */}
         <button
           onClick={(e) => { e.stopPropagation(); setSaved(!saved); }}
-          className={`absolute bottom-3 left-3 w-8 h-8 rounded-full flex items-center justify-center transition-all shadow-sm backdrop-blur-md ${saved ? "bg-rose-500 text-white" : "bg-white/80 text-gray-400 hover:bg-rose-500 hover:text-white"}`}
+          className={`absolute bottom-3 left-3 w-8 h-8 rounded-full flex items-center justify-center transition-all shadow-sm backdrop-blur-md z-10 ${saved ? "bg-rose-500 text-white" : "bg-white/80 text-gray-400 hover:bg-rose-500 hover:text-white"}`}
         >
           <Heart className={`w-4 h-4 ${saved ? "fill-current" : ""}`} />
         </button>
       </div>
+
       <div className="p-4">
-        <p className="text-lg font-black text-[#123C79] mb-1">{prop.priceLabel}</p>
+        <div className="flex items-start justify-between mb-1">
+          <p className="text-lg font-black text-[#123C79]">{prop.priceLabel}</p>
+          <span className="text-[11px] text-gray-400 font-medium mt-1 flex-shrink-0 mr-2">
+            {formatDaysAgo(prop.daysAgo ?? 0)}
+          </span>
+        </div>
         <h3 className="text-base font-bold text-gray-900 group-hover:text-[#123C79] transition-colors mb-1 leading-snug">{prop.title}</h3>
         <div className="flex items-center text-gray-500 text-xs mb-3">
           <MapPin className="w-3.5 h-3.5 ml-1 text-[#1EBFD5]" />{prop.location}
@@ -689,7 +769,7 @@ export default function SearchPage() {
                 </motion.div>
               ) : (
                 <>
-                  <div className="grid grid-cols-1 gap-5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     {sorted.map((prop, i) => (
                       <motion.div
                         key={prop.id}
@@ -697,7 +777,7 @@ export default function SearchPage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.35, delay: Math.min(i * 0.05, 0.4) }}
                       >
-                        <PropertyCard prop={prop} view="list" />
+                        <PropertyCard prop={prop} view="grid" />
                       </motion.div>
                     ))}
                   </div>
