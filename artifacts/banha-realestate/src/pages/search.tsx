@@ -11,7 +11,7 @@ import {
   ChevronRight, X, Check, LayoutGrid, LayoutList, ArrowUpDown,
   Building2, Home, Store, Briefcase, Warehouse, Trees, Layers,
   Stethoscope, Star, TrendingUp, Filter, ArrowLeft, SortAsc,
-  Menu, ChevronLeft, RotateCcw, CheckCircle, Map
+  Menu, ChevronLeft, RotateCcw, CheckCircle, ShieldCheck, Map
 } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 import PropertyImage from "@/components/PropertyImage";
@@ -204,16 +204,22 @@ function PropertyCard({ prop, view }: { prop: typeof MOCK_PROPERTIES[0]; view: "
               </span>
             )}
             {prop.badge && prop.badge !== "مميز" && (
-              <span className="text-[10px] font-black px-2.5 py-1 rounded-full text-white shadow-md backdrop-blur-sm"
-                style={{
-                  background: prop.badge === "موثق" ? "linear-gradient(135deg,#123C79,#1EBFD5)"
-                    : prop.badge === "جديد" ? "linear-gradient(135deg,#1EBFD5,#0e8fa3)"
-                    : prop.badge === "فرصة" ? "linear-gradient(135deg,#f97316,#ea580c)"
-                    : "linear-gradient(135deg,#6b7280,#4b5563)",
-                }}>
-                {prop.badge === "موثق" && <CheckCircle className="w-2.5 h-2.5 fill-white text-white inline ml-1" />}
-                {prop.badge}
-              </span>
+              prop.badge === "موثق" ? (
+                <span className="flex items-center gap-1.5 text-xs font-black px-3 py-1.5 rounded-xl text-white ring-2 ring-white/30"
+                  style={{ background: "linear-gradient(135deg,#0f2d5e,#1EBFD5)", boxShadow: "0 4px 15px rgba(30,191,213,0.45)" }}>
+                  <ShieldCheck className="w-3.5 h-3.5 fill-white/20 stroke-white" />
+                  موثق
+                </span>
+              ) : (
+                <span className="text-[10px] font-black px-2.5 py-1 rounded-full text-white shadow-md backdrop-blur-sm"
+                  style={{
+                    background: prop.badge === "جديد" ? "linear-gradient(135deg,#1EBFD5,#0e8fa3)"
+                      : prop.badge === "فرصة" ? "linear-gradient(135deg,#f97316,#ea580c)"
+                      : "linear-gradient(135deg,#6b7280,#4b5563)",
+                  }}>
+                  {prop.badge}
+                </span>
+              )
             )}
           </div>
         </div>
@@ -267,16 +273,22 @@ function PropertyCard({ prop, view }: { prop: typeof MOCK_PROPERTIES[0]; view: "
             </span>
           )}
           {prop.badge && prop.badge !== "مميز" && (
-            <span className="flex items-center gap-1 text-[10px] font-black px-2.5 py-1 rounded-full text-white shadow-md backdrop-blur-sm"
-              style={{
-                background: prop.badge === "موثق" ? "linear-gradient(135deg,#123C79,#1EBFD5)"
-                  : prop.badge === "جديد" ? "linear-gradient(135deg,#1EBFD5,#0e8fa3)"
-                  : prop.badge === "فرصة" ? "linear-gradient(135deg,#f97316,#ea580c)"
-                  : "linear-gradient(135deg,#6b7280,#4b5563)",
-              }}>
-              {prop.badge === "موثق" && <CheckCircle className="w-2.5 h-2.5 fill-white text-white" />}
-              {prop.badge}
-            </span>
+            prop.badge === "موثق" ? (
+              <span className="flex items-center gap-1.5 text-xs font-black px-3 py-1.5 rounded-xl text-white ring-2 ring-white/30"
+                style={{ background: "linear-gradient(135deg,#0f2d5e,#1EBFD5)", boxShadow: "0 4px 15px rgba(30,191,213,0.45)" }}>
+                <ShieldCheck className="w-3.5 h-3.5 fill-white/20 stroke-white" />
+                موثق
+              </span>
+            ) : (
+              <span className="flex items-center gap-1 text-[10px] font-black px-2.5 py-1 rounded-full text-white shadow-md backdrop-blur-sm"
+                style={{
+                  background: prop.badge === "جديد" ? "linear-gradient(135deg,#1EBFD5,#0e8fa3)"
+                    : prop.badge === "فرصة" ? "linear-gradient(135deg,#f97316,#ea580c)"
+                    : "linear-gradient(135deg,#6b7280,#4b5563)",
+                }}>
+                {prop.badge}
+              </span>
+            )
           )}
         </div>
         <button

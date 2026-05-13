@@ -8,7 +8,7 @@ import Navbar from "@/components/Navbar";
 import {
   Building2, Home, MapPin, BedDouble, Bath, Maximize2,
   Heart, Search, ChevronDown, Star, ArrowLeft, Plus,
-  Users, CheckCircle, Building, Store, Warehouse, Trees,
+  Users, CheckCircle, ShieldCheck, Building, Store, Warehouse, Trees,
   Stethoscope, Briefcase, Layers, Check, X, Clock
 } from "lucide-react";
 import { FaFacebook, FaInstagram, FaYoutube } from "react-icons/fa";
@@ -717,16 +717,16 @@ export default function HomePage() {
                         </div>
                         <div className="absolute top-3 left-3 flex flex-col gap-1.5">
                           {prop.badges.includes("موثق") && (
-                            <span className="text-[10px] font-black px-2.5 py-1 rounded-lg flex items-center gap-1 text-white shadow-lg"
-                              style={{ background: "linear-gradient(135deg,#123C79,#1EBFD5)" }}>
-                              <CheckCircle className="w-3 h-3 fill-white text-white" />
+                            <span className="text-xs font-black px-3 py-1.5 rounded-xl flex items-center gap-1.5 text-white shadow-xl ring-2 ring-white/30"
+                              style={{ background: "linear-gradient(135deg,#0f2d5e,#1EBFD5)", boxShadow: "0 4px 15px rgba(30,191,213,0.45)" }}>
+                              <ShieldCheck className="w-3.5 h-3.5 fill-white/20 stroke-white" />
                               موثق
                             </span>
                           )}
                           {prop.badges.includes("مميز") && (
-                            <span className="text-[10px] font-black px-2.5 py-1 rounded-lg flex items-center gap-1 text-white shadow-lg"
-                              style={{ background: "linear-gradient(135deg,#f59e0b,#d97706)" }}>
-                              <Star className="w-3 h-3 fill-white text-white" />
+                            <span className="text-xs font-black px-3 py-1.5 rounded-xl flex items-center gap-1.5 text-white shadow-xl ring-2 ring-white/30"
+                              style={{ background: "linear-gradient(135deg,#b45309,#f59e0b)", boxShadow: "0 4px 15px rgba(245,158,11,0.4)" }}>
+                              <Star className="w-3.5 h-3.5 fill-white stroke-white" />
                               مميز
                             </span>
                           )}
@@ -746,7 +746,7 @@ export default function HomePage() {
                           {prop.location}
                         </div>
                         <div className="flex items-center mb-3">
-                          <span className="flex items-center gap-1 text-[11px] text-gray-400 font-medium">
+                          <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#1EBFD5]/10 text-[#0e8fa3]">
                             <Clock className="w-3 h-3" />
                             منذ {prop.daysAgo} {prop.daysAgo === 1 ? "يوم" : "أيام"}
                           </span>
