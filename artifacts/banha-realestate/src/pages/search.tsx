@@ -343,9 +343,6 @@ function PropertyCard({ prop, view }: { prop: typeof MOCK_PROPERTIES[0]; view: "
           <div className="flex items-center gap-1 text-xs text-gray-500">
             <MapPin className="w-3.5 h-3.5 text-[#1EBFD5] flex-shrink-0" />
             <span>{prop.location}</span>
-            {prop.agent?.name && (
-              <><span className="mx-1 text-gray-300">·</span><span className="text-gray-400">{prop.agent.name}</span></>
-            )}
           </div>
 
           {/* Description */}
