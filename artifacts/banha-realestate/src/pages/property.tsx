@@ -563,7 +563,7 @@ export default function PropertyPage() {
 
             {/* Right sticky contact card */}
             <div className="hidden lg:block w-80 flex-shrink-0">
-              <div className="sticky top-[80px] max-h-[calc(100vh-96px)] overflow-y-auto overflow-x-hidden space-y-4 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent pr-0.5">
+              <div className="sticky top-[80px] space-y-4">
 
                 {/* Owner card */}
                 <div className="bg-white rounded-2xl border border-gray-100 p-5">
