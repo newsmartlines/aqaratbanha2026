@@ -787,6 +787,47 @@ export default function SearchPage() {
               </div>
             </div>
 
+            {/* ─── ACTIVE FILTER CHIPS ─────────────────────── */}
+            {activeFiltersCount > 0 && (() => {
+              const chips: { label: string; onRemove: () => void }[] = [];
+              if (txType) chips.push({ label: txType, onRemove: () => setTxType("") });
+              selectedCategories.forEach(cat => chips.push({ label: cat, onRemove: () => setSelectedCategories(prev => prev.filter(c => c !== cat)) }));
+              selectedSubTypes.forEach(sub => chips.push({ label: sub, onRemove: () => setSelectedSubTypes(prev => prev.filter(s => s !== sub)) }));
+              selectedAreas.forEach(area => chips.push({ label: area, onRemove: () => setSelectedAreas(prev => prev.filter(a => a !== area)) }));
+              if (priceMin || priceMax) chips.push({ label: `${priceMin || "0"} – ${priceMax || "∞"} ج.م`, onRemove: () => { setPriceMin(""); setPriceMax(""); } });
+              if (minBeds > 0) chips.push({ label: `${minBeds}+ غرف`, onRemove: () => setMinBeds(-1) });
+              if (minBaths > 0) chips.push({ label: `${minBaths}+ حمام`, onRemove: () => setMinBaths(-1) });
+              if (areaMin || areaMax) chips.push({ label: `${areaMin || "0"}–${areaMax || "∞"} م²`, onRemove: () => { setAreaMin(""); setAreaMax(""); } });
+
+              return (
+                <div className="py-2.5 flex items-center gap-2 flex-wrap border-t border-gray-100">
+                  <button
+                    onClick={clearAll}
+                    className="text-xs font-bold text-gray-500 hover:text-red-500 transition-colors flex-shrink-0 ml-1"
+                  >
+                    مسح الكل
+                  </button>
+                  {chips.map((chip, i) => (
+                    <motion.span
+                      key={i}
+                      initial={{ opacity: 0, scale: 0.85 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.85 }}
+                      className="inline-flex items-center gap-1.5 bg-[#1EBFD5] text-white text-xs font-bold px-3 py-1.5 rounded-full"
+                    >
+                      {chip.label}
+                      <button
+                        onClick={chip.onRemove}
+                        className="w-4 h-4 rounded-full bg-white/25 hover:bg-white/40 flex items-center justify-center transition-colors flex-shrink-0"
+                      >
+                        <X className="w-2.5 h-2.5" />
+                      </button>
+                    </motion.span>
+                  ))}
+                </div>
+              );
+            })()}
+
           </div>
         </div>
 
