@@ -560,7 +560,6 @@ export default function SearchPage() {
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-2">
           <Filter className="w-4 h-4 text-[#123C79]" />
-          <span className="font-black text-gray-900 text-base">الفلاتر</span>
           {activeFiltersCount > 0 && (
             <span className="bg-[#123C79] text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
               {activeFiltersCount}
@@ -703,17 +702,6 @@ export default function SearchPage() {
         {/* ─── BREADCRUMB + TITLE BAR ─────────────────────── */}
         <div className="bg-white border-b border-gray-100">
           <div className="container mx-auto px-4 md:px-6">
-
-            {/* Row 1: back link */}
-            <div className="pt-3 pb-1">
-              <button
-                onClick={() => navigate("/")}
-                className="inline-flex items-center gap-1 text-[#1EBFD5] text-sm font-bold hover:underline transition-colors"
-              >
-                الرجوع للقائمة
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
 
             {/* Row 2: title + sort + count */}
             <div className="py-3 flex items-center justify-between gap-4 flex-wrap">
