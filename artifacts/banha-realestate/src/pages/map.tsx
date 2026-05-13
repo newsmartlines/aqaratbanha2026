@@ -68,13 +68,72 @@ function makePriceIcon(label: string, selected: boolean, featured: boolean) {
   });
 }
 
-function MapEvents({ onBoundsChange }: { onBoundsChange: (b: L.LatLngBounds) => void }) {
+function MapEvents({
+  onBoundsChange,
+  onZoomChange,
+}: {
+  onBoundsChange: (b: L.LatLngBounds) => void;
+  onZoomChange: (z: number) => void;
+}) {
   useMapEvents({
     moveend: (e) => onBoundsChange(e.target.getBounds()),
-    zoomend: (e) => onBoundsChange(e.target.getBounds()),
-    load:    (e) => onBoundsChange(e.target.getBounds()),
+    zoomend: (e) => { onBoundsChange(e.target.getBounds()); onZoomChange(e.target.getZoom()); },
+    load:    (e) => { onBoundsChange(e.target.getBounds()); onZoomChange(e.target.getZoom()); },
   });
   return null;
+}
+
+/* ── Cluster icon: orange circle with white count ── */
+function makeClusterIcon(count: number) {
+  const size = count >= 10 ? 44 : 36;
+  return L.divIcon({
+    className: "",
+    html: `<div style="
+      width:${size}px;height:${size}px;border-radius:50%;
+      background:linear-gradient(135deg,#f97316,#ea580c);
+      color:#fff;font-size:${count >= 10 ? 13 : 14}px;font-weight:900;
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:0 4px 16px rgba(249,115,22,0.55),0 0 0 3px rgba(249,115,22,0.2);
+      font-family:Cairo,Arial,sans-serif;cursor:pointer;
+      border:2.5px solid #fff;
+    ">${count}</div>`,
+    iconAnchor: [size / 2, size / 2],
+    iconSize:   [size, size],
+  });
+}
+
+/* ── Grid-based clustering ── */
+interface Cluster {
+  lat: number;
+  lng: number;
+  ids: number[];
+}
+
+function computeClusters(
+  props: typeof PROPERTIES,
+  zoom: number
+): Cluster[] {
+  const cellSize = 0.028 / Math.pow(2, Math.max(0, zoom - 12));
+  const cells: Record<string, number[]> = {};
+  for (const p of props) {
+    const coord = COORDS[p.id];
+    if (!coord) continue;
+    const [lat, lng] = coord;
+    const row = Math.floor(lat / cellSize);
+    const col = Math.floor(lng / cellSize);
+    const key = `${row}_${col}`;
+    if (!cells[key]) cells[key] = [];
+    cells[key].push(p.id);
+  }
+  return Object.values(cells).map(ids => {
+    const lats = ids.map(id => COORDS[id]?.[0] ?? 0);
+    const lngs = ids.map(id => COORDS[id]?.[1] ?? 0);
+    return {
+      lat: lats.reduce((a, b) => a + b, 0) / lats.length,
+      lng: lngs.reduce((a, b) => a + b, 0) / lngs.length,
+      ids,
+    };
+  });
 }
 
 const CATEGORIES = ["الكل", "شقة", "فيلا", "محل", "مكتب", "أرض سكنية", "مخزن"];
@@ -223,9 +282,11 @@ export default function MapPage() {
   const [bounds, setBounds] = useState<L.LatLngBounds | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [savedSearch, setSavedSearch] = useState(false);
+  const [zoom, setZoom] = useState(13);
   const cardsRef = useHoverScroll<HTMLDivElement>();
 
   const handleBoundsChange = useCallback((b: L.LatLngBounds) => setBounds(b), []);
+  const handleZoomChange   = useCallback((z: number) => setZoom(z), []);
 
   const filtered = useMemo(() => {
     return PROPERTIES.filter(p => {
@@ -362,23 +423,33 @@ export default function MapPage() {
               attribution='&copy; <a href="https://openstreetmap.org">OpenStreetMap</a>'
               maxZoom={19}
             />
-            <MapEvents onBoundsChange={handleBoundsChange} />
+            <MapEvents onBoundsChange={handleBoundsChange} onZoomChange={handleZoomChange} />
 
-            {PROPERTIES.filter(p => COORDS[p.id]).map(prop => (
-              <Marker
-                key={prop.id}
-                position={COORDS[prop.id]}
-                icon={makePriceIcon(
-                  formatPriceShort(prop.price),
-                  selectedId === prop.id,
-                  prop.featured
-                )}
-                eventHandlers={{
-                  click: () => setSelectedId(prop.id === selectedId ? null : prop.id),
-                }}
-                zIndexOffset={selectedId === prop.id ? 1000 : prop.featured ? 100 : 0}
-              />
-            ))}
+            {computeClusters(filtered.filter(p => COORDS[p.id]), zoom).map((cluster, i) => {
+              const isSingle = cluster.ids.length === 1;
+              const singleId = cluster.ids[0];
+              const singleProp = isSingle ? PROPERTIES.find(p => p.id === singleId) : null;
+              const isSelected = isSingle && selectedId === singleId;
+
+              return (
+                <Marker
+                  key={`cluster-${i}`}
+                  position={[cluster.lat, cluster.lng]}
+                  icon={isSingle && singleProp
+                    ? makePriceIcon(formatPriceShort(singleProp.price), isSelected, singleProp.featured)
+                    : makeClusterIcon(cluster.ids.length)
+                  }
+                  eventHandlers={{
+                    click: () => {
+                      if (isSingle) {
+                        setSelectedId(singleId === selectedId ? null : singleId);
+                      }
+                    },
+                  }}
+                  zIndexOffset={isSelected ? 1000 : isSingle && singleProp?.featured ? 100 : 0}
+                />
+              );
+            })}
           </MapContainer>
 
           {/* ── SELECTED PROPERTY POPUP ── */}
