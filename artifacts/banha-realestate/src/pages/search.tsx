@@ -1,21 +1,19 @@
-import React, { useState, useEffect, useRef } from "react";
-
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
 import { PROPERTIES } from "@/data/properties";
-import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import {
-  Search, SlidersHorizontal, Grid3X3, List, MapPin,
-  BedDouble, Bath, Maximize2, Phone, Heart, ChevronDown,
+  Search, BedDouble, Bath, Maximize2, Phone, Heart, ChevronDown,
   ChevronRight, X, Check, LayoutGrid, LayoutList, ArrowUpDown,
-  Building2, Home, Store, Briefcase, Warehouse, Trees, Layers,
-  Stethoscope, Star, TrendingUp, Filter, ArrowLeft, SortAsc,
-  Menu, ChevronLeft, RotateCcw, CheckCircle, ShieldCheck, Map
+  ShieldCheck, Star, Filter, ChevronLeft, RotateCcw, Map,
 } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
-import PropertyImage from "@/components/PropertyImage";
 import Breadcrumb from "@/components/Breadcrumb";
+
+// ─── Constants ───────────────────────────────────────────────────────────────
+
+const ITEMS_PER_PAGE = 8;
 
 const PROPERTY_TYPES: Record<string, string[]> = {
   سكني: ["شقة", "دوبلكس", "بنتهاوس", "فيلا", "استوديو", "استراحة"],
@@ -32,11 +30,11 @@ const ALL_AREAS = [
 ];
 
 const SORT_OPTIONS = [
-  { value: "newest", label: "الأحدث" },
-  { value: "price_asc", label: "السعر: الأقل أولاً" },
+  { value: "newest",    label: "الأحدث" },
+  { value: "price_asc",  label: "السعر: الأقل أولاً" },
   { value: "price_desc", label: "السعر: الأعلى أولاً" },
-  { value: "area_asc", label: "المساحة: الأقل أولاً" },
-  { value: "area_desc", label: "المساحة: الأكبر أولاً" },
+  { value: "area_asc",   label: "المساحة: الأقل أولاً" },
+  { value: "area_desc",  label: "المساحة: الأكبر أولاً" },
 ];
 
 const MOCK_PROPERTIES = PROPERTIES.map(p => ({
@@ -62,27 +60,25 @@ const MOCK_PROPERTIES = PROPERTIES.map(p => ({
   totalFloors: p.totalFloors,
 }));
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
 function formatDaysAgo(days: number): string {
   if (days === 0) return "اليوم";
   if (days === 1) return "منذ يوم";
   if (days === 2) return "منذ يومين";
   if (days <= 10) return `منذ ${days} أيام`;
   if (days <= 30) return `منذ ${days} يوماً`;
-  return `منذ أكثر من شهر`;
+  return "منذ أكثر من شهر";
 }
+
+// ─── Sub-components ───────────────────────────────────────────────────────────
 
 function ImageSlider({ images, alt, onClick }: { images: string[]; alt: string; onClick?: (e: React.MouseEvent) => void }) {
   const [idx, setIdx] = useState(0);
   const total = images?.length || 1;
 
-  const prev = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIdx(i => (i - 1 + total) % total);
-  };
-  const next = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIdx(i => (i + 1) % total);
-  };
+  const prev = (e: React.MouseEvent) => { e.stopPropagation(); setIdx(i => (i - 1 + total) % total); };
+  const next = (e: React.MouseEvent) => { e.stopPropagation(); setIdx(i => (i + 1) % total); };
 
   return (
     <div className="relative w-full h-full overflow-hidden group/slider" onClick={onClick}>
@@ -102,25 +98,16 @@ function ImageSlider({ images, alt, onClick }: { images: string[]; alt: string; 
 
       {total > 1 && (
         <>
-          <button
-            onClick={prev}
-            className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white border border-gray-200 shadow-md text-gray-700 flex items-center justify-center opacity-0 group-hover/slider:opacity-100 transition-opacity hover:bg-gray-50 active:scale-95 z-10"
-          >
+          <button onClick={prev} className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/90 shadow text-gray-700 flex items-center justify-center opacity-0 group-hover/slider:opacity-100 transition-opacity z-10">
             <ChevronRight className="w-4 h-4" />
           </button>
-          <button
-            onClick={next}
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white border border-gray-200 shadow-md text-gray-700 flex items-center justify-center opacity-0 group-hover/slider:opacity-100 transition-opacity hover:bg-gray-50 active:scale-95 z-10"
-          >
+          <button onClick={next} className="absolute left-2 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-white/90 shadow text-gray-700 flex items-center justify-center opacity-0 group-hover/slider:opacity-100 transition-opacity z-10">
             <ChevronLeft className="w-4 h-4" />
           </button>
-          <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 flex items-center gap-1 z-10">
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-10">
             {images.map((_, i) => (
-              <button
-                key={i}
-                onClick={e => { e.stopPropagation(); setIdx(i); }}
-                className={`rounded-full transition-all duration-200 ${i === idx ? "w-4 h-1.5 bg-white shadow-sm" : "w-1.5 h-1.5 bg-white/60 hover:bg-white/85"}`}
-              />
+              <button key={i} onClick={e => { e.stopPropagation(); setIdx(i); }}
+                className={`rounded-full transition-all duration-200 ${i === idx ? "w-4 h-1.5 bg-white" : "w-1.5 h-1.5 bg-white/60"}`} />
             ))}
           </div>
         </>
@@ -129,34 +116,17 @@ function ImageSlider({ images, alt, onClick }: { images: string[]; alt: string; 
   );
 }
 
-function FilterSection({
-  title,
-  children,
-  defaultOpen = true,
-}: {
-  title: string;
-  children: React.ReactNode;
-  defaultOpen?: boolean;
-}) {
+function FilterSection({ title, children, defaultOpen = true }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
     <div className="border-b border-gray-100 last:border-0">
-      <button
-        onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between py-4 text-right"
-      >
+      <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between py-4 text-right">
         <span className="font-bold text-gray-800 text-sm">{title}</span>
         <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${open ? "rotate-180" : ""}`} />
       </button>
       <AnimatePresence>
         {open && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="overflow-hidden"
-          >
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.2 }} className="overflow-hidden">
             <div className="pb-4">{children}</div>
           </motion.div>
         )}
@@ -165,74 +135,17 @@ function FilterSection({
   );
 }
 
-function CheckOption({
-  label,
-  checked,
-  onChange,
-  count,
-}: {
-  label: string;
-  checked: boolean;
-  onChange: () => void;
-  count?: number;
-}) {
+function CheckOption({ label, checked, onChange, count }: { label: string; checked: boolean; onChange: () => void; count?: number }) {
   return (
     <label className="flex items-center justify-between gap-3 py-1.5 cursor-pointer group">
       <div className="flex items-center gap-2.5">
-        <div
-          onClick={onChange}
-          className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all ${checked ? "border-[#123C79] bg-[#123C79]" : "border-gray-300 group-hover:border-[#1EBFD5]"}`}
-        >
+        <div onClick={onChange} className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-all ${checked ? "border-[#123C79] bg-[#123C79]" : "border-gray-300 group-hover:border-[#1EBFD5]"}`}>
           {checked && <Check className="w-2.5 h-2.5 text-white" />}
         </div>
         <span className={`text-sm transition-colors ${checked ? "text-[#123C79] font-semibold" : "text-gray-600 group-hover:text-gray-900"}`}>{label}</span>
       </div>
-      {count !== undefined && (
-        <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full flex-shrink-0">{count}</span>
-      )}
+      {count !== undefined && <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full flex-shrink-0">{count}</span>}
     </label>
-  );
-}
-
-function PriceRangeInput({
-  min, max, onMinChange, onMaxChange
-}: { min: string; max: string; onMinChange: (v: string) => void; onMaxChange: (v: string) => void }) {
-  return (
-    <div className="space-y-3">
-      <div className="flex gap-2">
-        <div className="flex-1">
-          <label className="text-xs text-gray-500 mb-1 block">من</label>
-          <input
-            type="number"
-            placeholder="0"
-            value={min}
-            onChange={e => onMinChange(e.target.value)}
-            className="w-full border-2 border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-[#123C79] focus:outline-none transition-colors"
-          />
-        </div>
-        <div className="flex-1">
-          <label className="text-xs text-gray-500 mb-1 block">إلى</label>
-          <input
-            type="number"
-            placeholder="∞"
-            value={max}
-            onChange={e => onMaxChange(e.target.value)}
-            className="w-full border-2 border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-[#123C79] focus:outline-none transition-colors"
-          />
-        </div>
-      </div>
-      <div className="flex flex-wrap gap-1.5">
-        {["500,000", "1,000,000", "2,000,000", "5,000,000"].map(v => (
-          <button
-            key={v}
-            onClick={() => onMaxChange(v.replace(/,/g, ""))}
-            className="text-xs border border-gray-200 rounded-full px-2.5 py-1 hover:border-[#1EBFD5] hover:text-[#123C79] transition-colors"
-          >
-            {v}
-          </button>
-        ))}
-      </div>
-    </div>
   );
 }
 
@@ -240,11 +153,8 @@ function BedsSelector({ value, onChange }: { value: number; onChange: (v: number
   return (
     <div className="flex gap-2 flex-wrap">
       {[0, 1, 2, 3, 4, 5].map(n => (
-        <button
-          key={n}
-          onClick={() => onChange(n === value ? -1 : n)}
-          className={`w-10 h-10 rounded-xl text-sm font-bold transition-all ${value === n ? "bg-[#123C79] text-white shadow-md" : "bg-gray-100 text-gray-600 hover:bg-[#123C79]/10 hover:text-[#123C79]"}`}
-        >
+        <button key={n} onClick={() => onChange(n === value ? -1 : n)}
+          className={`w-10 h-10 rounded-xl text-sm font-bold transition-all ${value === n ? "bg-[#123C79] text-white shadow-md" : "bg-gray-100 text-gray-600 hover:bg-[#123C79]/10 hover:text-[#123C79]"}`}>
           {n === 0 ? "أي" : n === 5 ? "5+" : n}
         </button>
       ))}
@@ -252,165 +162,128 @@ function BedsSelector({ value, onChange }: { value: number; onChange: (v: number
   );
 }
 
-function PropertyCard({ prop, view }: { prop: typeof MOCK_PROPERTIES[0]; view: "grid" | "list" }) {
+// ─── Property Cards ───────────────────────────────────────────────────────────
+
+type PropItem = typeof MOCK_PROPERTIES[0];
+
+function PropertyCardList({ prop }: { prop: PropItem }) {
   const [saved, setSaved] = useState(false);
   const [, navigate] = useLocation();
-  if (view === "list") {
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        data-testid={`card-property-${prop.id}`}
-        onClick={() => navigate(`/property/${prop.id}`)}
-        className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow group flex cursor-pointer"
-      >
-        {/* ── RIGHT: image (first in DOM = right side in RTL) ── */}
-        <div className="relative w-36 sm:w-48 flex-shrink-0 self-stretch">
-          <ImageSlider images={prop.images?.length ? prop.images : [prop.image]} alt={prop.title} />
-
-          {/* Badges */}
-          <div className="absolute top-2 right-2 flex flex-col gap-1 z-10 pointer-events-none">
-            <span className={`text-[9px] font-black px-2 py-0.5 rounded-full text-white shadow ${prop.type === "للبيع" ? "bg-[#123C79]/90" : "bg-[#1EBFD5]/90"}`}>
-              {prop.type}
-            </span>
-            {prop.badge === "موثق" && (
-              <span className="flex items-center gap-1 text-[9px] font-black px-2 py-0.5 rounded-full text-white shadow"
-                style={{ background: "linear-gradient(135deg,#0f2d5e,#1EBFD5)" }}>
-                <ShieldCheck className="w-2.5 h-2.5" /> موثق
-              </span>
-            )}
-            {prop.badge && prop.badge !== "مميز" && prop.badge !== "موثق" && (
-              <span className="text-[9px] font-black px-2 py-0.5 rounded-full text-white shadow"
-                style={{
-                  background: prop.badge === "جديد" ? "linear-gradient(135deg,#1EBFD5,#0e8fa3)"
-                    : prop.badge === "فرصة" ? "linear-gradient(135deg,#f97316,#ea580c)"
-                    : "linear-gradient(135deg,#6b7280,#4b5563)",
-                }}>
-                {prop.badge}
-              </span>
-            )}
-            {prop.featured && (
-              <span className="flex items-center gap-0.5 text-[9px] font-black px-2 py-0.5 rounded-full text-white shadow"
-                style={{ background: "linear-gradient(135deg,#f59e0b,#d97706)" }}>
-                <Star className="w-2 h-2 fill-white" /> مميز
-              </span>
-            )}
-          </div>
-
-          {/* Days ago */}
-          <div className="absolute bottom-2 left-2 z-10">
-            <span className="text-[10px] bg-black/50 text-white px-1.5 py-0.5 rounded-md backdrop-blur-sm">
-              {formatDaysAgo(prop.daysAgo ?? 0)}
-            </span>
-          </div>
-        </div>
-
-        {/* ── LEFT: details ─────────────────────────────── */}
-        <div className="flex-1 min-w-0 p-4 flex flex-col gap-2">
-
-          {/* Action icons */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={e => { e.stopPropagation(); setSaved(!saved); }}
-              className={`w-8 h-8 rounded-full border flex items-center justify-center transition-colors ${saved ? "border-rose-400 bg-rose-50 text-rose-500" : "border-gray-200 text-gray-400 hover:border-rose-300 hover:text-rose-400"}`}
-            >
-              <Heart className={`w-4 h-4 ${saved ? "fill-current" : ""}`} />
-            </button>
-            <button onClick={e => e.stopPropagation()} className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center hover:border-gray-300 transition-colors">
-              <FaWhatsapp className="w-4 h-4 text-green-500" />
-            </button>
-            <button onClick={e => e.stopPropagation()} className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center hover:border-gray-300 transition-colors">
-              <Phone className="w-3.5 h-3.5 text-[#123C79]" />
-            </button>
-          </div>
-
-          {/* Specs */}
-          <div className="flex items-center flex-wrap gap-x-3 gap-y-1 text-sm text-gray-600">
-            {prop.beds > 0 && <span className="flex items-center gap-1"><BedDouble className="w-4 h-4 text-gray-400" />{prop.beds}</span>}
-            {prop.baths > 0 && <span className="flex items-center gap-1"><Bath className="w-4 h-4 text-gray-400" />{prop.baths}</span>}
-            <span className="flex items-center gap-1"><Maximize2 className="w-4 h-4 text-gray-400" />{prop.area} م²</span>
-            {prop.floor != null && prop.totalFloors != null && (
-              <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">دور {prop.floor} من {prop.totalFloors}</span>
-            )}
-          </div>
-
-          {/* Title */}
-          <h3 className="text-base font-bold text-gray-900 group-hover:text-[#123C79] transition-colors leading-snug line-clamp-2">
-            {prop.title}
-          </h3>
-
-          {/* Location */}
-          <div className="flex items-center gap-1 text-xs text-gray-500">
-            <MapPin className="w-3.5 h-3.5 text-[#1EBFD5] flex-shrink-0" />
-            <span>{prop.location}</span>
-          </div>
-
-          {/* Description */}
-          {prop.description && (
-            <p className="text-xs text-gray-500 leading-relaxed line-clamp-2">{prop.description}</p>
-          )}
-
-          {/* Price + views */}
-          <div className="flex items-center justify-between mt-auto pt-2 border-t border-gray-100">
-            <p className="text-base font-black text-[#123C79]">{prop.priceLabel}</p>
-            {prop.views != null && (
-              <span className="text-xs text-gray-400">{prop.views.toLocaleString()} مشاهدات</span>
-            )}
-          </div>
-        </div>
-      </motion.div>
-    );
-  }
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 15 }}
+      layout
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -5 }}
+      exit={{ opacity: 0, y: -10 }}
       data-testid={`card-property-${prop.id}`}
       onClick={() => navigate(`/property/${prop.id}`)}
-      className="bg-white rounded-2xl overflow-hidden border border-gray-100 transition-all group cursor-pointer"
+      className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow group flex cursor-pointer"
     >
-      {/* Image slider — taller */}
-      <div className="relative h-56 overflow-hidden">
+      {/* Image */}
+      <div className="relative w-36 sm:w-48 flex-shrink-0 self-stretch">
         <ImageSlider images={prop.images?.length ? prop.images : [prop.image]} alt={prop.title} />
-
-        {/* Badges top-right */}
-        <div className="absolute top-3 right-3 flex flex-col gap-1.5 z-10 pointer-events-none">
-          <span className={`text-[10px] font-black px-2.5 py-1 rounded-full text-white shadow-md backdrop-blur-sm ${prop.type === "للبيع" ? "bg-[#123C79]/90" : "bg-[#1EBFD5]/90"}`}>
-            {prop.type}
-          </span>
-          {prop.featured && (
-            <span className="flex items-center gap-1 text-[10px] font-black px-2.5 py-1 rounded-full text-white shadow-md backdrop-blur-sm"
-              style={{ background: "linear-gradient(135deg,#f59e0b,#d97706)" }}>
-              <Star className="w-2.5 h-2.5 fill-white text-white" /> مميز
+        <div className="absolute top-2 right-2 flex flex-col gap-1 z-10 pointer-events-none">
+          <span className={`text-[9px] font-black px-2 py-0.5 rounded-full text-white shadow ${prop.type === "للبيع" ? "bg-[#123C79]/90" : "bg-[#1EBFD5]/90"}`}>{prop.type}</span>
+          {prop.badge === "موثق" && (
+            <span className="flex items-center gap-1 text-[9px] font-black px-2 py-0.5 rounded-full text-white shadow" style={{ background: "linear-gradient(135deg,#0f2d5e,#1EBFD5)" }}>
+              <ShieldCheck className="w-2.5 h-2.5" /> موثق
             </span>
           )}
-          {prop.badge && prop.badge !== "مميز" && (
-            prop.badge === "موثق" ? (
-              <span className="flex items-center gap-1.5 text-xs font-black px-3 py-1.5 rounded-xl text-white ring-2 ring-white/30 pointer-events-none"
-                style={{ background: "linear-gradient(135deg,#0f2d5e,#1EBFD5)", boxShadow: "0 4px 15px rgba(30,191,213,0.45)" }}>
-                <ShieldCheck className="w-3.5 h-3.5 fill-white/20 stroke-white" />
-                موثق
-              </span>
-            ) : (
-              <span className="flex items-center gap-1 text-[10px] font-black px-2.5 py-1 rounded-full text-white shadow-md backdrop-blur-sm"
-                style={{
-                  background: prop.badge === "جديد" ? "linear-gradient(135deg,#1EBFD5,#0e8fa3)"
-                    : prop.badge === "فرصة" ? "linear-gradient(135deg,#f97316,#ea580c)"
-                    : "linear-gradient(135deg,#6b7280,#4b5563)",
-                }}>
-                {prop.badge}
-              </span>
-            )
+          {prop.badge && prop.badge !== "مميز" && prop.badge !== "موثق" && (
+            <span className="text-[9px] font-black px-2 py-0.5 rounded-full text-white shadow"
+              style={{ background: prop.badge === "جديد" ? "linear-gradient(135deg,#1EBFD5,#0e8fa3)" : prop.badge === "فرصة" ? "linear-gradient(135deg,#f97316,#ea580c)" : "linear-gradient(135deg,#6b7280,#4b5563)" }}>
+              {prop.badge}
+            </span>
+          )}
+          {prop.featured && (
+            <span className="flex items-center gap-0.5 text-[9px] font-black px-2 py-0.5 rounded-full text-white shadow" style={{ background: "linear-gradient(135deg,#f59e0b,#d97706)" }}>
+              <Star className="w-2 h-2 fill-white" /> مميز
+            </span>
+          )}
+        </div>
+        <div className="absolute bottom-2 left-2 z-10">
+          <span className="text-[10px] bg-black/50 text-white px-1.5 py-0.5 rounded-md backdrop-blur-sm">{formatDaysAgo(prop.daysAgo ?? 0)}</span>
+        </div>
+      </div>
+
+      {/* Details */}
+      <div className="flex-1 min-w-0 p-4 flex flex-col gap-2">
+        <div className="flex items-center gap-2">
+          <button onClick={e => { e.stopPropagation(); setSaved(!saved); }}
+            className={`w-8 h-8 rounded-full border flex items-center justify-center transition-colors ${saved ? "border-rose-400 bg-rose-50 text-rose-500" : "border-gray-200 text-gray-400 hover:border-rose-300 hover:text-rose-400"}`}>
+            <Heart className={`w-4 h-4 ${saved ? "fill-current" : ""}`} />
+          </button>
+          <button onClick={e => e.stopPropagation()} className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center hover:border-green-300 transition-colors">
+            <FaWhatsapp className="w-4 h-4 text-green-500" />
+          </button>
+          <button onClick={e => e.stopPropagation()} className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center hover:border-gray-300 transition-colors">
+            <Phone className="w-3.5 h-3.5 text-[#123C79]" />
+          </button>
+        </div>
+
+        <div className="flex items-center flex-wrap gap-x-3 gap-y-1 text-sm text-gray-600">
+          {prop.beds > 0 && <span className="flex items-center gap-1"><BedDouble className="w-4 h-4 text-gray-400" />{prop.beds}</span>}
+          {prop.baths > 0 && <span className="flex items-center gap-1"><Bath className="w-4 h-4 text-gray-400" />{prop.baths}</span>}
+          <span className="flex items-center gap-1"><Maximize2 className="w-4 h-4 text-gray-400" />{prop.area} م²</span>
+          {prop.floor != null && prop.totalFloors != null && (
+            <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">دور {prop.floor} من {prop.totalFloors}</span>
           )}
         </div>
 
-        {/* Save button */}
-        <button
-          onClick={(e) => { e.stopPropagation(); setSaved(!saved); }}
-          className={`absolute bottom-3 left-3 w-8 h-8 rounded-full flex items-center justify-center transition-all shadow-sm backdrop-blur-md z-10 ${saved ? "bg-rose-500 text-white" : "bg-white/80 text-gray-400 hover:bg-rose-500 hover:text-white"}`}
-        >
+        <h3 className="text-base font-bold text-gray-900 group-hover:text-[#123C79] transition-colors leading-snug line-clamp-2">{prop.title}</h3>
+
+        <div className="flex items-center gap-1 text-xs text-gray-500">
+          <span className="w-3.5 h-3.5 text-[#1EBFD5] flex-shrink-0">📍</span>
+          <span>{prop.location}</span>
+        </div>
+
+        {prop.description && <p className="text-xs text-gray-500 leading-relaxed line-clamp-2">{prop.description}</p>}
+
+        <div className="flex items-center justify-between mt-auto pt-2 border-t border-gray-100">
+          <p className="text-base font-black text-[#123C79]">{prop.priceLabel}</p>
+          {prop.views != null && <span className="text-xs text-gray-400">{prop.views.toLocaleString()} مشاهدة</span>}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
+function PropertyCardGrid({ prop }: { prop: PropItem }) {
+  const [saved, setSaved] = useState(false);
+  const [, navigate] = useLocation();
+
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      whileHover={{ y: -4 }}
+      data-testid={`card-property-${prop.id}`}
+      onClick={() => navigate(`/property/${prop.id}`)}
+      className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-all group cursor-pointer"
+    >
+      <div className="relative h-52 overflow-hidden">
+        <ImageSlider images={prop.images?.length ? prop.images : [prop.image]} alt={prop.title} />
+        <div className="absolute top-3 right-3 flex flex-col gap-1.5 z-10 pointer-events-none">
+          <span className={`text-[10px] font-black px-2.5 py-1 rounded-full text-white shadow-md backdrop-blur-sm ${prop.type === "للبيع" ? "bg-[#123C79]/90" : "bg-[#1EBFD5]/90"}`}>{prop.type}</span>
+          {prop.featured && (
+            <span className="flex items-center gap-1 text-[10px] font-black px-2.5 py-1 rounded-full text-white shadow-md" style={{ background: "linear-gradient(135deg,#f59e0b,#d97706)" }}>
+              <Star className="w-2.5 h-2.5 fill-white" /> مميز
+            </span>
+          )}
+          {prop.badge && prop.badge !== "مميز" && (
+            prop.badge === "موثق"
+              ? <span className="flex items-center gap-1 text-[10px] font-black px-2.5 py-1 rounded-full text-white" style={{ background: "linear-gradient(135deg,#0f2d5e,#1EBFD5)" }}><ShieldCheck className="w-3 h-3" /> موثق</span>
+              : <span className="text-[10px] font-black px-2.5 py-1 rounded-full text-white shadow-md"
+                  style={{ background: prop.badge === "جديد" ? "linear-gradient(135deg,#1EBFD5,#0e8fa3)" : prop.badge === "فرصة" ? "linear-gradient(135deg,#f97316,#ea580c)" : "linear-gradient(135deg,#6b7280,#4b5563)" }}>
+                  {prop.badge}
+                </span>
+          )}
+        </div>
+        <button onClick={e => { e.stopPropagation(); setSaved(!saved); }}
+          className={`absolute bottom-3 left-3 w-8 h-8 rounded-full flex items-center justify-center transition-all shadow z-10 ${saved ? "bg-rose-500 text-white" : "bg-white/80 text-gray-400 hover:bg-rose-500 hover:text-white"}`}>
           <Heart className={`w-4 h-4 ${saved ? "fill-current" : ""}`} />
         </button>
       </div>
@@ -418,37 +291,122 @@ function PropertyCard({ prop, view }: { prop: typeof MOCK_PROPERTIES[0]; view: "
       <div className="p-4">
         <div className="flex items-start justify-between mb-1">
           <p className="text-lg font-black text-[#123C79]">{prop.priceLabel}</p>
-          <span className="text-[11px] text-gray-400 font-medium mt-1 flex-shrink-0 mr-2">
-            {formatDaysAgo(prop.daysAgo ?? 0)}
-          </span>
+          <span className="text-[11px] text-gray-400 font-medium mt-1 flex-shrink-0 mr-2">{formatDaysAgo(prop.daysAgo ?? 0)}</span>
         </div>
-        <h3 className="text-base font-bold text-gray-900 group-hover:text-[#123C79] transition-colors mb-1 leading-snug">{prop.title}</h3>
-        <div className="flex items-center text-gray-500 text-xs mb-3">
-          <MapPin className="w-3.5 h-3.5 ml-1 text-[#1EBFD5]" />{prop.location}
-        </div>
+        <h3 className="text-base font-bold text-gray-900 group-hover:text-[#123C79] transition-colors mb-1 leading-snug line-clamp-2">{prop.title}</h3>
+        <p className="text-xs text-gray-500 mb-3 truncate">{prop.location}</p>
         <div className="flex items-center gap-3 py-3 border-t border-b border-gray-100 mb-3">
           {prop.beds > 0 && <span className="flex items-center gap-1 text-xs text-gray-600 flex-1 justify-center"><BedDouble className="w-3.5 h-3.5 text-gray-400" />{prop.beds}</span>}
           {prop.baths > 0 && <span className="flex items-center gap-1 text-xs text-gray-600 flex-1 justify-center border-x border-gray-100"><Bath className="w-3.5 h-3.5 text-gray-400" />{prop.baths}</span>}
           <span className="flex items-center gap-1 text-xs text-gray-600 flex-1 justify-center"><Maximize2 className="w-3.5 h-3.5 text-gray-400" />{prop.area} م²</span>
         </div>
-        <div className="flex items-center justify-between">
-          <div className="flex gap-1.5">
-            <button onClick={e => e.stopPropagation()} className="w-7 h-7 rounded-full bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-500 hover:text-white transition-colors"><FaWhatsapp className="w-3.5 h-3.5" /></button>
-            <button onClick={e => e.stopPropagation()} className="w-7 h-7 rounded-full bg-[#123C79]/5 text-[#123C79] flex items-center justify-center hover:bg-[#123C79] hover:text-white transition-colors"><Phone className="w-3 h-3" /></button>
-          </div>
+        <div className="flex gap-1.5">
+          <button onClick={e => e.stopPropagation()} className="w-7 h-7 rounded-full bg-green-50 text-green-600 flex items-center justify-center hover:bg-green-500 hover:text-white transition-colors"><FaWhatsapp className="w-3.5 h-3.5" /></button>
+          <button onClick={e => e.stopPropagation()} className="w-7 h-7 rounded-full bg-[#123C79]/5 text-[#123C79] flex items-center justify-center hover:bg-[#123C79] hover:text-white transition-colors"><Phone className="w-3 h-3" /></button>
         </div>
       </div>
     </motion.div>
   );
 }
 
+// ─── Skeleton loading cards ───────────────────────────────────────────────────
+
+function SkeletonCard({ view }: { view: "list" | "grid" }) {
+  if (view === "list") {
+    return (
+      <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm flex animate-pulse">
+        <div className="w-36 sm:w-48 flex-shrink-0 bg-gray-200" />
+        <div className="flex-1 p-4 space-y-3">
+          <div className="flex gap-2">
+            <div className="w-8 h-8 rounded-full bg-gray-200" />
+            <div className="w-8 h-8 rounded-full bg-gray-200" />
+          </div>
+          <div className="h-4 bg-gray-200 rounded w-2/3" />
+          <div className="h-5 bg-gray-200 rounded w-full" />
+          <div className="h-3 bg-gray-200 rounded w-1/3" />
+          <div className="h-4 bg-gray-200 rounded w-1/2 mt-auto" />
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm animate-pulse">
+      <div className="h-52 bg-gray-200" />
+      <div className="p-4 space-y-3">
+        <div className="h-5 bg-gray-200 rounded w-1/2" />
+        <div className="h-4 bg-gray-200 rounded w-full" />
+        <div className="h-3 bg-gray-200 rounded w-1/3" />
+        <div className="h-px bg-gray-200 rounded" />
+        <div className="flex gap-2 justify-around py-1">
+          <div className="h-4 bg-gray-200 rounded w-10" />
+          <div className="h-4 bg-gray-200 rounded w-10" />
+          <div className="h-4 bg-gray-200 rounded w-10" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Pagination ───────────────────────────────────────────────────────────────
+
+function Pagination({ current, total, onChange }: { current: number; total: number; onChange: (p: number) => void }) {
+  if (total <= 1) return null;
+
+  const pages: (number | "…")[] = [];
+  if (total <= 6) {
+    for (let i = 1; i <= total; i++) pages.push(i);
+  } else {
+    pages.push(1);
+    if (current > 3) pages.push("…");
+    for (let i = Math.max(2, current - 1); i <= Math.min(total - 1, current + 1); i++) pages.push(i);
+    if (current < total - 2) pages.push("…");
+    pages.push(total);
+  }
+
+  return (
+    <div className="mt-8 flex items-center justify-center gap-1.5 flex-wrap">
+      <button
+        onClick={() => onChange(current - 1)} disabled={current === 1}
+        className="w-10 h-10 rounded-xl border-2 border-gray-200 flex items-center justify-center text-gray-400 hover:border-[#123C79] hover:text-[#123C79] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+      >
+        <ChevronRight className="w-5 h-5" />
+      </button>
+
+      {pages.map((p, i) =>
+        p === "…" ? (
+          <span key={`ellipsis-${i}`} className="w-10 h-10 flex items-center justify-center text-gray-400 text-sm">…</span>
+        ) : (
+          <button
+            key={p}
+            onClick={() => onChange(p as number)}
+            className={`w-10 h-10 rounded-xl text-sm font-bold transition-all ${p === current ? "bg-[#123C79] text-white shadow-sm" : "border-2 border-gray-200 text-gray-600 hover:border-[#123C79] hover:text-[#123C79]"}`}
+          >
+            {p}
+          </button>
+        )
+      )}
+
+      <button
+        onClick={() => onChange(current + 1)} disabled={current === total}
+        className="w-10 h-10 rounded-xl border-2 border-gray-200 flex items-center justify-center text-gray-400 hover:border-[#123C79] hover:text-[#123C79] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+      >
+        <ChevronLeft className="w-5 h-5" />
+      </button>
+    </div>
+  );
+}
+
+// ─── Main Page ────────────────────────────────────────────────────────────────
+
 export default function SearchPage() {
   const [, navigate] = useLocation();
   const [sort, setSort] = useState("newest");
   const [sortOpen, setSortOpen] = useState(false);
   const [viewMode, setViewMode] = useState<"single" | "grid">("single");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
-  // Filters state
+  // Filters
   const [txType, setTxType] = useState<"" | "للبيع" | "للإيجار">("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
@@ -460,36 +418,35 @@ export default function SearchPage() {
   const [minBaths, setMinBaths] = useState(-1);
   const [areaMin, setAreaMin] = useState("");
   const [areaMax, setAreaMax] = useState("");
-
   const [scrolled, setScrolled] = useState(false);
+
   useEffect(() => {
     const h = () => setScrolled(window.scrollY > 10);
-    window.addEventListener("scroll", h);
+    window.addEventListener("scroll", h, { passive: true });
     return () => window.removeEventListener("scroll", h);
   }, []);
 
-  const toggleArr = (arr: string[], val: string, set: (a: string[]) => void) => {
+  // Reset to page 1 when any filter or sort changes
+  useEffect(() => { setCurrentPage(1); }, [txType, selectedCategories, selectedSubTypes, selectedAreas, priceMin, priceMax, minBeds, minBaths, areaMin, areaMax, sort]);
+
+  const toggleArr = useCallback((arr: string[], val: string, set: (a: string[]) => void) => {
     set(arr.includes(val) ? arr.filter(x => x !== val) : [...arr, val]);
-  };
+  }, []);
 
-  const toggleCategory = (cat: string) => {
-    const next = selectedCategories.includes(cat)
-      ? selectedCategories.filter(c => c !== cat)
-      : [...selectedCategories, cat];
-    setSelectedCategories(next);
-    if (!next.includes(cat)) {
-      setSelectedSubTypes(prev => prev.filter(s => !PROPERTY_TYPES[cat]?.includes(s)));
-    }
-  };
+  const toggleCategory = useCallback((cat: string) => {
+    setSelectedCategories(prev => {
+      const next = prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat];
+      if (!next.includes(cat)) setSelectedSubTypes(p => p.filter(s => !PROPERTY_TYPES[cat]?.includes(s)));
+      return next;
+    });
+  }, []);
 
-  const toggleCategoryExpand = (cat: string) => {
-    setExpandedCategories(prev =>
-      prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
-    );
-  };
+  const toggleCategoryExpand = useCallback((cat: string) => {
+    setExpandedCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]);
+  }, []);
 
-  // Filtered results
-  const filtered = MOCK_PROPERTIES.filter(p => {
+  // Filtered + sorted results
+  const filtered = useMemo(() => MOCK_PROPERTIES.filter(p => {
     if (txType && p.type !== txType) return false;
     if (selectedSubTypes.length > 0 && !selectedSubTypes.includes(p.category)) return false;
     else if (selectedSubTypes.length === 0 && selectedCategories.length > 0) {
@@ -504,64 +461,56 @@ export default function SearchPage() {
     if (areaMin && p.area < Number(areaMin)) return false;
     if (areaMax && p.area > Number(areaMax)) return false;
     return true;
-  });
+  }), [txType, selectedCategories, selectedSubTypes, selectedAreas, priceMin, priceMax, minBeds, minBaths, areaMin, areaMax]);
 
-  const sorted = [...filtered].sort((a, b) => {
+  const sorted = useMemo(() => [...filtered].sort((a, b) => {
     if (sort === "price_asc") return a.price - b.price;
     if (sort === "price_desc") return b.price - a.price;
     if (sort === "area_asc") return a.area - b.area;
     if (sort === "area_desc") return b.area - a.area;
     return b.id - a.id;
-  });
+  }), [filtered, sort]);
 
-  // Dynamic title based on active filters
-  const pageTitle = (() => {
+  const totalPages = Math.max(1, Math.ceil(sorted.length / ITEMS_PER_PAGE));
+  const paginated = sorted.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
+
+  const activeFiltersCount = useMemo(() => [
+    txType ? 1 : 0, selectedCategories.length, selectedAreas.length,
+    priceMin || priceMax ? 1 : 0, minBeds > 0 ? 1 : 0, minBaths > 0 ? 1 : 0,
+    areaMin || areaMax ? 1 : 0,
+  ].reduce((a, b) => a + b, 0), [txType, selectedCategories, selectedAreas, priceMin, priceMax, minBeds, minBaths, areaMin, areaMax]);
+
+  const clearAll = useCallback(() => {
+    setTxType(""); setSelectedCategories([]); setExpandedCategories([]);
+    setSelectedSubTypes([]); setSelectedAreas([]); setPriceMin(""); setPriceMax("");
+    setMinBeds(-1); setMinBaths(-1); setAreaMin(""); setAreaMax("");
+  }, []);
+
+  const pageTitle = useMemo(() => {
     const parts: string[] = [];
     if (selectedSubTypes.length === 1) parts.push(selectedSubTypes[0]);
     else if (selectedSubTypes.length > 1) parts.push(selectedSubTypes.slice(0, 2).join(" و"));
-    else if (selectedCategories.length === 1) parts.push(selectedCategories[0] === "سكني" ? "عقارات سكنية" : selectedCategories[0] === "تجاري" ? "عقارات تجارية" : selectedCategories[0] === "إداري" ? "عقارات إدارية" : selectedCategories[0] === "أراضي" ? "أراضي" : "عقارات");
-    else parts.push("عقارات");
+    else if (selectedCategories.length === 1) {
+      const m: Record<string, string> = { سكني: "عقارات سكنية", تجاري: "عقارات تجارية", إداري: "عقارات إدارية", أراضي: "أراضي" };
+      parts.push(m[selectedCategories[0]] || "عقارات");
+    } else parts.push("عقارات");
     if (txType) parts.push(txType === "للبيع" ? "للبيع" : "للإيجار");
     if (selectedAreas.length === 1) parts.push(`في ${selectedAreas[0]}`);
-    else if (selectedAreas.length > 1) parts.push(`في ${selectedAreas[0]} و${selectedAreas.length - 1} مناطق أخرى`);
+    else if (selectedAreas.length > 1) parts.push(`في ${selectedAreas[0]} و${selectedAreas.length - 1} مناطق`);
     else parts.push("في بنها");
     return parts.join(" ");
-  })();
+  }, [selectedSubTypes, selectedCategories, txType, selectedAreas]);
 
-  const activeFiltersCount = [
-    txType ? 1 : 0,
-    selectedCategories.length,
-    selectedAreas.length,
-    priceMin || priceMax ? 1 : 0,
-    minBeds > 0 ? 1 : 0,
-    minBaths > 0 ? 1 : 0,
-    areaMin || areaMax ? 1 : 0,
-  ].reduce((a, b) => a + b, 0);
+  // ─── Filter panel content (shared desktop + mobile) ───────────────────────
 
-  const clearAll = () => {
-    setTxType("");
-    setSelectedCategories([]);
-    setExpandedCategories([]);
-    setSelectedSubTypes([]);
-    setSelectedAreas([]);
-    setPriceMin("");
-    setPriceMax("");
-    setMinBeds(-1);
-    setMinBaths(-1);
-    setAreaMin("");
-    setAreaMax("");
-  };
-
-  const FilterPanel = () => (
+  const FilterPanelContent = () => (
     <div className="space-y-0">
-      {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-2">
           <Filter className="w-4 h-4 text-[#123C79]" />
+          <span className="font-bold text-gray-800 text-sm">الفلاتر</span>
           {activeFiltersCount > 0 && (
-            <span className="bg-[#123C79] text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">
-              {activeFiltersCount}
-            </span>
+            <span className="bg-[#123C79] text-white text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">{activeFiltersCount}</span>
           )}
         </div>
         {activeFiltersCount > 0 && (
@@ -571,59 +520,36 @@ export default function SearchPage() {
         )}
       </div>
 
-      {/* Transaction Type */}
       <FilterSection title="الحالة">
         <div className="flex gap-2">
-          {["", "للبيع", "للإيجار"].map(t => (
-            <button
-              key={t || "all"}
-              onClick={() => setTxType(t as any)}
-              className={`flex-1 py-2 rounded-xl text-sm font-bold transition-all ${txType === t ? "bg-[#123C79] text-white shadow-sm" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
-            >
+          {(["", "للبيع", "للإيجار"] as const).map(t => (
+            <button key={t || "all"} onClick={() => setTxType(t)}
+              className={`flex-1 py-2 rounded-xl text-sm font-bold transition-all ${txType === t ? "bg-[#123C79] text-white shadow-sm" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
               {t || "الكل"}
             </button>
           ))}
         </div>
       </FilterSection>
 
-      {/* Property Category Tree */}
       <FilterSection title="تصنيف العقار">
         <div className="space-y-1">
           {Object.entries(PROPERTY_TYPES).map(([cat, subs]) => (
             <div key={cat}>
               <div className="flex items-center gap-2">
-                <div
-                  onClick={() => toggleCategory(cat)}
-                  className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 cursor-pointer transition-all ${selectedCategories.includes(cat) ? "border-[#123C79] bg-[#123C79]" : "border-gray-300 hover:border-[#1EBFD5]"}`}
-                >
+                <div onClick={() => toggleCategory(cat)}
+                  className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 cursor-pointer transition-all ${selectedCategories.includes(cat) ? "border-[#123C79] bg-[#123C79]" : "border-gray-300 hover:border-[#1EBFD5]"}`}>
                   {selectedCategories.includes(cat) && <Check className="w-2.5 h-2.5 text-white" />}
                 </div>
-                <span
-                  onClick={() => toggleCategory(cat)}
-                  className={`text-sm cursor-pointer flex-1 py-1.5 font-medium ${selectedCategories.includes(cat) ? "text-[#123C79] font-semibold" : "text-gray-700"}`}
-                >
-                  {cat}
-                </span>
+                <span onClick={() => toggleCategory(cat)} className={`text-sm cursor-pointer flex-1 py-1.5 font-medium ${selectedCategories.includes(cat) ? "text-[#123C79] font-semibold" : "text-gray-700"}`}>{cat}</span>
                 <button onClick={() => toggleCategoryExpand(cat)} className="text-gray-400 hover:text-gray-600">
                   <ChevronRight className={`w-4 h-4 transition-transform ${expandedCategories.includes(cat) ? "rotate-90" : ""}`} />
                 </button>
               </div>
               <AnimatePresence>
                 {expandedCategories.includes(cat) && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.18 }}
-                    className="overflow-hidden mr-6 mt-1 space-y-0.5"
-                  >
+                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: 0.18 }} className="overflow-hidden mr-6 mt-1 space-y-0.5">
                     {subs.map(sub => (
-                      <CheckOption
-                        key={sub}
-                        label={sub}
-                        checked={selectedSubTypes.includes(sub)}
-                        onChange={() => toggleArr(selectedSubTypes, sub, setSelectedSubTypes)}
-                      />
+                      <CheckOption key={sub} label={sub} checked={selectedSubTypes.includes(sub)} onChange={() => toggleArr(selectedSubTypes, sub, setSelectedSubTypes)} />
                     ))}
                   </motion.div>
                 )}
@@ -633,37 +559,49 @@ export default function SearchPage() {
         </div>
       </FilterSection>
 
-      {/* Areas */}
       <FilterSection title="المنطقة">
         <div className="space-y-0.5">
           {ALL_AREAS.map(area => (
-            <CheckOption
-              key={area}
-              label={area}
-              checked={selectedAreas.includes(area)}
+            <CheckOption key={area} label={area} checked={selectedAreas.includes(area)}
               onChange={() => toggleArr(selectedAreas, area, setSelectedAreas)}
-              count={MOCK_PROPERTIES.filter(p => p.location.includes(area)).length}
-            />
+              count={MOCK_PROPERTIES.filter(p => p.location.includes(area)).length} />
           ))}
         </div>
       </FilterSection>
 
-      {/* Price */}
       <FilterSection title="السعر (ج.م)">
-        <PriceRangeInput min={priceMin} max={priceMax} onMinChange={setPriceMin} onMaxChange={setPriceMax} />
+        <div className="space-y-3">
+          <div className="flex gap-2">
+            <div className="flex-1">
+              <label className="text-xs text-gray-500 mb-1 block">من</label>
+              <input type="number" placeholder="0" value={priceMin} onChange={e => setPriceMin(e.target.value)}
+                className="w-full border-2 border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-[#123C79] focus:outline-none transition-colors" />
+            </div>
+            <div className="flex-1">
+              <label className="text-xs text-gray-500 mb-1 block">إلى</label>
+              <input type="number" placeholder="∞" value={priceMax} onChange={e => setPriceMax(e.target.value)}
+                className="w-full border-2 border-gray-200 rounded-lg px-3 py-2 text-sm focus:border-[#123C79] focus:outline-none transition-colors" />
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {["500000", "1000000", "2000000", "5000000"].map(v => (
+              <button key={v} onClick={() => setPriceMax(v)}
+                className="text-xs border border-gray-200 rounded-full px-2.5 py-1 hover:border-[#1EBFD5] hover:text-[#123C79] transition-colors">
+                {Number(v).toLocaleString()}
+              </button>
+            ))}
+          </div>
+        </div>
       </FilterSection>
 
-      {/* Bedrooms */}
       <FilterSection title="عدد الغرف">
         <BedsSelector value={minBeds} onChange={setMinBeds} />
       </FilterSection>
 
-      {/* Bathrooms */}
       <FilterSection title="عدد الحمامات">
         <BedsSelector value={minBaths} onChange={setMinBaths} />
       </FilterSection>
 
-      {/* Area size */}
       <FilterSection title="المساحة (م²)" defaultOpen={false}>
         <div className="flex gap-2">
           <div className="flex-1">
@@ -679,69 +617,89 @@ export default function SearchPage() {
         </div>
       </FilterSection>
 
-      {/* Apply */}
       <div className="pt-4">
-        <button
-          className="w-full py-3 rounded-xl font-bold text-white text-sm bg-[#123C79] hover:bg-[#0d2b5e] transition-colors"
-          onClick={() => setMobileFilterOpen(false)}
-        >
+        <button onClick={() => setMobileFilterOpen(false)}
+          className="w-full py-3 rounded-xl font-bold text-white text-sm bg-[#123C79] hover:bg-[#0d2b5e] transition-colors">
           عرض {filtered.length} نتيجة
         </button>
       </div>
     </div>
   );
 
-  return (
-    <div className="h-screen flex flex-col overflow-hidden bg-gray-50 font-sans text-foreground" dir="rtl">
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
+  return (
+    <div className="h-screen flex flex-col overflow-hidden bg-gray-50 font-sans" dir="rtl">
       <Navbar showSearch scrolled={scrolled} />
 
+      {/* Mobile filter drawer */}
+      <AnimatePresence>
+        {mobileFilterOpen && (
+          <>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setMobileFilterOpen(false)}
+              className="fixed inset-0 bg-black/50 z-40 lg:hidden" />
+            <motion.div initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ type: "tween", duration: 0.28 }}
+              className="fixed top-0 right-0 h-full w-80 max-w-[90vw] bg-white z-50 lg:hidden flex flex-col shadow-2xl">
+              <div className="flex items-center justify-between p-4 border-b border-gray-100 flex-shrink-0">
+                <h2 className="font-bold text-gray-900">الفلاتر</h2>
+                <button onClick={() => setMobileFilterOpen(false)} className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors">
+                  <X className="w-4 h-4 text-gray-600" />
+                </button>
+              </div>
+              <div className="flex-1 overflow-y-auto p-4">
+                <FilterPanelContent />
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
       <div className="flex-1 flex flex-col overflow-hidden min-h-0 pt-[65px]">
-        {/* ─── BREADCRUMB + TITLE BAR ─────────────────────── */}
+
+        {/* Header bar */}
         <div className="flex-shrink-0 bg-white border-b border-gray-100 z-10 shadow-sm">
           <div className="container mx-auto px-4 md:px-6">
-
-            {/* Breadcrumb */}
             <Breadcrumb items={[
               { label: "نتائج البحث", href: "/search" },
               ...(selectedCategories.length === 1 ? [{ label: selectedCategories[0], href: "/search" }] : []),
               ...(selectedSubTypes.length === 1 ? [{ label: selectedSubTypes[0] }] : []),
             ]} />
 
-            {/* Row 2: title + sort + count */}
-            <div className="py-3 flex items-center justify-between gap-4 flex-wrap">
-              <h1 className="text-xl md:text-2xl font-black text-gray-900 leading-tight">
-                {pageTitle}
-              </h1>
+            <div className="py-3 flex items-center justify-between gap-3 flex-wrap">
+              <h1 className="text-xl md:text-2xl font-black text-gray-900 leading-tight">{pageTitle}</h1>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="text-sm text-gray-500 font-medium">{sorted.length} عقار</span>
+
+                {/* Mobile filter button */}
+                <button onClick={() => setMobileFilterOpen(true)}
+                  className="lg:hidden flex items-center gap-1.5 border-2 border-gray-200 rounded-xl px-3 py-2 text-sm font-bold text-gray-700 hover:border-[#123C79] transition-colors">
+                  <Filter className="w-4 h-4" />
+                  فلاتر
+                  {activeFiltersCount > 0 && (
+                    <span className="bg-[#123C79] text-white text-xs font-bold w-4 h-4 rounded-full flex items-center justify-center">{activeFiltersCount}</span>
+                  )}
+                </button>
 
                 {/* Sort dropdown */}
                 <div className="relative">
-                  <button
-                    onClick={() => setSortOpen(!sortOpen)}
-                    className="flex items-center gap-2 border-2 border-gray-200 rounded-xl px-3 py-2 text-sm font-bold text-gray-700 hover:border-[#123C79] transition-colors"
-                  >
+                  <button onClick={() => setSortOpen(!sortOpen)}
+                    className="flex items-center gap-2 border-2 border-gray-200 rounded-xl px-3 py-2 text-sm font-bold text-gray-700 hover:border-[#123C79] transition-colors">
                     <ArrowUpDown className="w-4 h-4" />
-                    <span>الترتيب حسب</span>
+                    <span className="hidden sm:inline">الترتيب حسب</span>
                     <ChevronDown className={`w-4 h-4 transition-transform ${sortOpen ? "rotate-180" : ""}`} />
                   </button>
                   <AnimatePresence>
                     {sortOpen && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -8, scale: 0.97 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -8, scale: 0.97 }}
-                        transition={{ duration: 0.15 }}
-                        className="absolute top-full mt-2 left-0 w-52 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 overflow-hidden"
-                      >
+                      <motion.div initial={{ opacity: 0, y: -8, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -8, scale: 0.97 }} transition={{ duration: 0.15 }}
+                        className="absolute top-full mt-2 left-0 w-52 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 overflow-hidden">
                         {SORT_OPTIONS.map(opt => (
-                          <button
-                            key={opt.value}
-                            onClick={() => { setSort(opt.value); setSortOpen(false); }}
-                            className={`w-full text-right px-4 py-3 text-sm font-medium hover:bg-[#123C79]/5 transition-colors flex items-center justify-between ${sort === opt.value ? "text-[#123C79] font-bold bg-[#123C79]/5" : "text-gray-700"}`}
-                          >
+                          <button key={opt.value} onClick={() => { setSort(opt.value); setSortOpen(false); }}
+                            className={`w-full text-right px-4 py-3 text-sm font-medium hover:bg-[#123C79]/5 transition-colors flex items-center justify-between ${sort === opt.value ? "text-[#123C79] font-bold bg-[#123C79]/5" : "text-gray-700"}`}>
                             {opt.label}
                             {sort === opt.value && <Check className="w-4 h-4 text-[#123C79]" />}
                           </button>
@@ -753,154 +711,114 @@ export default function SearchPage() {
 
                 {/* View mode toggle */}
                 <div className="flex items-center rounded-xl border-2 border-gray-200 overflow-hidden">
-                  <button
-                    onClick={() => setViewMode("single")}
-                    title="عمود واحد"
-                    className={`flex items-center justify-center w-9 h-9 transition-colors ${viewMode === "single" ? "bg-[#123C79] text-white" : "text-gray-500 hover:bg-gray-100"}`}
-                  >
+                  <button onClick={() => setViewMode("single")} title="قائمة"
+                    className={`flex items-center justify-center w-9 h-9 transition-colors ${viewMode === "single" ? "bg-[#123C79] text-white" : "text-gray-500 hover:bg-gray-100"}`}>
                     <LayoutList className="w-4 h-4" />
                   </button>
-                  <button
-                    onClick={() => setViewMode("grid")}
-                    title="عمودين"
-                    className={`flex items-center justify-center w-9 h-9 border-r-2 border-gray-200 transition-colors ${viewMode === "grid" ? "bg-[#123C79] text-white" : "text-gray-500 hover:bg-gray-100"}`}
-                  >
+                  <button onClick={() => setViewMode("grid")} title="شبكة"
+                    className={`flex items-center justify-center w-9 h-9 border-r-2 border-gray-200 transition-colors ${viewMode === "grid" ? "bg-[#123C79] text-white" : "text-gray-500 hover:bg-gray-100"}`}>
                     <LayoutGrid className="w-4 h-4" />
                   </button>
                 </div>
 
-                {/* Map view button */}
-                <button
-                  onClick={() => navigate("/map")}
-                  className="flex items-center gap-1.5 border-2 border-[#1EBFD5] text-[#1EBFD5] rounded-xl px-3 py-2 text-xs font-black hover:bg-[#1EBFD5] hover:text-white transition-all"
-                >
+                {/* Map view */}
+                <button onClick={() => navigate("/map")}
+                  className="flex items-center gap-1.5 border-2 border-[#1EBFD5] text-[#1EBFD5] rounded-xl px-3 py-2 text-xs font-black hover:bg-[#1EBFD5] hover:text-white transition-all">
                   <Map className="w-4 h-4" />
-                  <span className="hidden sm:inline">عرض الخريطة</span>
+                  <span className="hidden sm:inline">الخريطة</span>
                 </button>
               </div>
             </div>
 
-            {/* ─── ACTIVE FILTER CHIPS ─────────────────────── */}
-            {activeFiltersCount > 0 && (() => {
-              const chips: { label: string; onRemove: () => void }[] = [];
-              if (txType) chips.push({ label: txType, onRemove: () => setTxType("") });
-              selectedCategories.forEach(cat => chips.push({ label: cat, onRemove: () => setSelectedCategories(prev => prev.filter(c => c !== cat)) }));
-              selectedSubTypes.forEach(sub => chips.push({ label: sub, onRemove: () => setSelectedSubTypes(prev => prev.filter(s => s !== sub)) }));
-              selectedAreas.forEach(area => chips.push({ label: area, onRemove: () => setSelectedAreas(prev => prev.filter(a => a !== area)) }));
-              if (priceMin || priceMax) chips.push({ label: `${priceMin || "0"} – ${priceMax || "∞"} ج.م`, onRemove: () => { setPriceMin(""); setPriceMax(""); } });
-              if (minBeds > 0) chips.push({ label: `${minBeds}+ غرف`, onRemove: () => setMinBeds(-1) });
-              if (minBaths > 0) chips.push({ label: `${minBaths}+ حمام`, onRemove: () => setMinBaths(-1) });
-              if (areaMin || areaMax) chips.push({ label: `${areaMin || "0"}–${areaMax || "∞"} م²`, onRemove: () => { setAreaMin(""); setAreaMax(""); } });
-
-              return (
-                <div className="py-2.5 flex items-center gap-2 flex-wrap border-t border-gray-100">
-                  <button
-                    onClick={clearAll}
-                    className="text-xs font-bold text-gray-500 hover:text-red-500 transition-colors flex-shrink-0 ml-1"
-                  >
-                    مسح الكل
-                  </button>
-                  {chips.map((chip, i) => (
-                    <motion.span
-                      key={i}
-                      initial={{ opacity: 0, scale: 0.85 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.85 }}
-                      className="inline-flex items-center gap-1.5 bg-[#1EBFD5] text-white text-xs font-bold px-3 py-1.5 rounded-full"
-                    >
-                      {chip.label}
-                      <button
-                        onClick={chip.onRemove}
-                        className="w-4 h-4 rounded-full bg-white/25 hover:bg-white/40 flex items-center justify-center transition-colors flex-shrink-0"
-                      >
-                        <X className="w-2.5 h-2.5" />
-                      </button>
-                    </motion.span>
-                  ))}
-                </div>
-              );
-            })()}
-
+            {/* Active filter chips */}
+            {activeFiltersCount > 0 && (
+              <div className="py-2.5 flex items-center gap-2 flex-wrap border-t border-gray-100">
+                <button onClick={clearAll} className="text-xs font-bold text-gray-500 hover:text-red-500 transition-colors flex-shrink-0">مسح الكل</button>
+                {[
+                  txType && { label: txType, clear: () => setTxType("") },
+                  ...selectedCategories.map(c => ({ label: c, clear: () => setSelectedCategories(p => p.filter(x => x !== c)) })),
+                  ...selectedSubTypes.map(s => ({ label: s, clear: () => setSelectedSubTypes(p => p.filter(x => x !== s)) })),
+                  ...selectedAreas.map(a => ({ label: a, clear: () => setSelectedAreas(p => p.filter(x => x !== a)) })),
+                  (priceMin || priceMax) && { label: `${priceMin || "0"} – ${priceMax || "∞"} ج.م`, clear: () => { setPriceMin(""); setPriceMax(""); } },
+                  minBeds > 0 && { label: `${minBeds}+ غرف`, clear: () => setMinBeds(-1) },
+                  minBaths > 0 && { label: `${minBaths}+ حمام`, clear: () => setMinBaths(-1) },
+                  (areaMin || areaMax) && { label: `${areaMin || "0"}–${areaMax || "∞"} م²`, clear: () => { setAreaMin(""); setAreaMax(""); } },
+                ].filter(Boolean).map((chip: any, i) => (
+                  <motion.span key={i} initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }}
+                    className="inline-flex items-center gap-1.5 bg-[#1EBFD5] text-white text-xs font-bold px-3 py-1.5 rounded-full">
+                    {chip.label}
+                    <button onClick={chip.clear} className="w-4 h-4 rounded-full bg-white/25 hover:bg-white/40 flex items-center justify-center transition-colors">
+                      <X className="w-2.5 h-2.5" />
+                    </button>
+                  </motion.span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
-        {/* ─── MAIN LAYOUT ────────────────────────────────────── */}
+        {/* Main layout — sidebar + results */}
         <div className="flex-1 flex overflow-hidden min-h-0">
-          <div className="flex-1 flex gap-6 min-h-0 w-full max-w-screen-xl mx-auto px-4 md:px-6 py-5">
+          <div className="flex-1 flex gap-5 min-h-0 w-full max-w-screen-xl mx-auto px-4 md:px-6 py-5">
 
-            {/* ─── FILTERS SIDEBAR ─────────────────────────── */}
+            {/* Desktop sidebar */}
             <aside className="w-72 flex-shrink-0 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-y-auto hidden lg:block">
               <div className="p-5">
-                <FilterPanel />
+                <FilterPanelContent />
               </div>
             </aside>
 
-            {/* ─── RESULTS ──────────────────────────────────── */}
-            <main className="flex-1 min-w-0 overflow-y-auto scroll-smooth" style={{ scrollBehavior: "smooth" }}>
+            {/* Results column — scrollable */}
+            <main className="flex-1 min-w-0 overflow-y-auto">
 
               {sorted.length === 0 ? (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-center py-24 bg-white rounded-2xl border border-gray-100 shadow-sm"
-                >
+                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                  className="text-center py-24 bg-white rounded-2xl border border-gray-100 shadow-sm">
                   <div className="w-20 h-20 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-6">
                     <Search className="w-10 h-10 text-gray-300" />
                   </div>
                   <h3 className="text-xl font-bold text-gray-800 mb-2">لا توجد نتائج</h3>
                   <p className="text-gray-500 text-sm mb-6">جرب تعديل الفلاتر للحصول على نتائج أكثر</p>
-                  <button
-                    onClick={clearAll}
-                    className="text-white px-6 py-3 rounded-xl font-bold text-sm bg-[#123C79] hover:bg-[#0d2b5e] transition-colors"
-                  >
+                  <button onClick={clearAll}
+                    className="text-white px-6 py-3 rounded-xl font-bold text-sm bg-[#123C79] hover:bg-[#0d2b5e] transition-colors">
                     مسح كل الفلاتر
                   </button>
                 </motion.div>
               ) : (
                 <>
-                  <div className={`grid gap-5 ${viewMode === "grid" ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1"}`}>
-                    {sorted.map((prop, i) => (
-                      <motion.div
-                        key={prop.id}
-                        initial={{ opacity: 0, y: 15 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.35, delay: Math.min(i * 0.05, 0.4) }}
-                      >
-                        <PropertyCard prop={prop} view={viewMode === "single" ? "list" : "grid"} />
-                      </motion.div>
-                    ))}
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={`${currentPage}-${sort}-${viewMode}`}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className={`grid gap-4 ${viewMode === "grid" ? "grid-cols-1 sm:grid-cols-2" : "grid-cols-1"}`}
+                    >
+                      {paginated.map((prop, i) => (
+                        <motion.div key={prop.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.3, delay: Math.min(i * 0.04, 0.3) }}>
+                          {viewMode === "single"
+                            ? <PropertyCardList prop={prop} />
+                            : <PropertyCardGrid prop={prop} />}
+                        </motion.div>
+                      ))}
+                    </motion.div>
+                  </AnimatePresence>
+
+                  {/* Result count + pagination */}
+                  <div className="mt-2 mb-1 flex items-center justify-between text-xs text-gray-400 px-1">
+                    <span>عرض {(currentPage - 1) * ITEMS_PER_PAGE + 1}–{Math.min(currentPage * ITEMS_PER_PAGE, sorted.length)} من {sorted.length}</span>
+                    <span>صفحة {currentPage} من {totalPages}</span>
                   </div>
 
-                  {/* Pagination */}
-                  <div className="mt-10 flex items-center justify-center gap-2">
-                    <button className="w-10 h-10 rounded-xl border-2 border-gray-200 flex items-center justify-center text-gray-400 hover:border-[#123C79] hover:text-[#123C79] transition-colors">
-                      <ChevronRight className="w-5 h-5" />
-                    </button>
-                    {[1, 2, 3].map(p => (
-                      <button
-                        key={p}
-                        className={`w-10 h-10 rounded-xl text-sm font-bold transition-all ${p === 1 ? "bg-[#123C79] text-white shadow-sm" : "border-2 border-gray-200 text-gray-600 hover:border-[#123C79] hover:text-[#123C79]"}`}
-                      >
-                        {p}
-                      </button>
-                    ))}
-                    <span className="text-gray-400 text-sm px-1">...</span>
-                    <button className="w-10 h-10 rounded-xl border-2 border-gray-200 text-sm font-bold text-gray-600 hover:border-[#123C79] hover:text-[#123C79] transition-colors">
-                      8
-                    </button>
-                    <button className="w-10 h-10 rounded-xl border-2 border-gray-200 flex items-center justify-center text-gray-400 hover:border-[#123C79] hover:text-[#123C79] transition-colors">
-                      <ChevronLeft className="w-5 h-5" />
-                    </button>
-                  </div>
+                  <Pagination current={currentPage} total={totalPages} onChange={handlePageChange} />
+
+                  <div className="h-6" />
                 </>
               )}
             </main>
           </div>
         </div>
-      </div>
-
-      <div className="flex-shrink-0">
-        <Footer />
       </div>
     </div>
   );
