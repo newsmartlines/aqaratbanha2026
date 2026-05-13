@@ -213,58 +213,62 @@ function PropertyCardSmall({
   const [, navigate] = useLocation();
   return (
     <motion.div
-      whileHover={{ y: -2 }}
-      onClick={onClick}
-      className={`bg-white rounded-xl overflow-hidden border cursor-pointer transition-all ${
-        selected ? "border-[#1EBFD5] shadow-lg ring-2 ring-[#1EBFD5]/20" : "border-gray-100 shadow-sm hover:shadow-md hover:border-gray-200"
+      whileHover={{ y: -3 }}
+      onClick={() => navigate(`/property/${prop.id}`)}
+      className={`bg-white rounded-2xl overflow-hidden border cursor-pointer transition-all ${
+        selected ? "border-[#1EBFD5] shadow-xl ring-2 ring-[#1EBFD5]/20" : "border-gray-100 shadow-sm hover:shadow-lg hover:border-gray-200"
       }`}
     >
       <div className="relative">
         <PropertyImage
           src={prop.image}
           alt={prop.title}
-          className="w-full h-32 object-cover"
+          className="w-full h-44 object-cover"
           loading="lazy"
         />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
         <button
           onClick={e => { e.stopPropagation(); setSaved(v => !v); }}
-          className={`absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center shadow-sm transition-all ${saved ? "bg-rose-500 text-white" : "bg-white/90 text-gray-400 hover:bg-white hover:text-rose-500"}`}
+          className={`absolute top-2.5 right-2.5 w-8 h-8 rounded-full flex items-center justify-center shadow transition-all ${saved ? "bg-rose-500 text-white" : "bg-white/90 text-gray-400 hover:bg-white hover:text-rose-500"}`}
         >
-          <Heart className={`w-3.5 h-3.5 ${saved ? "fill-current" : ""}`} />
+          <Heart className={`w-4 h-4 ${saved ? "fill-current" : ""}`} />
         </button>
         {prop.images && prop.images.length > 1 && (
-          <span className="absolute bottom-2 left-2 bg-black/60 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-md flex items-center gap-1">
+          <span className="absolute bottom-2.5 left-2.5 bg-black/60 text-white text-[10px] font-bold px-2 py-1 rounded-lg flex items-center gap-1">
             📷 {prop.images.length}
           </span>
         )}
-        {prop.badge === "موثق" && (
-          <span className="absolute top-2 left-2 bg-[#123C79] text-white text-[9px] font-black px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
-            <CheckCircle className="w-2.5 h-2.5 fill-white" /> موثق
-          </span>
-        )}
-        {prop.featured && (
-          <span className="absolute top-2 left-2 flex items-center gap-0.5 text-[9px] font-black px-1.5 py-0.5 rounded-md text-white"
-            style={{ background: "linear-gradient(135deg,#f59e0b,#d97706)" }}>
-            <Star className="w-2.5 h-2.5 fill-white" /> مميز
-          </span>
-        )}
+        <div className="absolute top-2.5 left-2.5 flex flex-col gap-1">
+          {prop.badge === "موثق" && (
+            <span className="flex items-center gap-1 text-[10px] font-black px-2 py-1 rounded-lg text-white"
+              style={{ background: "linear-gradient(135deg,#0f2d5e,#1EBFD5)", boxShadow: "0 2px 8px rgba(30,191,213,0.4)" }}>
+              <CheckCircle className="w-2.5 h-2.5 fill-white" /> موثق
+            </span>
+          )}
+          {prop.featured && (
+            <span className="flex items-center gap-1 text-[10px] font-black px-2 py-1 rounded-lg text-white"
+              style={{ background: "linear-gradient(135deg,#f59e0b,#d97706)" }}>
+              <Star className="w-2.5 h-2.5 fill-white" /> مميز
+            </span>
+          )}
+        </div>
       </div>
-      <div className="p-2.5">
-        <p className="text-sm font-black text-[#123C79] mb-0.5">{prop.priceLabel}</p>
-        <p className="text-xs text-gray-600 line-clamp-1 mb-1.5">{prop.title}</p>
-        <div className="flex items-center text-[10px] text-gray-400 gap-2">
+      <div className="p-3.5">
+        <p className="text-base font-black text-[#123C79] mb-1">{prop.priceLabel}</p>
+        <p className="text-sm text-gray-700 font-semibold line-clamp-1 mb-2">{prop.title}</p>
+        <div className="flex items-center text-xs text-gray-400 gap-3">
           {prop.beds > 0 && (
-            <span className="flex items-center gap-0.5">
-              <BedDouble className="w-3 h-3" /> {prop.beds}
+            <span className="flex items-center gap-1">
+              <BedDouble className="w-3.5 h-3.5" /> {prop.beds}
             </span>
           )}
           {prop.baths > 0 && (
-            <span className="flex items-center gap-0.5">
-              <Bath className="w-3 h-3" /> {prop.baths}
+            <span className="flex items-center gap-1">
+              <Bath className="w-3.5 h-3.5" /> {prop.baths}
             </span>
           )}
-          <span className="flex items-center gap-0.5">
-            <Maximize2 className="w-3 h-3" /> {prop.size} م²
+          <span className="flex items-center gap-1">
+            <Maximize2 className="w-3.5 h-3.5" /> {prop.size} م²
           </span>
         </div>
       </div>
@@ -544,7 +548,7 @@ export default function MapPage() {
         </div>
 
         {/* ── RIGHT: PROPERTY CARDS ── */}
-        <div className="w-[380px] flex-shrink-0 bg-white border-r border-gray-100 flex flex-col overflow-hidden">
+        <div className="w-[460px] flex-shrink-0 bg-white border-r border-gray-100 flex flex-col overflow-hidden">
           {/* Cards header */}
           <div className="px-3 py-2.5 border-b border-gray-100 flex items-center justify-between flex-shrink-0">
             <span className="text-sm font-black text-gray-900">العقارات المتاحة</span>
