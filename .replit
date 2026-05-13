@@ -31,7 +31,6 @@ waitForPort = 5000
 
 [workflows.workflow.metadata]
 outputType = "webview"
-isCanvasWorkflow = true
 
 [agent]
 stack = "BEST_EFFORT_FALLBACK"
@@ -48,10 +47,6 @@ externalPort = 3001
 [[ports]]
 localPort = 5000
 externalPort = 80
-
-[[ports]]
-localPort = 24749
-externalPort = 3002
 
 [userenv]
 
