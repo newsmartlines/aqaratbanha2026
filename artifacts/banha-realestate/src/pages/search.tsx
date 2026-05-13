@@ -692,13 +692,13 @@ export default function SearchPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans text-foreground" dir="rtl">
+    <div className="h-screen flex flex-col overflow-hidden bg-gray-50 font-sans text-foreground" dir="rtl">
 
       <Navbar showSearch scrolled={scrolled} />
 
-      <div className="pt-[65px]">
+      <div className="flex-1 flex flex-col overflow-hidden min-h-0 pt-[65px]">
         {/* ─── BREADCRUMB + TITLE BAR ─────────────────────── */}
-        <div className="bg-white border-b border-gray-100">
+        <div className="flex-shrink-0 bg-white border-b border-gray-100 z-10 shadow-sm">
           <div className="container mx-auto px-4 md:px-6">
 
             {/* Breadcrumb */}
@@ -825,16 +825,18 @@ export default function SearchPage() {
         </div>
 
         {/* ─── MAIN LAYOUT ────────────────────────────────────── */}
-        <div className="container mx-auto px-4 md:px-6 py-6">
-          <div className="flex gap-6 items-start">
+        <div className="flex-1 flex overflow-hidden min-h-0">
+          <div className="flex-1 flex gap-6 min-h-0 w-full max-w-screen-xl mx-auto px-4 md:px-6 py-5">
 
             {/* ─── FILTERS SIDEBAR ─────────────────────────── */}
-            <aside className="w-72 flex-shrink-0 bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sticky top-20 hidden lg:block">
-              <FilterPanel />
+            <aside className="w-72 flex-shrink-0 bg-white rounded-2xl border border-gray-100 shadow-sm overflow-y-auto hidden lg:block">
+              <div className="p-5">
+                <FilterPanel />
+              </div>
             </aside>
 
             {/* ─── RESULTS ──────────────────────────────────── */}
-            <main className="flex-1 min-w-0">
+            <main className="flex-1 min-w-0 overflow-y-auto scroll-smooth" style={{ scrollBehavior: "smooth" }}>
 
               {sorted.length === 0 ? (
                 <motion.div
@@ -897,7 +899,9 @@ export default function SearchPage() {
         </div>
       </div>
 
-      <Footer />
+      <div className="flex-shrink-0">
+        <Footer />
+      </div>
     </div>
   );
 }
