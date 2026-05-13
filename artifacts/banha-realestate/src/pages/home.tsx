@@ -677,17 +677,19 @@ export default function HomePage() {
                       {prop.type}
                     </span>
                   </div>
-                  {/* Left badges: category + مميز only */}
+                  {/* Left badges: موثق + مميز */}
                   <div className="absolute top-3 left-3 flex flex-col gap-1.5">
-                    {prop.category && (
-                      <span className="text-[10px] font-black px-2.5 py-1 rounded-full flex items-center gap-1 text-white shadow-md backdrop-blur-sm bg-black/60">
-                        {prop.category}
+                    {prop.badges.includes("موثق") && (
+                      <span className="text-[10px] font-black px-2.5 py-1 rounded-lg flex items-center gap-1 text-white shadow-lg"
+                        style={{ background: "linear-gradient(135deg,#123C79,#1EBFD5)" }}>
+                        <CheckCircle className="w-3 h-3 fill-white text-white" />
+                        موثق
                       </span>
                     )}
                     {prop.badges.includes("مميز") && (
-                      <span className="text-[10px] font-black px-2.5 py-1 rounded-full flex items-center gap-1 text-white shadow-md backdrop-blur-sm"
+                      <span className="text-[10px] font-black px-2.5 py-1 rounded-lg flex items-center gap-1 text-white shadow-lg"
                         style={{ background: "linear-gradient(135deg,#f59e0b,#d97706)" }}>
-                        <Star className="w-2.5 h-2.5 fill-white text-white" />
+                        <Star className="w-3 h-3 fill-white text-white" />
                         مميز
                       </span>
                     )}
@@ -707,18 +709,12 @@ export default function HomePage() {
                     <MapPin className="w-3.5 h-3.5 ml-1 text-[#1EBFD5] flex-shrink-0" />
                     {prop.location}
                   </div>
-                  {/* Date + Verified row */}
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="flex items-center gap-1 text-[11px] text-gray-500 font-medium">
-                      <Clock className="w-3 h-3 text-gray-400" />
+                  {/* Date row */}
+                  <div className="flex items-center mb-3">
+                    <span className="flex items-center gap-1 text-[11px] text-gray-400 font-medium">
+                      <Clock className="w-3 h-3" />
                       منذ {prop.daysAgo} {prop.daysAgo === 1 ? "يوم" : "أيام"}
                     </span>
-                    {prop.badges.includes("موثق") && (
-                      <span className="flex items-center gap-1 text-[10px] font-black px-2 py-0.5 rounded-full bg-black text-white">
-                        <CheckCircle className="w-2.5 h-2.5" />
-                        موثق
-                      </span>
-                    )}
                   </div>
                   <div className="flex items-center justify-between text-xs text-gray-900 pt-2.5 border-t border-gray-100">
                     {prop.beds > 0 ? (

@@ -403,25 +403,25 @@ export default function PropertyPage() {
               {/* Key stats */}
               {(() => {
                 const stats = [
-                  ...(property.beds > 0 ? [{ icon: <BedDouble className="w-5 h-5" />, value: property.beds, label: t("bedroom"), color: "#123C79" }] : []),
-                  ...(property.baths > 0 ? [{ icon: <Bath className="w-5 h-5" />, value: property.baths, label: t("bath"), color: "#1EBFD5" }] : []),
-                  { icon: <Maximize2 className="w-5 h-5" />, value: property.size, label: "م²", color: "#123C79" },
-                  ...(property.floor !== null && property.floor > 0 ? [{ icon: <Layers className="w-5 h-5" />, value: property.floor, label: t("floor"), color: "#1EBFD5" }] : []),
+                  ...(property.beds > 0   ? [{ icon: <BedDouble className="w-6 h-6" />, value: property.beds,  label: t("bedroom"), color: "#123C79" }] : []),
+                  ...(property.baths > 0  ? [{ icon: <Bath      className="w-6 h-6" />, value: property.baths, label: t("bath"),    color: "#1EBFD5" }] : []),
+                  { icon: <Maximize2 className="w-6 h-6" />, value: property.size, label: "م²", color: "#123C79" },
+                  ...(property.floor !== null && property.floor > 0 ? [{ icon: <Layers className="w-6 h-6" />, value: property.floor, label: t("floor"), color: "#1EBFD5" }] : []),
                 ];
                 return (
                   <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-                    <div className="h-1 w-full" style={{ background: "linear-gradient(90deg,#123C79,#1EBFD5,#123C79)" }} />
-                    <div className="flex divide-x divide-x-reverse divide-gray-100">
+                    <div className="h-[3px] w-full" style={{ background: "linear-gradient(90deg,#123C79,#1EBFD5)" }} />
+                    <div className="flex">
                       {stats.map((s, i) => (
-                        <div key={i} className="flex-1 flex flex-col items-center gap-1.5 py-6 px-3 group hover:bg-gray-50/70 transition-colors">
+                        <div key={i} className={`flex-1 flex flex-col items-center py-8 px-4 ${i < stats.length - 1 ? "border-l border-gray-100" : ""}`}>
                           <div
-                            className="w-10 h-10 rounded-xl flex items-center justify-center mb-1 text-white shadow-sm"
-                            style={{ background: `linear-gradient(135deg,${s.color}ee,${s.color}99)` }}
+                            className="w-12 h-12 rounded-2xl flex items-center justify-center mb-3 text-white"
+                            style={{ background: `linear-gradient(135deg,${s.color},${s.color}bb)` }}
                           >
                             {s.icon}
                           </div>
-                          <span className="text-2xl font-black text-gray-900 leading-none">{s.value}</span>
-                          <span className="text-xs text-gray-400 font-semibold uppercase tracking-wide">{s.label}</span>
+                          <span className="text-3xl font-black text-gray-900 leading-none mb-1">{s.value}</span>
+                          <span className="text-sm text-gray-400 font-medium">{s.label}</span>
                         </div>
                       ))}
                     </div>
