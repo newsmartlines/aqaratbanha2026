@@ -147,3 +147,25 @@
 .scroll-subtle:hover::-webkit-scrollbar-thumb:hover {
   background: rgba(30, 191, 213, 0.65);
 }
+
+/* Properties internal scroll container */
+.props-scroll-container {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(18, 60, 121, 0.18) transparent;
+  scroll-behavior: smooth;
+}
+.props-scroll-container::-webkit-scrollbar {
+  width: 5px;
+}
+.props-scroll-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 99px;
+}
+.props-scroll-container::-webkit-scrollbar-thumb {
+  background: rgba(18, 60, 121, 0.22);
+  border-radius: 99px;
+  transition: background 0.2s;
+}
+.props-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(30, 191, 213, 0.55);
+}

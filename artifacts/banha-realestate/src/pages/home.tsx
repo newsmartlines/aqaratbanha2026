@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useHoverScroll } from "@/hooks/useHoverScroll";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useInternalScroll } from "@/hooks/useInternalScroll";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
 import { PROPERTIES } from "@/data/properties";
@@ -242,11 +242,22 @@ function MultiAreaDropdown({
   );
 }
 
+const PAGE_SIZE = 8;
+const LOAD_MORE = 4;
+
 export default function HomePage() {
   const [, navigate] = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const { t } = useLanguage();
-  const propertiesRef = useHoverScroll<HTMLDivElement>();
+
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const loadMoreSentinel = useRef<HTMLDivElement>(null);
+
+  const handleNearBottom = useCallback(() => {
+    setVisibleCount(prev => prev + LOAD_MORE);
+  }, []);
+
+  const propertiesRef = useInternalScroll<HTMLDivElement>(loadMoreSentinel, handleNearBottom);
 
   const [searchTab, setSearchTab] = useState<"buy" | "rent">("buy");
   const [searchKeyword, setSearchKeyword] = useState("");
@@ -290,6 +301,11 @@ export default function HomePage() {
   ];
 
   const [propertyTab, setPropertyTab] = useState("الكل");
+  const handleTabChange = (tab: string) => {
+    setPropertyTab(tab);
+    setVisibleCount(PAGE_SIZE);
+    if (propertiesRef.current) propertiesRef.current.scrollTop = 0;
+  };
 
   const latestProperties = PROPERTIES.map(p => ({
     id: p.id,
@@ -620,7 +636,7 @@ export default function HomePage() {
           </div>
 
           {/* Category Tabs */}
-          <div className="flex gap-2 mb-7 overflow-x-auto pb-1">
+          <div className="flex gap-2 mb-5 overflow-x-auto pb-1 scroll-hidden">
             {[
               { key: "الكل", label: "الكل" },
               { key: "شقة", label: "شقق" },
@@ -633,7 +649,7 @@ export default function HomePage() {
             ].map(tab => (
               <button
                 key={tab.key}
-                onClick={() => setPropertyTab(tab.key)}
+                onClick={() => handleTabChange(tab.key)}
                 className={`flex-shrink-0 text-sm font-bold px-5 py-2 rounded-xl transition-all ${
                   propertyTab === tab.key
                     ? "bg-[#123C79] text-white shadow-md"
@@ -645,100 +661,138 @@ export default function HomePage() {
             ))}
           </div>
 
-          {/* 4-col grid, up to 3 rows = 12 cards */}
-          <div
-            ref={propertiesRef}
-            className="overflow-y-auto scroll-subtle rounded-xl"
-            style={{ maxHeight: "680px" }}
-          >
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {filteredProperties.slice(0, 12).map((prop, index) => (
-              <motion.div
-                key={prop.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: (index % 4) * 0.05 }}
-                whileHover={{ y: -4 }}
-                data-testid={`card-property-${prop.id}`}
-                onClick={() => navigate(`/property/${prop.id}`)}
-                className="bg-white rounded-2xl overflow-hidden border border-gray-100 transition-all group cursor-pointer shadow-sm hover:shadow-lg"
-              >
-                <div className="relative aspect-[4/3] overflow-hidden">
-                  <PropertyImage
-                    src={prop.image}
-                    alt={prop.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    loading="lazy"
-                  />
-                  {/* للبيع / للإيجار label */}
-                  <div className="absolute top-3 right-3">
-                    <span className={`text-xs font-bold px-2.5 py-1 rounded-md text-white ${prop.type === "للبيع" ? "bg-[#123C79]" : "bg-[#1EBFD5]"}`}>
-                      {prop.type}
-                    </span>
-                  </div>
-                  {/* Left badges: موثق + مميز */}
-                  <div className="absolute top-3 left-3 flex flex-col gap-1.5">
-                    {prop.badges.includes("موثق") && (
-                      <span className="text-[10px] font-black px-2.5 py-1 rounded-lg flex items-center gap-1 text-white shadow-lg"
-                        style={{ background: "linear-gradient(135deg,#123C79,#1EBFD5)" }}>
-                        <CheckCircle className="w-3 h-3 fill-white text-white" />
-                        موثق
-                      </span>
-                    )}
-                    {prop.badges.includes("مميز") && (
-                      <span className="text-[10px] font-black px-2.5 py-1 rounded-lg flex items-center gap-1 text-white shadow-lg"
-                        style={{ background: "linear-gradient(135deg,#f59e0b,#d97706)" }}>
-                        <Star className="w-3 h-3 fill-white text-white" />
-                        مميز
-                      </span>
-                    )}
-                  </div>
-                  {/* Heart / Favourite button */}
-                  <button
-                    onClick={e => e.stopPropagation()}
-                    className="absolute bottom-3 left-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm shadow flex items-center justify-center hover:bg-white transition-colors group/heart"
-                  >
-                    <Heart className="w-4 h-4 text-gray-400 group-hover/heart:text-red-500 transition-colors" />
-                  </button>
-                </div>
-                <div className="p-4">
-                  <p className="text-lg font-black text-[#123C79] mb-1">{prop.price}</p>
-                  <h3 className="text-base font-bold text-gray-900 leading-snug mb-1 line-clamp-2">{prop.title}</h3>
-                  <div className="flex items-center text-gray-500 mb-2 text-xs font-medium">
-                    <MapPin className="w-3.5 h-3.5 ml-1 text-[#1EBFD5] flex-shrink-0" />
-                    {prop.location}
-                  </div>
-                  {/* Date row */}
-                  <div className="flex items-center mb-3">
-                    <span className="flex items-center gap-1 text-[11px] text-gray-400 font-medium">
-                      <Clock className="w-3 h-3" />
-                      منذ {prop.daysAgo} {prop.daysAgo === 1 ? "يوم" : "أيام"}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs text-gray-900 pt-2.5 border-t border-gray-100">
-                    {prop.beds > 0 ? (
-                      <span className="flex items-center gap-1 font-semibold"><BedDouble className="w-3.5 h-3.5 text-gray-500" />{prop.beds}</span>
-                    ) : <span />}
-                    {prop.baths > 0 ? (
-                      <span className="flex items-center gap-1 font-semibold"><Bath className="w-3.5 h-3.5 text-gray-500" />{prop.baths}</span>
-                    ) : <span />}
-                    <span className="flex items-center gap-1 font-semibold"><Maximize2 className="w-3.5 h-3.5 text-gray-500" />{prop.area} م²</span>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          {/* Stats bar */}
+          <div className="flex items-center justify-between mb-4 text-sm">
+            <span className="text-gray-500">
+              عرض <span className="font-black text-[#123C79]">{Math.min(visibleCount, filteredProperties.length)}</span> من <span className="font-black text-gray-700">{filteredProperties.length}</span> عقار
+            </span>
+            <button
+              onClick={() => navigate("/search")}
+              className="hidden md:flex items-center gap-1 text-[#1EBFD5] font-bold text-xs hover:underline"
+            >
+              عرض الكل في صفحة البحث →
+            </button>
           </div>
 
-          {filteredProperties.length === 0 && (
-            <div className="text-center py-16 text-gray-400">
-              <Building2 className="w-12 h-12 mx-auto mb-3 text-gray-200" />
-              <p className="font-semibold">لا توجد عقارات في هذا التصنيف</p>
+          {/* Properties scroll container — internal scroll only */}
+          <div className="relative">
+            <div
+              ref={propertiesRef}
+              className="props-scroll-container"
+              style={{
+                maxHeight: "740px",
+                overflowY: "auto",
+                overscrollBehavior: "contain",
+              }}
+            >
+              {filteredProperties.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+                  <Building2 className="w-12 h-12 mb-3 opacity-20" />
+                  <p className="font-semibold">لا توجد عقارات في هذا التصنيف</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 p-1">
+                  {filteredProperties.slice(0, visibleCount).map((prop, index) => (
+                    <motion.div
+                      key={prop.id}
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: (index % 4) * 0.04 }}
+                      whileHover={{ y: -4 }}
+                      data-testid={`card-property-${prop.id}`}
+                      onClick={() => navigate(`/property/${prop.id}`)}
+                      className="bg-white rounded-2xl overflow-hidden border border-gray-100 transition-all group cursor-pointer shadow-sm hover:shadow-lg"
+                    >
+                      <div className="relative aspect-[4/3] overflow-hidden">
+                        <PropertyImage
+                          src={prop.image}
+                          alt={prop.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          loading="lazy"
+                        />
+                        <div className="absolute top-3 right-3">
+                          <span className={`text-xs font-bold px-2.5 py-1 rounded-md text-white ${prop.type === "للبيع" ? "bg-[#123C79]" : "bg-[#1EBFD5]"}`}>
+                            {prop.type}
+                          </span>
+                        </div>
+                        <div className="absolute top-3 left-3 flex flex-col gap-1.5">
+                          {prop.badges.includes("موثق") && (
+                            <span className="text-[10px] font-black px-2.5 py-1 rounded-lg flex items-center gap-1 text-white shadow-lg"
+                              style={{ background: "linear-gradient(135deg,#123C79,#1EBFD5)" }}>
+                              <CheckCircle className="w-3 h-3 fill-white text-white" />
+                              موثق
+                            </span>
+                          )}
+                          {prop.badges.includes("مميز") && (
+                            <span className="text-[10px] font-black px-2.5 py-1 rounded-lg flex items-center gap-1 text-white shadow-lg"
+                              style={{ background: "linear-gradient(135deg,#f59e0b,#d97706)" }}>
+                              <Star className="w-3 h-3 fill-white text-white" />
+                              مميز
+                            </span>
+                          )}
+                        </div>
+                        <button
+                          onClick={e => e.stopPropagation()}
+                          className="absolute bottom-3 left-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm shadow flex items-center justify-center hover:bg-white transition-colors group/heart"
+                        >
+                          <Heart className="w-4 h-4 text-gray-400 group-hover/heart:text-red-500 transition-colors" />
+                        </button>
+                      </div>
+                      <div className="p-4">
+                        <p className="text-lg font-black text-[#123C79] mb-1">{prop.price}</p>
+                        <h3 className="text-base font-bold text-gray-900 leading-snug mb-1 line-clamp-2">{prop.title}</h3>
+                        <div className="flex items-center text-gray-500 mb-2 text-xs font-medium">
+                          <MapPin className="w-3.5 h-3.5 ml-1 text-[#1EBFD5] flex-shrink-0" />
+                          {prop.location}
+                        </div>
+                        <div className="flex items-center mb-3">
+                          <span className="flex items-center gap-1 text-[11px] text-gray-400 font-medium">
+                            <Clock className="w-3 h-3" />
+                            منذ {prop.daysAgo} {prop.daysAgo === 1 ? "يوم" : "أيام"}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between text-xs text-gray-900 pt-2.5 border-t border-gray-100">
+                          {prop.beds > 0 ? (
+                            <span className="flex items-center gap-1 font-semibold"><BedDouble className="w-3.5 h-3.5 text-gray-500" />{prop.beds}</span>
+                          ) : <span />}
+                          {prop.baths > 0 ? (
+                            <span className="flex items-center gap-1 font-semibold"><Bath className="w-3.5 h-3.5 text-gray-500" />{prop.baths}</span>
+                          ) : <span />}
+                          <span className="flex items-center gap-1 font-semibold"><Maximize2 className="w-3.5 h-3.5 text-gray-500" />{prop.area} م²</span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+
+                  {/* Infinite scroll sentinel */}
+                  <div ref={loadMoreSentinel} className="col-span-full h-4" />
+
+                  {/* Loading more indicator */}
+                  {visibleCount < filteredProperties.length && (
+                    <div className="col-span-full flex items-center justify-center py-4 gap-2 text-sm text-gray-400">
+                      <div className="w-4 h-4 border-2 border-[#1EBFD5] border-t-transparent rounded-full animate-spin" />
+                      جاري تحميل المزيد...
+                    </div>
+                  )}
+
+                  {/* All loaded indicator */}
+                  {visibleCount >= filteredProperties.length && filteredProperties.length > PAGE_SIZE && (
+                    <div className="col-span-full flex items-center justify-center py-4 gap-2 text-xs text-gray-400">
+                      <div className="h-px flex-1 bg-gray-200" />
+                      <span>تم عرض جميع العقارات ({filteredProperties.length})</span>
+                      <div className="h-px flex-1 bg-gray-200" />
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
-          )}
 
-          <div className="mt-10 text-center md:hidden">
+            {/* Fade bottom gradient — hidden when scrolled to end */}
+            <div className="absolute bottom-0 left-0 right-0 h-14 pointer-events-none"
+              style={{ background: "linear-gradient(to top, rgba(255,255,255,0.95), transparent)" }} />
+          </div>
+
+          <div className="mt-8 text-center md:hidden">
             <button
               onClick={() => navigate("/search")}
               className="border-2 border-[#123C79] text-[#123C79] hover:bg-[#123C79] hover:text-white px-8 py-3 rounded-xl font-bold transition-colors w-full flex items-center justify-center gap-2"
