@@ -436,7 +436,7 @@ export default function SearchPage() {
       </div>
 
       {/* Transaction Type */}
-      <FilterSection title="نوع الصفقة">
+      <FilterSection title="الحالة">
         <div className="flex gap-2">
           {["", "للبيع", "للإيجار"].map(t => (
             <button

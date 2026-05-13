@@ -50,7 +50,7 @@ const translations = {
     yearBuilt: "سنة البناء",
     totalFloors: "عدد الطوابق",
     refNumber: "الرقم المرجعي",
-    dealType: "نوع الصفقة",
+    dealType: "الحالة",
     areaSize: "المساحة",
     bedroomsSpec: "غرف النوم",
     bathsSpec: "الحمامات",

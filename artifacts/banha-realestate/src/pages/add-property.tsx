@@ -363,7 +363,7 @@ export default function AddPropertyPage() {
           {/* STEP 0 — نوع الصفقة */}
           {step === 0 && (
             <StepWrap key="s0">
-              <StepTitle title="ما نوع الصفقة؟" sub="هل تريد البيع أم الإيجار؟" />
+              <StepTitle title="ما الحالة؟" sub="هل تريد البيع أم الإيجار؟" />
               <div className="grid grid-cols-2 gap-4">
                 {(["بيع", "إيجار"] as const).map((type) => (
                   <Card key={type} selected={dealType === type} onClick={() => setDealType(type)}>
