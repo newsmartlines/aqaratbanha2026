@@ -401,6 +401,20 @@ export default function SearchPage() {
     return b.id - a.id;
   });
 
+  // Dynamic title based on active filters
+  const pageTitle = (() => {
+    const parts: string[] = [];
+    if (selectedSubTypes.length === 1) parts.push(selectedSubTypes[0]);
+    else if (selectedSubTypes.length > 1) parts.push(selectedSubTypes.slice(0, 2).join(" و"));
+    else if (selectedCategories.length === 1) parts.push(selectedCategories[0] === "سكني" ? "عقارات سكنية" : selectedCategories[0] === "تجاري" ? "عقارات تجارية" : selectedCategories[0] === "إداري" ? "عقارات إدارية" : selectedCategories[0] === "أراضي" ? "أراضي" : "عقارات");
+    else parts.push("عقارات");
+    if (txType) parts.push(txType === "للبيع" ? "للبيع" : "للإيجار");
+    if (selectedAreas.length === 1) parts.push(`في ${selectedAreas[0]}`);
+    else if (selectedAreas.length > 1) parts.push(`في ${selectedAreas[0]} و${selectedAreas.length - 1} مناطق أخرى`);
+    else parts.push("في بنها");
+    return parts.join(" ");
+  })();
+
   const activeFiltersCount = [
     txType ? 1 : 0,
     selectedCategories.length,
@@ -571,61 +585,75 @@ export default function SearchPage() {
       <Navbar showSearch scrolled={scrolled} />
 
       <div className="pt-[65px]">
-        {/* ─── BREADCRUMB + RESULTS BAR ─────────────────────── */}
+        {/* ─── BREADCRUMB + TITLE BAR ─────────────────────── */}
         <div className="bg-white border-b border-gray-100">
-          <div className="container mx-auto px-4 md:px-6 py-3.5 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <button onClick={() => navigate("/")} className="hover:text-[#123C79] transition-colors">الرئيسية</button>
-              <ChevronLeft className="w-3.5 h-3.5" />
-              <span className="text-gray-900 font-semibold">نتائج البحث</span>
-              <span className="text-gray-400 text-xs">({sorted.length} عقار)</span>
-            </div>
+          <div className="container mx-auto px-4 md:px-6">
 
-            <div className="flex items-center gap-2">
-              {/* Sort dropdown */}
-              <div className="relative">
-                <button
-                  onClick={() => setSortOpen(!sortOpen)}
-                  className="flex items-center gap-2 border-2 border-gray-200 rounded-xl px-3 py-2 text-sm font-bold text-gray-700 hover:border-[#123C79] transition-colors"
-                >
-                  <ArrowUpDown className="w-4 h-4" />
-                  <span className="hidden sm:inline">{SORT_OPTIONS.find(s => s.value === sort)?.label}</span>
-                  <ChevronDown className={`w-4 h-4 transition-transform ${sortOpen ? "rotate-180" : ""}`} />
-                </button>
-                <AnimatePresence>
-                  {sortOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -8, scale: 0.97 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -8, scale: 0.97 }}
-                      transition={{ duration: 0.15 }}
-                      className="absolute top-full mt-2 left-0 w-52 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 overflow-hidden"
-                    >
-                      {SORT_OPTIONS.map(opt => (
-                        <button
-                          key={opt.value}
-                          onClick={() => { setSort(opt.value); setSortOpen(false); }}
-                          className={`w-full text-right px-4 py-3 text-sm font-medium hover:bg-[#123C79]/5 transition-colors flex items-center justify-between ${sort === opt.value ? "text-[#123C79] font-bold bg-[#123C79]/5" : "text-gray-700"}`}
-                        >
-                          {opt.label}
-                          {sort === opt.value && <Check className="w-4 h-4 text-[#123C79]" />}
-                        </button>
-                      ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-
-              {/* Map view button */}
+            {/* Row 1: back link */}
+            <div className="pt-3 pb-1">
               <button
-                onClick={() => navigate("/map")}
-                className="flex items-center gap-1.5 border-2 border-[#1EBFD5] text-[#1EBFD5] rounded-xl px-3 py-2 text-xs font-black hover:bg-[#1EBFD5] hover:text-white transition-all"
+                onClick={() => navigate("/")}
+                className="inline-flex items-center gap-1 text-[#1EBFD5] text-sm font-bold hover:underline transition-colors"
               >
-                <Map className="w-4 h-4" />
-                <span className="hidden sm:inline">عرض الخريطة</span>
+                الرجوع للقائمة
+                <ChevronRight className="w-4 h-4" />
               </button>
-
             </div>
+
+            {/* Row 2: title + sort + count */}
+            <div className="py-3 flex items-center justify-between gap-4 flex-wrap">
+              <h1 className="text-xl md:text-2xl font-black text-gray-900 leading-tight">
+                {pageTitle}
+              </h1>
+
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-gray-500 font-medium">{sorted.length} عقار</span>
+
+                {/* Sort dropdown */}
+                <div className="relative">
+                  <button
+                    onClick={() => setSortOpen(!sortOpen)}
+                    className="flex items-center gap-2 border-2 border-gray-200 rounded-xl px-3 py-2 text-sm font-bold text-gray-700 hover:border-[#123C79] transition-colors"
+                  >
+                    <ArrowUpDown className="w-4 h-4" />
+                    <span>الترتيب حسب</span>
+                    <ChevronDown className={`w-4 h-4 transition-transform ${sortOpen ? "rotate-180" : ""}`} />
+                  </button>
+                  <AnimatePresence>
+                    {sortOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute top-full mt-2 left-0 w-52 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 overflow-hidden"
+                      >
+                        {SORT_OPTIONS.map(opt => (
+                          <button
+                            key={opt.value}
+                            onClick={() => { setSort(opt.value); setSortOpen(false); }}
+                            className={`w-full text-right px-4 py-3 text-sm font-medium hover:bg-[#123C79]/5 transition-colors flex items-center justify-between ${sort === opt.value ? "text-[#123C79] font-bold bg-[#123C79]/5" : "text-gray-700"}`}
+                          >
+                            {opt.label}
+                            {sort === opt.value && <Check className="w-4 h-4 text-[#123C79]" />}
+                          </button>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Map view button */}
+                <button
+                  onClick={() => navigate("/map")}
+                  className="flex items-center gap-1.5 border-2 border-[#1EBFD5] text-[#1EBFD5] rounded-xl px-3 py-2 text-xs font-black hover:bg-[#1EBFD5] hover:text-white transition-all"
+                >
+                  <Map className="w-4 h-4" />
+                  <span className="hidden sm:inline">عرض الخريطة</span>
+                </button>
+              </div>
+            </div>
+
           </div>
         </div>
 
