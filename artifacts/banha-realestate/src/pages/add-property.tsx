@@ -604,12 +604,12 @@ export default function AddPropertyPage() {
             </button>
           ) : (
             <button
-              onClick={() => navigate("/")}
+              onClick={() => navigate("/plans")}
               className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-sm text-white"
               style={{ background: "linear-gradient(135deg, #1EBFD5, #123C79)", boxShadow: "0 4px 20px rgba(30,191,213,0.3)" }}
             >
               <Sparkles className="w-4 h-4" />
-              نشر الإعلان
+              متابعة — اختر باقتك
             </button>
           )}
         </div>

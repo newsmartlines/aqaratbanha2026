@@ -13,6 +13,8 @@ import MapPage from "@/pages/map";
 import LoginPage from "@/pages/login";
 import RegisterPage from "@/pages/register";
 import AddPropertyPage from "@/pages/add-property";
+import PlansPage from "@/pages/plans";
+import PaymentConfirmPage from "@/pages/payment-confirm";
 import { LanguageProvider, useLanguage } from "@/contexts/LanguageContext";
 
 const queryClient = new QueryClient();
@@ -64,6 +66,8 @@ function Router() {
         <Route path="/login" component={LoginPage} />
         <Route path="/register" component={RegisterPage} />
         <Route path="/add-property" component={AddPropertyPage} />
+        <Route path="/plans" component={PlansPage} />
+        <Route path="/payment-confirm" component={PaymentConfirmPage} />
         <Route component={NotFound} />
       </Switch>
     </>
