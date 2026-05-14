@@ -1,0 +1,7 @@
+# Proxy all requests to the Node.js app
+# (Passenger / cPanel Node.js App handles this automatically)
+# This file is only needed if you're using a manual Apache reverse proxy
+
+Options -MultiViews
+RewriteEngine On
+RewriteRule ^(.*)$ http://127.0.0.1:%PORT%/$1 [P,L]
