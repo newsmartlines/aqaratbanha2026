@@ -7,11 +7,12 @@ import {
   Bell, Mail, TrendingUp, TrendingDown, Crown, Zap, ChevronRight,
   ToggleLeft, ToggleRight, Image, Lock, Globe, Shield, Send,
   CheckCircle, X, Menu, BarChart3, Users, ArrowUpRight, Home,
-  Megaphone, Check
+  Megaphone, Check, Clock, XCircle, Filter
 } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import logoColor from "@assets/rgb_1778457941418.png";
 import { PROPERTIES } from "@/data/properties";
+import ListingEditPanel from "@/components/dashboard/ListingEditPanel";
 
 type Section = "overview" | "listings" | "favorites" | "messages" | "plans" | "settings";
 
@@ -32,12 +33,19 @@ const MESSAGES = [
   { id: 4, name: "نور حسن", text: "هل الإيجار يشمل الخدمات؟ أحتاج للمعرفة", time: "منذ 3 س", unread: 0, avatar: "ن" },
 ];
 
-const MY_LISTINGS = PROPERTIES.slice(0, 4).map((p, i) => ({
-  ...p,
-  active: i !== 2,
-  phoneClicks: Math.floor(Math.random() * 60 + 10),
-  favorites: Math.floor(Math.random() * 25 + 3),
-}));
+type ListingStatus = "الكل" | "نشط" | "قيد الموافقة" | "مرفوض";
+
+const MY_LISTINGS_BASE = [
+  ...PROPERTIES.slice(0, 3).map((p, i) => ({
+    ...p,
+    active: true,
+    status: "نشط" as ListingStatus,
+    phoneClicks: [47, 23, 61][i],
+    favorites: [18, 9, 24][i],
+  })),
+  { ...PROPERTIES[3], active: false, status: "مرفوض" as ListingStatus, phoneClicks: 5, favorites: 2 },
+  { ...PROPERTIES[4], active: false, status: "قيد الموافقة" as ListingStatus, phoneClicks: 0, favorites: 0 },
+];
 
 const QUICK_ACTIONS = [
   { label: "إضافة عقار", icon: Plus, color: "from-[#1EBFD5] to-[#17a8bd]", href: "/add-property" },
@@ -85,57 +93,90 @@ function StatCard({ label, value, trend, icon: Icon, iconColor, delay = 0 }: {
   );
 }
 
-function ListingCard({ listing, onToggle }: { listing: typeof MY_LISTINGS[0]; onToggle: () => void }) {
-  const [deleted, setDeleted] = useState(false);
-  if (deleted) return null;
+type DashListing = typeof MY_LISTINGS_BASE[0];
+
+const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; icon: React.ElementType }> = {
+  "نشط":          { label: "نشط",          color: "text-green-600",  bg: "bg-green-50",  icon: CheckCircle },
+  "قيد الموافقة": { label: "قيد الموافقة", color: "text-amber-600",  bg: "bg-amber-50",  icon: Clock },
+  "مرفوض":        { label: "مرفوض",        color: "text-red-500",   bg: "bg-red-50",    icon: XCircle },
+};
+
+function ListingCard({ listing, onToggle, onEdit, onDelete }: {
+  listing: DashListing; onToggle: () => void; onEdit: () => void; onDelete: () => void;
+}) {
+  const cfg = STATUS_CONFIG[listing.status] ?? { label: listing.status, color: "text-gray-400", bg: "bg-gray-100", icon: Clock };
+  const Ico = cfg.icon;
   return (
     <motion.div
       layout
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -20 }}
-      className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#1EBFD5]/20 transition-all p-5 flex gap-5 items-center group"
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.97 }}
+      className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md hover:border-[#1EBFD5]/20 transition-all p-4 sm:p-5 flex gap-4 items-start group"
     >
-      <div className="relative w-32 h-24 rounded-xl overflow-hidden flex-shrink-0">
+      {/* Thumbnail */}
+      <div className="relative w-28 sm:w-36 h-24 rounded-xl overflow-hidden flex-shrink-0">
         <img src={listing.image} alt={listing.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
         {listing.featured && (
           <span className="absolute top-2 right-2 bg-amber-400 text-white text-[10px] font-black px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
             <Star className="w-2.5 h-2.5" /> مميز
           </span>
         )}
+        <span className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent text-white text-[10px] font-bold px-2 py-1.5">
+          {listing.category}
+        </span>
       </div>
 
+      {/* Info */}
       <div className="flex-1 min-w-0">
-        <div className="flex items-start justify-between mb-1">
-          <h3 className="font-black text-gray-900 truncate text-sm leading-tight">{listing.title}</h3>
-          <span className={`mr-2 text-[11px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${listing.active ? "bg-green-50 text-green-600" : "bg-gray-100 text-gray-400"}`}>
-            {listing.active ? "منشور" : "موقوف"}
+        <div className="flex flex-wrap items-start gap-2 mb-1">
+          <h3 className="font-black text-gray-900 text-sm leading-tight line-clamp-1 flex-1">{listing.title}</h3>
+          <span className={`flex items-center gap-1 text-[11px] font-black px-2 py-0.5 rounded-full flex-shrink-0 ${cfg.bg} ${cfg.color}`}>
+            <Ico className="w-3 h-3" />{cfg.label}
           </span>
         </div>
-        <div className="flex items-center gap-1 text-gray-400 text-xs mb-2">
-          <MapPin className="w-3 h-3" />{listing.location}
+        <div className="flex items-center gap-1 text-gray-400 text-xs mb-1.5">
+          <MapPin className="w-3 h-3 flex-shrink-0" />
+          <span className="truncate">{listing.location}</span>
         </div>
-        <p className="text-[#1EBFD5] font-black text-sm mb-3">{listing.priceLabel}</p>
-        <div className="flex items-center gap-4 text-xs text-gray-400 font-semibold">
-          <span className="flex items-center gap-1"><Eye className="w-3.5 h-3.5 text-blue-400" />{listing.views}</span>
-          <span className="flex items-center gap-1"><Phone className="w-3.5 h-3.5 text-green-400" />{listing.phoneClicks}</span>
-          <span className="flex items-center gap-1"><Heart className="w-3.5 h-3.5 text-red-400" />{listing.favorites}</span>
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-[#1EBFD5] font-black text-sm">{listing.priceLabel}</span>
+          <span className="text-gray-200">•</span>
+          <span className="text-xs text-gray-400 font-semibold">{listing.type}</span>
+        </div>
+        <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs text-gray-400 font-semibold">
+          <span className="flex items-center gap-1"><Eye className="w-3.5 h-3.5 text-blue-400" />{listing.views} مشاهدة</span>
+          <span className="flex items-center gap-1"><Phone className="w-3.5 h-3.5 text-green-400" />{listing.phoneClicks} اتصال</span>
+          <span className="flex items-center gap-1"><Heart className="w-3.5 h-3.5 text-red-400" />{listing.favorites} مفضل</span>
         </div>
       </div>
 
-      <div className="flex flex-col items-center gap-3 flex-shrink-0">
-        <button onClick={onToggle} className="group/tog">
-          {listing.active
-            ? <ToggleRight className="w-9 h-9 text-[#1EBFD5]" />
-            : <ToggleLeft className="w-9 h-9 text-gray-300" />}
-        </button>
-        <div className="flex gap-2">
-          <button className="w-8 h-8 rounded-lg bg-gray-50 hover:bg-blue-50 text-gray-400 hover:text-blue-500 flex items-center justify-center transition-colors">
-            <Edit3 className="w-3.5 h-3.5" />
+      {/* Actions */}
+      <div className="flex flex-col items-center gap-2 flex-shrink-0 pt-1">
+        {listing.status === "نشط" && (
+          <button onClick={onToggle} title={listing.active ? "إيقاف الإعلان" : "تفعيل الإعلان"}>
+            {listing.active
+              ? <ToggleRight className="w-9 h-9 text-[#1EBFD5]" />
+              : <ToggleLeft className="w-9 h-9 text-gray-300" />}
           </button>
-          <button onClick={() => setDeleted(true)} className="w-8 h-8 rounded-lg bg-gray-50 hover:bg-red-50 text-gray-400 hover:text-red-500 flex items-center justify-center transition-colors">
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
+        )}
+        <div className="flex gap-1.5">
+          <motion.button
+            whileTap={{ scale: 0.92 }}
+            onClick={onEdit}
+            className="w-9 h-9 rounded-xl bg-[#1EBFD5]/10 hover:bg-[#1EBFD5]/20 text-[#1EBFD5] flex items-center justify-center transition-colors"
+            title="تعديل الإعلان"
+          >
+            <Edit3 className="w-4 h-4" />
+          </motion.button>
+          <motion.button
+            whileTap={{ scale: 0.92 }}
+            onClick={onDelete}
+            className="w-9 h-9 rounded-xl bg-red-50 hover:bg-red-100 text-red-400 flex items-center justify-center transition-colors"
+            title="حذف الإعلان"
+          >
+            <Trash2 className="w-4 h-4" />
+          </motion.button>
         </div>
       </div>
     </motion.div>
@@ -145,7 +186,9 @@ function ListingCard({ listing, onToggle }: { listing: typeof MY_LISTINGS[0]; on
 export default function DashboardPage() {
   const [section, setSection] = useState<Section>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [listings, setListings] = useState(MY_LISTINGS);
+  const [listings, setListings] = useState<DashListing[]>(MY_LISTINGS_BASE);
+  const [statusFilter, setStatusFilter] = useState<ListingStatus>("الكل");
+  const [editingListing, setEditingListing] = useState<DashListing | null>(null);
   const [activeMsg, setActiveMsg] = useState(MESSAGES[0]);
   const [msgInput, setMsgInput] = useState("");
   const [, navigate] = useLocation();
@@ -153,6 +196,26 @@ export default function DashboardPage() {
   const toggleListing = (id: number) => {
     setListings(prev => prev.map(l => l.id === id ? { ...l, active: !l.active } : l));
   };
+
+  const deleteListing = (id: number) => {
+    setListings(prev => prev.filter(l => l.id !== id));
+  };
+
+  const saveListing = (updated: DashListing) => {
+    setListings(prev => prev.map(l => l.id === updated.id ? { ...updated } : l));
+  };
+
+  // Filter counts — mock totals that include paginated listings beyond our local array
+  const FILTER_TABS: { id: ListingStatus; count: number }[] = [
+    { id: "الكل",          count: 169 },
+    { id: "نشط",           count: 145 },
+    { id: "قيد الموافقة", count: 0 },
+    { id: "مرفوض",        count: 24 },
+  ];
+
+  const filteredListings = statusFilter === "الكل"
+    ? listings
+    : listings.filter(l => l.status === statusFilter);
 
   const NAV_ITEMS = [
     { id: "overview", label: "لوحة التحكم", icon: LayoutDashboard },
@@ -467,24 +530,103 @@ export default function DashboardPage() {
             {/* ─── LISTINGS ─── */}
             {section === "listings" && (
               <motion.div key="listings" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-5">
-                <div className="flex items-center justify-between">
+
+                {/* Header */}
+                <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <h2 className="text-xl font-black text-gray-900">إعلاناتي</h2>
-                    <p className="text-sm text-gray-400 font-medium mt-0.5">{listings.length} إعلانات • {listings.filter(l => l.active).length} منشورة</p>
+                    <p className="text-sm text-gray-400 font-medium mt-0.5">
+                      {filteredListings.length} إعلان معروض
+                      {" "}•{" "}
+                      {listings.filter(l => l.active && l.status === "نشط").length} نشط
+                    </p>
                   </div>
                   <motion.button
                     whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
                     onClick={() => navigate("/add-property")}
                     className="bg-gradient-to-l from-[#1EBFD5] to-[#123C79] text-white px-5 py-2.5 rounded-xl font-black text-sm flex items-center gap-2 shadow-sm"
                   >
-                    <Plus className="w-4 h-4" /> إضافة عقار
+                    <Plus className="w-4 h-4" /> إضافة عقار جديد
                   </motion.button>
                 </div>
-                <AnimatePresence>
-                  {listings.map(listing => (
-                    <ListingCard key={listing.id} listing={listing} onToggle={() => toggleListing(listing.id)} />
+
+                {/* Filter tabs */}
+                <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-1.5 flex gap-1 overflow-x-auto">
+                  {FILTER_TABS.map(tab => {
+                    const isActive = statusFilter === tab.id;
+                    const dotColor: Record<ListingStatus, string> = {
+                      "الكل": "bg-gray-400",
+                      "نشط": "bg-green-500",
+                      "قيد الموافقة": "bg-amber-500",
+                      "مرفوض": "bg-red-500",
+                    };
+                    return (
+                      <motion.button
+                        key={tab.id}
+                        onClick={() => setStatusFilter(tab.id)}
+                        whileTap={{ scale: 0.97 }}
+                        className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all whitespace-nowrap flex-shrink-0 ${
+                          isActive
+                            ? "bg-gradient-to-l from-[#1EBFD5]/15 to-[#123C79]/10 text-[#123C79] shadow-sm"
+                            : "text-gray-400 hover:text-gray-700 hover:bg-gray-50"
+                        }`}
+                      >
+                        <span className={`w-2 h-2 rounded-full flex-shrink-0 ${dotColor[tab.id]}`} />
+                        {tab.id}
+                        <span className={`text-[11px] font-black px-1.5 py-0.5 rounded-full min-w-[22px] text-center ${
+                          isActive ? "bg-[#1EBFD5] text-white" : "bg-gray-100 text-gray-500"
+                        }`}>
+                          {tab.count}
+                        </span>
+                      </motion.button>
+                    );
+                  })}
+                </div>
+
+                {/* Stats summary row */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  {[
+                    { label: "إجمالي المشاهدات", value: listings.reduce((s, l) => s + l.views, 0).toLocaleString("ar"), color: "text-blue-500", bg: "bg-blue-50", icon: Eye },
+                    { label: "إجمالي الاتصالات", value: listings.reduce((s, l) => s + l.phoneClicks, 0).toLocaleString("ar"), color: "text-green-500", bg: "bg-green-50", icon: Phone },
+                    { label: "إجمالي المفضلة", value: listings.reduce((s, l) => s + l.favorites, 0).toLocaleString("ar"), color: "text-red-400", bg: "bg-red-50", icon: Heart },
+                    { label: "إعلانات مميزة", value: String(listings.filter(l => l.featured).length), color: "text-amber-500", bg: "bg-amber-50", icon: Star },
+                  ].map((s, i) => (
+                    <div key={i} className={`flex items-center gap-3 p-3.5 rounded-xl ${s.bg} border border-white`}>
+                      <s.icon className={`w-4 h-4 ${s.color} flex-shrink-0`} />
+                      <div>
+                        <p className={`font-black text-sm ${s.color}`}>{s.value}</p>
+                        <p className="text-[11px] text-gray-500 font-medium">{s.label}</p>
+                      </div>
+                    </div>
                   ))}
+                </div>
+
+                {/* Listing cards */}
+                <AnimatePresence mode="popLayout">
+                  {filteredListings.length === 0 ? (
+                    <motion.div
+                      initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                      className="bg-white rounded-2xl border border-gray-100 shadow-sm py-16 flex flex-col items-center gap-4 text-gray-300"
+                    >
+                      <Building2 className="w-12 h-12" />
+                      <p className="font-bold text-gray-400">لا توجد إعلانات بهذه الحالة</p>
+                      <button onClick={() => navigate("/add-property")} className="bg-[#1EBFD5] text-white px-6 py-2 rounded-xl font-black text-sm">
+                        إضافة إعلان جديد
+                      </button>
+                    </motion.div>
+                  ) : (
+                    filteredListings.map(listing => (
+                      <ListingCard
+                        key={listing.id}
+                        listing={listing}
+                        onToggle={() => toggleListing(listing.id)}
+                        onEdit={() => setEditingListing(listing)}
+                        onDelete={() => deleteListing(listing.id)}
+                      />
+                    ))
+                  )}
                 </AnimatePresence>
+
               </motion.div>
             )}
 
@@ -731,6 +873,20 @@ export default function DashboardPage() {
           </AnimatePresence>
         </main>
       </div>
+
+      {/* ── LISTING EDIT PANEL ── */}
+      <AnimatePresence>
+        {editingListing && (
+          <ListingEditPanel
+            listing={editingListing as any}
+            onClose={() => setEditingListing(null)}
+            onSave={(updated) => {
+              saveListing(updated as unknown as DashListing);
+              setEditingListing(null);
+            }}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
