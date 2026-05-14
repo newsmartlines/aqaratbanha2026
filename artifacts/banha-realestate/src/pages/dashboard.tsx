@@ -117,7 +117,7 @@ function BoostModal({ listing, onClose }: { listing: DashListing; onClose: () =>
                 <p className="text-xs text-gray-400 flex items-center gap-1 mt-0.5">
                   <MapPin className="w-3 h-3" />{listing.location}
                 </p>
-                <p className="text-[#1EBFD5] font-bold text-sm mt-1">{listing.priceLabel}</p>
+                <p className="text-[#123C79] font-bold text-sm mt-1">{listing.priceLabel}</p>
               </div>
               <div className="text-right flex-shrink-0">
                 <div className="flex items-center gap-1 text-xs text-gray-400">
@@ -139,21 +139,21 @@ function BoostModal({ listing, onClose }: { listing: DashListing; onClose: () =>
                   onClick={() => setSelected(p.id)}
                   className={`relative rounded-xl border-2 p-4 text-right transition-all ${
                     selected === p.id
-                      ? "border-[#1EBFD5] bg-[#1EBFD5]/5"
+                      ? "border-[#123C79] bg-[#123C79]/5"
                       : "border-gray-200 hover:border-gray-300 bg-white"
                   }`}
                 >
                   {p.popular && (
-                    <span className="absolute -top-2.5 right-3 bg-[#1EBFD5] text-white text-[9px] font-bold px-2 py-0.5 rounded-full">
+                    <span className="absolute -top-2.5 right-3 bg-[#123C79] text-white text-[9px] font-bold px-2 py-0.5 rounded-full">
                       الأشهر
                     </span>
                   )}
                   <p className="font-bold text-gray-900 text-sm">{p.label}</p>
-                  <p className="text-[#1EBFD5] font-bold text-lg mt-1">{p.price}<span className="text-xs font-medium text-gray-400"> ج.م</span></p>
+                  <p className="text-[#123C79] font-bold text-lg mt-1">{p.price}<span className="text-xs font-medium text-gray-400"> ج.م</span></p>
                   <p className="text-xs text-gray-400 mt-0.5">{p.days} يوم</p>
                   <p className="text-[10px] text-gray-400 mt-1">{p.desc}</p>
                   {selected === p.id && (
-                    <span className="absolute top-3 left-3 w-4 h-4 bg-[#1EBFD5] rounded-full flex items-center justify-center">
+                    <span className="absolute top-3 left-3 w-4 h-4 bg-[#123C79] rounded-full flex items-center justify-center">
                       <Check className="w-2.5 h-2.5 text-white" />
                     </span>
                   )}
@@ -183,7 +183,7 @@ function BoostModal({ listing, onClose }: { listing: DashListing; onClose: () =>
             onClick={confirm}
             disabled={done}
             className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white transition-all ${
-              done ? "bg-emerald-500" : "bg-[#1EBFD5] hover:bg-[#17a8bd]"
+              done ? "bg-emerald-500" : "bg-[#123C79] hover:bg-[#0d2d5e]"
             }`}
           >
             {done ? <><CheckCircle className="w-4 h-4" /> تم التفعيل!</> : <>
@@ -230,7 +230,7 @@ function ListingCard({ listing, onToggle, onEdit, onDelete, onBoost }: {
           <MapPin className="w-3 h-3 flex-shrink-0" />
           <span className="truncate">{listing.location}</span>
           <span className="text-gray-200 mx-1">·</span>
-          <span className="text-[#1EBFD5] font-semibold">{listing.priceLabel}</span>
+          <span className="text-[#123C79] font-semibold">{listing.priceLabel}</span>
         </div>
         <div className="flex items-center gap-4 text-xs text-gray-400">
           <span className="flex items-center gap-1"><Eye className="w-3.5 h-3.5" />{listing.views}</span>
@@ -244,7 +244,7 @@ function ListingCard({ listing, onToggle, onEdit, onDelete, onBoost }: {
         {listing.status === "نشط" && (
           <button onClick={onToggle} title={listing.active ? "إيقاف" : "تفعيل"}>
             {listing.active
-              ? <ToggleRight className="w-8 h-8 text-[#1EBFD5]" />
+              ? <ToggleRight className="w-8 h-8 text-[#123C79]" />
               : <ToggleLeft className="w-8 h-8 text-gray-300" />}
           </button>
         )}
@@ -351,7 +351,7 @@ export default function DashboardPage() {
         {/* User */}
         <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-3">
           <div className="relative flex-shrink-0">
-            <div className="w-9 h-9 rounded-full bg-[#1EBFD5] flex items-center justify-center text-white font-bold text-sm">أ</div>
+            <div className="w-9 h-9 rounded-full bg-[#123C79] flex items-center justify-center text-white font-bold text-sm">أ</div>
             <span className="absolute bottom-0 left-0 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-white" />
           </div>
           <div className="min-w-0">
@@ -368,7 +368,7 @@ export default function DashboardPage() {
               onClick={() => { setSection(item.id as Section); setSidebarOpen(false); }}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-all
                 ${section === item.id
-                  ? "bg-[#EBF9FB] text-[#1EBFD5]"
+                  ? "bg-[#EEF2F8] text-[#123C79]"
                   : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"}`}
             >
               <span className="flex items-center gap-2.5">
@@ -377,7 +377,7 @@ export default function DashboardPage() {
               </span>
               {item.badge ? (
                 <span className={`text-[10px] font-bold min-w-[18px] h-[18px] rounded-full flex items-center justify-center px-1
-                  ${section === item.id ? "bg-[#1EBFD5] text-white" : "bg-gray-100 text-gray-500"}`}>
+                  ${section === item.id ? "bg-[#123C79] text-white" : "bg-gray-100 text-gray-500"}`}>
                   {item.badge}
                 </span>
               ) : null}
@@ -408,7 +408,7 @@ export default function DashboardPage() {
             <div className="relative hidden sm:block">
               <Search className="w-3.5 h-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
               <input
-                className="bg-gray-50 text-sm py-1.5 pr-9 pl-4 rounded-lg border border-gray-200 outline-none w-64 focus:border-[#1EBFD5]/50 focus:bg-white transition-all placeholder:text-gray-400"
+                className="bg-gray-50 text-sm py-1.5 pr-9 pl-4 rounded-lg border border-gray-200 outline-none w-64 focus:border-[#123C79]/50 focus:bg-white transition-all placeholder:text-gray-400"
                 placeholder="بحث..."
               />
             </div>
@@ -420,9 +420,9 @@ export default function DashboardPage() {
             </button>
             <button className="relative w-8 h-8 rounded-lg hover:bg-gray-50 flex items-center justify-center text-gray-500 transition-colors">
               <MessageCircle style={{ width: 17, height: 17 }} />
-              <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-[#1EBFD5] rounded-full" />
+              <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-[#123C79] rounded-full" />
             </button>
-            <div className="w-8 h-8 rounded-full bg-[#1EBFD5] flex items-center justify-center text-white font-bold text-sm cursor-pointer mr-1">أ</div>
+            <div className="w-8 h-8 rounded-full bg-[#123C79] flex items-center justify-center text-white font-bold text-sm cursor-pointer mr-1">أ</div>
           </div>
         </header>
 
@@ -435,13 +435,13 @@ export default function DashboardPage() {
               <motion.div key="overview" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-5">
 
                 {/* Welcome */}
-                <div className="bg-[#1EBFD5] rounded-xl px-6 py-5 flex items-center justify-between text-white">
+                <div className="bg-[#123C79] rounded-xl px-6 py-5 flex items-center justify-between text-white">
                   <div>
                     <p className="text-white/80 text-sm mb-0.5">مرحبًا بعودتك 👋</p>
                     <h2 className="text-xl font-bold mb-3">أحمد محمد</h2>
                     <button
                       onClick={() => navigate("/add-property")}
-                      className="bg-white text-[#1EBFD5] px-4 py-2 rounded-lg font-semibold text-sm hover:bg-white/90 transition-colors flex items-center gap-1.5"
+                      className="bg-white text-[#123C79] px-4 py-2 rounded-lg font-semibold text-sm hover:bg-white/90 transition-colors flex items-center gap-1.5"
                     >
                       <Plus className="w-4 h-4" /> إضافة عقار
                     </button>
@@ -466,7 +466,7 @@ export default function DashboardPage() {
                       </div>
                       <p className="text-xl font-bold text-gray-900">{s.value}</p>
                       <p className="text-xs text-gray-500 mt-0.5">{s.label}</p>
-                      <p className="text-[10px] text-[#1EBFD5] mt-1 font-medium">{s.sub}</p>
+                      <p className="text-[10px] text-[#123C79] mt-1 font-medium">{s.sub}</p>
                     </motion.div>
                   ))}
                 </div>
@@ -480,27 +480,27 @@ export default function DashboardPage() {
                         <p className="text-xs text-gray-400 mt-0.5">آخر 7 أيام</p>
                       </div>
                       <div className="flex gap-3 text-xs">
-                        <span className="flex items-center gap-1.5 text-gray-500"><span className="w-2 h-2 rounded-full bg-[#1EBFD5]" />مشاهدات</span>
-                        <span className="flex items-center gap-1.5 text-gray-500"><span className="w-2 h-2 rounded-full bg-[#123C79]" />اتصالات</span>
+                        <span className="flex items-center gap-1.5 text-gray-500"><span className="w-2 h-2 rounded-full bg-[#123C79]" />مشاهدات</span>
+                        <span className="flex items-center gap-1.5 text-gray-500"><span className="w-2 h-2 rounded-full bg-[#93C5FD]" />اتصالات</span>
                       </div>
                     </div>
                     <ResponsiveContainer width="100%" height={180}>
                       <AreaChart data={CHART_DATA} margin={{ top: 0, right: 0, left: -30, bottom: 0 }}>
                         <defs>
                           <linearGradient id="gV" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#1EBFD5" stopOpacity={0.2} />
-                            <stop offset="100%" stopColor="#1EBFD5" stopOpacity={0} />
-                          </linearGradient>
-                          <linearGradient id="gC" x1="0" y1="0" x2="0" y2="1">
                             <stop offset="0%" stopColor="#123C79" stopOpacity={0.15} />
                             <stop offset="100%" stopColor="#123C79" stopOpacity={0} />
+                          </linearGradient>
+                          <linearGradient id="gC" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#93C5FD" stopOpacity={0.2} />
+                            <stop offset="100%" stopColor="#93C5FD" stopOpacity={0} />
                           </linearGradient>
                         </defs>
                         <XAxis dataKey="day" tick={{ fontSize: 10, fill: "#9CA3AF" }} axisLine={false} tickLine={false} />
                         <YAxis tick={{ fontSize: 10, fill: "#9CA3AF" }} axisLine={false} tickLine={false} />
                         <Tooltip contentStyle={{ borderRadius: 8, border: "1px solid #f3f4f6", fontSize: 12, boxShadow: "0 2px 8px rgba(0,0,0,.06)" }} />
-                        <Area type="monotone" dataKey="مشاهدات" stroke="#1EBFD5" strokeWidth={2} fill="url(#gV)" dot={false} />
-                        <Area type="monotone" dataKey="اتصالات" stroke="#123C79" strokeWidth={2} fill="url(#gC)" dot={false} />
+                        <Area type="monotone" dataKey="مشاهدات" stroke="#123C79" strokeWidth={2} fill="url(#gV)" dot={false} />
+                        <Area type="monotone" dataKey="اتصالات" stroke="#93C5FD" strokeWidth={2} fill="url(#gC)" dot={false} />
                       </AreaChart>
                     </ResponsiveContainer>
                   </div>
@@ -510,7 +510,7 @@ export default function DashboardPage() {
                     <div className="bg-white rounded-xl border border-gray-100 p-4">
                       <div className="flex items-center justify-between mb-3">
                         <h3 className="font-semibold text-gray-900 text-sm">آخر الرسائل</h3>
-                        <button onClick={() => setSection("messages")} className="text-[#1EBFD5] text-xs font-medium hover:underline">الكل</button>
+                        <button onClick={() => setSection("messages")} className="text-[#123C79] text-xs font-medium hover:underline">الكل</button>
                       </div>
                       <div className="space-y-2">
                         {MESSAGES.slice(0, 3).map(msg => (
@@ -523,7 +523,7 @@ export default function DashboardPage() {
                               <p className="text-gray-400 text-[11px] truncate">{msg.text}</p>
                             </div>
                             {msg.unread > 0 && (
-                              <span className="bg-[#1EBFD5] text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0">{msg.unread}</span>
+                              <span className="bg-[#123C79] text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center flex-shrink-0">{msg.unread}</span>
                             )}
                           </div>
                         ))}
@@ -548,12 +548,12 @@ export default function DashboardPage() {
                           <motion.div
                             initial={{ width: 0 }} animate={{ width: "53%" }}
                             transition={{ delay: 0.5, duration: 0.8 }}
-                            className="h-full bg-[#1EBFD5] rounded-full"
+                            className="h-full bg-[#123C79] rounded-full"
                           />
                         </div>
                       </div>
                       <button onClick={() => setSection("plans")}
-                        className="w-full bg-[#1EBFD5] text-white text-xs font-semibold py-2 rounded-lg hover:bg-[#17a8bd] transition-colors">
+                        className="w-full bg-[#123C79] text-white text-xs font-semibold py-2 rounded-lg hover:bg-[#0d2d5e] transition-colors">
                         ترقية الباقة
                       </button>
                     </div>
@@ -564,7 +564,7 @@ export default function DashboardPage() {
                 <div className="bg-white rounded-xl border border-gray-100 p-5">
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="font-semibold text-gray-900 text-sm">آخر إعلاناتي</h3>
-                    <button onClick={() => setSection("listings")} className="text-[#1EBFD5] text-xs font-medium flex items-center gap-1">
+                    <button onClick={() => setSection("listings")} className="text-[#123C79] text-xs font-medium flex items-center gap-1">
                       عرض الكل <ArrowUpRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -601,7 +601,7 @@ export default function DashboardPage() {
                   </div>
                   <button
                     onClick={() => navigate("/add-property")}
-                    className="bg-[#1EBFD5] text-white px-4 py-2 rounded-lg font-semibold text-sm flex items-center gap-1.5 hover:bg-[#17a8bd] transition-colors"
+                    className="bg-[#123C79] text-white px-4 py-2 rounded-lg font-semibold text-sm flex items-center gap-1.5 hover:bg-[#0d2d5e] transition-colors"
                   >
                     <Plus className="w-4 h-4" /> إضافة إعلان
                   </button>
@@ -622,14 +622,14 @@ export default function DashboardPage() {
                         onClick={() => setStatusFilter(tab.id)}
                         className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium whitespace-nowrap border-b-2 transition-all -mb-px ${
                           statusFilter === tab.id
-                            ? "border-[#1EBFD5] text-[#1EBFD5]"
+                            ? "border-[#123C79] text-[#123C79]"
                             : "border-transparent text-gray-500 hover:text-gray-700"
                         }`}
                       >
                         <span className={`w-1.5 h-1.5 rounded-full ${dotColor[tab.id]}`} />
                         {tab.id}
                         <span className={`text-[11px] font-semibold px-1.5 py-0.5 rounded-full ${
-                          statusFilter === tab.id ? "bg-[#1EBFD5]/10 text-[#1EBFD5]" : "bg-gray-100 text-gray-500"
+                          statusFilter === tab.id ? "bg-[#123C79]/10 text-[#123C79]" : "bg-gray-100 text-gray-500"
                         }`}>{tab.count}</span>
                       </button>
                     );
@@ -639,15 +639,15 @@ export default function DashboardPage() {
                 {/* Mini stats */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {[
-                    { label: "المشاهدات",  val: listings.reduce((s, l) => s + l.views, 0).toLocaleString("ar"),        icon: Eye,   color: "text-blue-500" },
-                    { label: "الاتصالات",  val: listings.reduce((s, l) => s + l.phoneClicks, 0).toLocaleString("ar"),  icon: Phone, color: "text-emerald-500" },
-                    { label: "المفضلة",    val: listings.reduce((s, l) => s + l.favorites, 0).toLocaleString("ar"),    icon: Heart, color: "text-red-400" },
-                    { label: "مميزة",      val: String(listings.filter(l => l.featured).length),                       icon: Star,  color: "text-amber-500" },
+                    { label: "المشاهدات", val: listings.reduce((s, l) => s + l.views, 0).toLocaleString("ar"),       icon: Eye   },
+                    { label: "الاتصالات", val: listings.reduce((s, l) => s + l.phoneClicks, 0).toLocaleString("ar"), icon: Phone },
+                    { label: "المفضلة",   val: listings.reduce((s, l) => s + l.favorites, 0).toLocaleString("ar"),   icon: Heart },
+                    { label: "مميزة",     val: String(listings.filter(l => l.featured).length),                      icon: Star  },
                   ].map((s, i) => (
                     <div key={i} className="bg-white rounded-xl border border-gray-100 p-3 flex items-center gap-2.5">
-                      <s.icon className={`w-4 h-4 ${s.color} flex-shrink-0`} />
+                      <s.icon className="w-4 h-4 text-[#123C79] flex-shrink-0" />
                       <div>
-                        <p className={`font-bold text-sm ${s.color}`}>{s.val}</p>
+                        <p className="font-bold text-sm text-gray-900">{s.val}</p>
                         <p className="text-[11px] text-gray-400">{s.label}</p>
                       </div>
                     </div>
@@ -661,7 +661,7 @@ export default function DashboardPage() {
                       className="bg-white rounded-xl border border-gray-100 py-16 flex flex-col items-center gap-3 text-center">
                       <Building2 className="w-10 h-10 text-gray-200" />
                       <p className="text-gray-500 font-medium">لا توجد إعلانات بهذه الحالة</p>
-                      <button onClick={() => navigate("/add-property")} className="bg-[#1EBFD5] text-white px-5 py-2 rounded-lg font-semibold text-sm">
+                      <button onClick={() => navigate("/add-property")} className="bg-[#123C79] text-white px-5 py-2 rounded-lg font-semibold text-sm">
                         إضافة إعلان
                       </button>
                     </motion.div>
@@ -698,12 +698,12 @@ export default function DashboardPage() {
                         <button className="absolute top-2.5 left-2.5 w-7 h-7 bg-white rounded-full shadow flex items-center justify-center">
                           <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500" />
                         </button>
-                        <span className="absolute top-2.5 right-2.5 bg-[#1EBFD5] text-white text-[10px] font-semibold px-2 py-0.5 rounded-md">{p.type}</span>
+                        <span className="absolute top-2.5 right-2.5 bg-[#123C79] text-white text-[10px] font-semibold px-2 py-0.5 rounded-md">{p.type}</span>
                       </div>
                       <div className="p-3.5">
                         <h3 className="font-semibold text-gray-900 text-sm mb-1 truncate">{p.title}</h3>
                         <div className="flex items-center gap-1 text-gray-400 text-xs mb-2"><MapPin className="w-3 h-3" />{p.location}</div>
-                        <p className="text-[#1EBFD5] font-bold text-sm">{p.priceLabel}</p>
+                        <p className="text-[#123C79] font-bold text-sm">{p.priceLabel}</p>
                       </div>
                     </motion.div>
                   ))}
@@ -728,7 +728,7 @@ export default function DashboardPage() {
                       {MESSAGES.map(msg => (
                         <div key={msg.id} onClick={() => setActiveMsg(msg)}
                           className={`flex items-center gap-2.5 p-3 cursor-pointer transition-colors
-                            ${activeMsg.id === msg.id ? "bg-[#EBF9FB]" : "hover:bg-gray-50"}`}>
+                            ${activeMsg.id === msg.id ? "bg-[#EEF2F8]" : "hover:bg-gray-50"}`}>
                           <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-semibold text-sm flex-shrink-0">{msg.avatar}</div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between">
@@ -738,7 +738,7 @@ export default function DashboardPage() {
                             <p className="text-gray-400 text-[11px] truncate mt-0.5">{msg.text}</p>
                           </div>
                           {msg.unread > 0 && (
-                            <span className="bg-[#1EBFD5] text-white text-[9px] font-bold min-w-[16px] h-4 rounded-full flex items-center justify-center flex-shrink-0">{msg.unread}</span>
+                            <span className="bg-[#123C79] text-white text-[9px] font-bold min-w-[16px] h-4 rounded-full flex items-center justify-center flex-shrink-0">{msg.unread}</span>
                           )}
                         </div>
                       ))}
@@ -756,7 +756,7 @@ export default function DashboardPage() {
                     </div>
                     <div className="flex-1 p-4 space-y-3 overflow-y-auto bg-gray-50">
                       <div className="flex justify-end">
-                        <div className="bg-[#1EBFD5] text-white text-sm px-4 py-2.5 rounded-xl rounded-tl-sm max-w-xs">
+                        <div className="bg-[#123C79] text-white text-sm px-4 py-2.5 rounded-xl rounded-tl-sm max-w-xs">
                           مرحباً! شكراً على تواصلك معنا 😊
                         </div>
                       </div>
@@ -771,12 +771,12 @@ export default function DashboardPage() {
                         value={msgInput}
                         onChange={e => setMsgInput(e.target.value)}
                         onKeyDown={e => e.key === "Enter" && setMsgInput("")}
-                        className="flex-1 bg-gray-50 text-sm py-2 px-3.5 rounded-lg border border-gray-200 outline-none focus:border-[#1EBFD5]/50 placeholder:text-gray-400"
+                        className="flex-1 bg-gray-50 text-sm py-2 px-3.5 rounded-lg border border-gray-200 outline-none focus:border-[#123C79]/50 placeholder:text-gray-400"
                         placeholder="اكتب رسالتك..."
                       />
                       <button
                         onClick={() => setMsgInput("")}
-                        className="w-9 h-9 bg-[#1EBFD5] rounded-lg flex items-center justify-center text-white hover:bg-[#17a8bd] transition-colors"
+                        className="w-9 h-9 bg-[#123C79] rounded-lg flex items-center justify-center text-white hover:bg-[#0d2d5e] transition-colors"
                       >
                         <Send className="w-4 h-4" />
                       </button>
@@ -828,18 +828,18 @@ export default function DashboardPage() {
                     { name: "الاحترافية", price: "599", ads: "غير محدود",    icon: Zap,   current: false },
                   ].map((plan, i) => (
                     <motion.div key={i} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}
-                      className={`bg-white rounded-xl border-2 p-5 relative ${plan.current ? "border-[#1EBFD5]" : "border-gray-100"}`}>
+                      className={`bg-white rounded-xl border-2 p-5 relative ${plan.current ? "border-[#123C79]" : "border-gray-100"}`}>
                       {plan.current && (
-                        <span className="absolute -top-3 right-4 bg-[#1EBFD5] text-white text-[10px] font-bold px-3 py-1 rounded-full">
+                        <span className="absolute -top-3 right-4 bg-[#123C79] text-white text-[10px] font-bold px-3 py-1 rounded-full">
                           باقتك الحالية
                         </span>
                       )}
-                      <plan.icon className={`w-6 h-6 mb-3 ${plan.current ? "text-[#1EBFD5]" : "text-gray-400"}`} />
+                      <plan.icon className={`w-6 h-6 mb-3 ${plan.current ? "text-[#123C79]" : "text-gray-400"}`} />
                       <h3 className="font-bold text-gray-900 mb-1">{plan.name}</h3>
                       <p className="text-2xl font-bold text-gray-900 mb-0.5">{plan.price}<span className="text-sm text-gray-400 font-normal"> ج.م/شهر</span></p>
                       <p className="text-sm text-gray-500 mb-4">{plan.ads}</p>
                       <button className={`w-full py-2 rounded-lg font-semibold text-sm transition-colors ${plan.current
-                        ? "bg-[#1EBFD5]/10 text-[#1EBFD5] cursor-default"
+                        ? "bg-[#123C79]/10 text-[#123C79] cursor-default"
                         : "bg-gray-900 text-white hover:bg-gray-800"}`}>
                         {plan.current ? "✓ باقتك الحالية" : "الترقية"}
                       </button>
@@ -861,14 +861,14 @@ export default function DashboardPage() {
                   {SETTINGS_CARDS.map((card, i) => (
                     <motion.button key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.06 }}
                       className="bg-white rounded-xl border border-gray-100 p-4 text-right flex items-center gap-3 hover:border-gray-200 transition-colors group">
-                      <div className="w-9 h-9 rounded-lg bg-gray-50 flex items-center justify-center flex-shrink-0 group-hover:bg-[#EBF9FB] transition-colors">
-                        <card.icon className="w-4.5 h-4.5 text-gray-500 group-hover:text-[#1EBFD5] transition-colors" style={{ width: 18, height: 18 }} />
+                      <div className="w-9 h-9 rounded-lg bg-gray-50 flex items-center justify-center flex-shrink-0 group-hover:bg-[#EEF2F8] transition-colors">
+                        <card.icon className="w-4.5 h-4.5 text-gray-500 group-hover:text-[#123C79] transition-colors" style={{ width: 18, height: 18 }} />
                       </div>
                       <div className="flex-1 text-right">
                         <p className="font-semibold text-gray-900 text-sm">{card.label}</p>
                         <p className="text-xs text-gray-400 mt-0.5">{card.desc}</p>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-[#1EBFD5] transition-colors flex-shrink-0" />
+                      <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-[#123C79] transition-colors flex-shrink-0" />
                     </motion.button>
                   ))}
                 </div>
@@ -878,7 +878,7 @@ export default function DashboardPage() {
                   <h3 className="font-semibold text-gray-900 mb-4 pb-3 border-b border-gray-100 text-sm">تعديل الملف الشخصي</h3>
                   <div className="flex items-center gap-4 mb-5">
                     <div className="relative">
-                      <div className="w-14 h-14 rounded-xl bg-[#1EBFD5] flex items-center justify-center text-white font-bold text-xl">أ</div>
+                      <div className="w-14 h-14 rounded-xl bg-[#123C79] flex items-center justify-center text-white font-bold text-xl">أ</div>
                       <button className="absolute -bottom-1 -left-1 w-5 h-5 bg-white rounded-full border border-gray-200 shadow flex items-center justify-center">
                         <Image className="w-2.5 h-2.5 text-gray-500" style={{ width: 10, height: 10 }} />
                       </button>
@@ -900,13 +900,13 @@ export default function DashboardPage() {
                         <input
                           defaultValue={f.value}
                           type={f.type}
-                          className="w-full py-2.5 px-3.5 rounded-lg bg-gray-50 border border-gray-200 text-sm text-gray-900 outline-none focus:border-[#1EBFD5]/50 focus:bg-white transition-all"
+                          className="w-full py-2.5 px-3.5 rounded-lg bg-gray-50 border border-gray-200 text-sm text-gray-900 outline-none focus:border-[#123C79]/50 focus:bg-white transition-all"
                         />
                       </div>
                     ))}
                   </div>
                   <div className="flex gap-2 mt-4">
-                    <button className="bg-[#1EBFD5] text-white px-6 py-2 rounded-lg font-semibold text-sm flex items-center gap-1.5 hover:bg-[#17a8bd] transition-colors">
+                    <button className="bg-[#123C79] text-white px-6 py-2 rounded-lg font-semibold text-sm flex items-center gap-1.5 hover:bg-[#0d2d5e] transition-colors">
                       <CheckCircle className="w-4 h-4" /> حفظ
                     </button>
                     <button className="px-5 py-2 rounded-lg font-medium text-sm text-gray-500 hover:bg-gray-50 border border-gray-200 transition-colors">إلغاء</button>
