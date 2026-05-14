@@ -162,7 +162,7 @@ function StatCard({ stat, delay }: { stat: typeof STATS[0]; delay: number }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      whileHover={{ y: -3, shadow: "lg" }}
+      whileHover={{ y: -3, boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)" }}
       className={`bg-gradient-to-br ${stat.bg} rounded-2xl p-5 border border-white shadow-sm hover:shadow-md transition-all cursor-default`}
     >
       <div className="flex items-start justify-between mb-4">

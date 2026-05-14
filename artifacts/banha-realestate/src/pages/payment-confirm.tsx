@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
 import {
@@ -9,7 +9,7 @@ import {
 import logoColor from "@assets/rgb_1778457941418.png";
 
 const PLAN_META: Record<string, {
-  nameAr: string; color: string; icon: JSX.Element;
+  nameAr: string; color: string; icon: React.ReactNode;
   priceMonthly: number; priceYearly: number;
   duration: string; listings: number; photos: number; visibility: string;
 }> = {
