@@ -12,7 +12,6 @@ import {
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import logoColor from "@assets/rgb_1778457941418.png";
 import { PROPERTIES } from "@/data/properties";
-import ListingEditPanel from "@/components/dashboard/ListingEditPanel";
 
 type Section = "overview" | "listings" | "favorites" | "messages" | "plans" | "settings";
 
@@ -188,7 +187,6 @@ export default function DashboardPage() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [listings, setListings] = useState<DashListing[]>(MY_LISTINGS_BASE);
   const [statusFilter, setStatusFilter] = useState<ListingStatus>("الكل");
-  const [editingListing, setEditingListing] = useState<DashListing | null>(null);
   const [activeMsg, setActiveMsg] = useState(MESSAGES[0]);
   const [msgInput, setMsgInput] = useState("");
   const [, navigate] = useLocation();
@@ -199,10 +197,6 @@ export default function DashboardPage() {
 
   const deleteListing = (id: number) => {
     setListings(prev => prev.filter(l => l.id !== id));
-  };
-
-  const saveListing = (updated: DashListing) => {
-    setListings(prev => prev.map(l => l.id === updated.id ? { ...updated } : l));
   };
 
   // Filter counts — mock totals that include paginated listings beyond our local array
@@ -620,7 +614,7 @@ export default function DashboardPage() {
                         key={listing.id}
                         listing={listing}
                         onToggle={() => toggleListing(listing.id)}
-                        onEdit={() => setEditingListing(listing)}
+                        onEdit={() => navigate(`/dashboard/edit/${listing.id}`)}
                         onDelete={() => deleteListing(listing.id)}
                       />
                     ))
@@ -874,19 +868,6 @@ export default function DashboardPage() {
         </main>
       </div>
 
-      {/* ── LISTING EDIT PANEL ── */}
-      <AnimatePresence>
-        {editingListing && (
-          <ListingEditPanel
-            listing={editingListing as any}
-            onClose={() => setEditingListing(null)}
-            onSave={(updated) => {
-              saveListing(updated as unknown as DashListing);
-              setEditingListing(null);
-            }}
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
 }
