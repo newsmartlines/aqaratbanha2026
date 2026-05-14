@@ -74,12 +74,17 @@ export default function Navbar({ transparent = false, scrolled = false, showSear
                   {link.label}
                 </button>
               ))}
+              <button
+                onClick={() => navigate("/dashboard")}
+                className={`text-sm font-medium transition-colors hover:text-[#1EBFD5] ${isLight ? "text-white/90" : "text-gray-600"}`}
+              >
+                {t("dashboard")}
+              </button>
             </nav>
           )}
 
           {/* Right actions */}
           <div className="hidden md:flex items-center gap-2 mr-auto">
-
             {/* Language toggle */}
             <button
               onClick={() => setLang(lang === "ar" ? "en" : "ar")}
@@ -92,26 +97,12 @@ export default function Navbar({ transparent = false, scrolled = false, showSear
               {lang === "ar" ? "EN" : "ع"}
             </button>
 
-            {/* User icon */}
+            {/* Dashboard Button (replaces sign in/register for demo) */}
             <button
-              onClick={() => navigate("/login")}
-              className={`w-9 h-9 rounded-full flex items-center justify-center transition-colors ${isLight ? "text-white hover:bg-white/10" : "text-gray-500 hover:bg-gray-100"}`}
-            >
-              <User className="w-5 h-5" />
-            </button>
-
-            <button
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/dashboard")}
               className={`text-sm font-semibold px-4 py-2 rounded-xl transition-all ${isLight ? "text-white hover:bg-white/10" : "text-gray-700 hover:bg-gray-50 border border-gray-200 hover:border-gray-300"}`}
             >
-              {t("signIn")}
-            </button>
-
-            <button
-              onClick={() => navigate("/register")}
-              className={`text-sm font-semibold px-4 py-2 rounded-xl transition-all ${isLight ? "bg-white/15 hover:bg-white/25 text-white border border-white/30" : "text-[#123C79] border border-[#123C79]/30 hover:bg-[#123C79]/5"}`}
-            >
-              {t("register")}
+              {t("dashboard")}
             </button>
 
             <button
@@ -169,20 +160,15 @@ export default function Navbar({ transparent = false, scrolled = false, showSear
                   <ArrowLeft className="w-4 h-4 text-gray-300" />
                 </button>
               ))}
+              <button
+                onClick={() => { setMobileOpen(false); navigate("/dashboard"); }}
+                className="text-lg font-semibold text-gray-800 border-b border-gray-50 py-4 text-right flex items-center justify-between"
+              >
+                {t("dashboard")}
+                <ArrowLeft className="w-4 h-4 text-gray-300" />
+              </button>
             </div>
             <div className="p-5 flex flex-col gap-3 border-t border-gray-100">
-              <button
-                onClick={() => { setMobileOpen(false); navigate("/login"); }}
-                className="w-full py-3 rounded-xl border border-gray-200 text-gray-700 font-semibold text-sm"
-              >
-                {t("login")}
-              </button>
-              <button
-                onClick={() => { setMobileOpen(false); navigate("/register"); }}
-                className="w-full py-3 rounded-xl border border-[#123C79]/30 text-[#123C79] font-semibold text-sm"
-              >
-                {t("register")}
-              </button>
               <button
                 onClick={() => { setMobileOpen(false); navigate("/add-property"); }}
                 className="w-full py-3 rounded-xl text-white font-bold text-sm flex items-center justify-center gap-2"

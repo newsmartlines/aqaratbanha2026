@@ -674,133 +674,60 @@ export default function HomePage() {
             </button>
           </div>
 
-          {/* Properties scroll container — internal scroll only */}
-          <div className="relative">
-            <div
-              ref={propertiesRef}
-              className="props-scroll-container"
-              style={{
-                maxHeight: "740px",
-                overflowY: "auto",
-                overscrollBehavior: "contain",
-              }}
-            >
-              {filteredProperties.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-20 text-gray-400">
-                  <Building2 className="w-12 h-12 mb-3 opacity-20" />
-                  <p className="font-semibold">لا توجد عقارات في هذا التصنيف</p>
+          {/* Latest Properties Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {filteredProperties.slice(0, visibleCount).map((prop, index) => (
+              <motion.div
+                key={prop.id}
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: (index % 4) * 0.04 }}
+                whileHover={{ y: -4 }}
+                onClick={() => navigate(`/property/${prop.id}`)}
+                className="bg-white rounded-2xl overflow-hidden border border-gray-100 transition-all group cursor-pointer shadow-sm hover:shadow-lg"
+              >
+                <div className="relative aspect-[4/3] overflow-hidden">
+                  <PropertyImage
+                    src={prop.image}
+                    alt={prop.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                  />
+                  {/* Status Badges */}
+                  <div className="absolute top-3 right-3">
+                    <span className={`text-xs font-bold px-2.5 py-1 rounded-md text-white ${prop.type === "للبيع" ? "bg-[#123C79]" : "bg-[#1EBFD5]"}`}>
+                      {prop.type}
+                    </span>
+                  </div>
                 </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 p-1">
-                  {filteredProperties.slice(0, visibleCount).map((prop, index) => (
-                    <motion.div
-                      key={prop.id}
-                      initial={{ opacity: 0, y: 16 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: (index % 4) * 0.04 }}
-                      whileHover={{ y: -4 }}
-                      data-testid={`card-property-${prop.id}`}
-                      onClick={() => navigate(`/property/${prop.id}`)}
-                      className="bg-white rounded-2xl overflow-hidden border border-gray-100 transition-all group cursor-pointer shadow-sm hover:shadow-lg"
-                    >
-                      <div className="relative aspect-[4/3] overflow-hidden">
-                        <PropertyImage
-                          src={prop.image}
-                          alt={prop.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                          loading="lazy"
-                        />
-                        <div className="absolute top-3 right-3">
-                          <span className={`text-xs font-bold px-2.5 py-1 rounded-md text-white ${prop.type === "للبيع" ? "bg-[#123C79]" : "bg-[#1EBFD5]"}`}>
-                            {prop.type}
-                          </span>
-                        </div>
-                        <div className="absolute top-3 left-3 flex flex-col gap-1.5">
-                          {prop.badges.includes("موثق") && (
-                            <span className="text-xs font-black px-3 py-1.5 rounded-xl flex items-center gap-1.5 text-white shadow-xl ring-2 ring-white/30"
-                              style={{ background: "linear-gradient(135deg,#0f2d5e,#1EBFD5)", boxShadow: "0 4px 15px rgba(30,191,213,0.45)" }}>
-                              <ShieldCheck className="w-3.5 h-3.5 fill-white/20 stroke-white" />
-                              موثق
-                            </span>
-                          )}
-                          {prop.badges.includes("مميز") && (
-                            <span className="text-xs font-black px-3 py-1.5 rounded-xl flex items-center gap-1.5 text-white shadow-xl ring-2 ring-white/30"
-                              style={{ background: "linear-gradient(135deg,#b45309,#f59e0b)", boxShadow: "0 4px 15px rgba(245,158,11,0.4)" }}>
-                              <Star className="w-3.5 h-3.5 fill-white stroke-white" />
-                              مميز
-                            </span>
-                          )}
-                        </div>
-                        <button
-                          onClick={e => e.stopPropagation()}
-                          className="absolute bottom-3 left-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm shadow flex items-center justify-center hover:bg-white transition-colors group/heart"
-                        >
-                          <Heart className="w-4 h-4 text-gray-400 group-hover/heart:text-red-500 transition-colors" />
-                        </button>
-                      </div>
-                      <div className="p-4">
-                        <p className="text-lg font-black text-[#123C79] mb-1">{prop.price}</p>
-                        <h3 className="text-base font-bold text-gray-900 leading-snug mb-1 line-clamp-2">{prop.title}</h3>
-                        <div className="flex items-center text-gray-500 mb-2 text-xs font-medium">
-                          <MapPin className="w-3.5 h-3.5 ml-1 text-[#1EBFD5] flex-shrink-0" />
-                          {prop.location}
-                        </div>
-                        <div className="flex items-center mb-3">
-                          <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-[#1EBFD5]/10 text-[#0e8fa3]">
-                            <Clock className="w-3 h-3" />
-                            منذ {prop.daysAgo} {prop.daysAgo === 1 ? "يوم" : "أيام"}
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between text-xs text-gray-900 pt-2.5 border-t border-gray-100">
-                          {prop.beds > 0 ? (
-                            <span className="flex items-center gap-1 font-semibold"><BedDouble className="w-3.5 h-3.5 text-gray-500" />{prop.beds}</span>
-                          ) : <span />}
-                          {prop.baths > 0 ? (
-                            <span className="flex items-center gap-1 font-semibold"><Bath className="w-3.5 h-3.5 text-gray-500" />{prop.baths}</span>
-                          ) : <span />}
-                          <span className="flex items-center gap-1 font-semibold"><Maximize2 className="w-3.5 h-3.5 text-gray-500" />{prop.area} م²</span>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-
-                  {/* Infinite scroll sentinel */}
-                  <div ref={loadMoreSentinel} className="col-span-full h-4" />
-
-                  {/* Loading more indicator */}
-                  {visibleCount < filteredProperties.length && (
-                    <div className="col-span-full flex items-center justify-center py-4 gap-2 text-sm text-gray-400">
-                      <div className="w-4 h-4 border-2 border-[#1EBFD5] border-t-transparent rounded-full animate-spin" />
-                      جاري تحميل المزيد...
-                    </div>
-                  )}
-
-                  {/* All loaded indicator */}
-                  {visibleCount >= filteredProperties.length && filteredProperties.length > PAGE_SIZE && (
-                    <div className="col-span-full flex items-center justify-center py-4 gap-2 text-xs text-gray-400">
-                      <div className="h-px flex-1 bg-gray-200" />
-                      <span>تم عرض جميع العقارات ({filteredProperties.length})</span>
-                      <div className="h-px flex-1 bg-gray-200" />
-                    </div>
-                  )}
+                <div className="p-4">
+                  <p className="text-lg font-black text-[#123C79] mb-1">{prop.price}</p>
+                  <h3 className="text-base font-bold text-gray-900 leading-snug mb-1 line-clamp-1">{prop.title}</h3>
+                  <div className="flex items-center text-gray-500 text-xs font-medium mb-3">
+                    <MapPin className="w-3.5 h-3.5 ml-1 text-[#1EBFD5]" />
+                    {prop.location}
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-gray-900 pt-2.5 border-t border-gray-100">
+                    <span className="flex items-center gap-1"><BedDouble className="w-3.5 h-3.5 text-gray-400" />{prop.beds}</span>
+                    <span className="flex items-center gap-1"><Bath className="w-3.5 h-3.5 text-gray-400" />{prop.baths}</span>
+                    <span className="flex items-center gap-1"><Maximize2 className="w-3.5 h-3.5 text-gray-400" />{prop.area} م²</span>
+                  </div>
                 </div>
-              )}
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Load More Button */}
+          {visibleCount < filteredProperties.length && (
+            <div className="mt-12 text-center">
+              <button
+                onClick={() => setVisibleCount(p => p + LOAD_MORE)}
+                className="bg-gray-900 text-white px-8 py-3 rounded-xl font-bold hover:bg-gray-800 transition-all"
+              >
+                تحميل المزيد
+              </button>
             </div>
-
-            {/* Fade bottom gradient — hidden when scrolled to end */}
-            <div className="absolute bottom-0 left-0 right-0 h-14 pointer-events-none"
-              style={{ background: "linear-gradient(to top, rgba(255,255,255,0.95), transparent)" }} />
-          </div>
-
-          <div className="mt-8 text-center md:hidden">
-            <button
-              onClick={() => navigate("/search")}
-              className="border-2 border-[#123C79] text-[#123C79] hover:bg-[#123C79] hover:text-white px-8 py-3 rounded-xl font-bold transition-colors w-full flex items-center justify-center gap-2"
-            >
-              عرض كل العقارات
-              <ArrowLeft className="w-4 h-4" />
-            </button>
-          </div>
+          )}
         </div>
       </section>
 
