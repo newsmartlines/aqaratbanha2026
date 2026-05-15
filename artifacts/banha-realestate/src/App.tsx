@@ -17,6 +17,8 @@ import PlansPage from "@/pages/plans";
 import PaymentConfirmPage from "@/pages/payment-confirm";
 import DashboardPage from "@/pages/dashboard";
 import EditListingPage from "@/pages/edit-listing";
+import AdminLogin from "@/pages/admin-login";
+import AdminPanel from "@/pages/admin";
 import { LanguageProvider, useLanguage } from "@/contexts/LanguageContext";
 
 const queryClient = new QueryClient();
@@ -72,6 +74,8 @@ function Router() {
         <Route path="/payment-confirm" component={PaymentConfirmPage} />
         <Route path="/dashboard" component={DashboardPage} />
         <Route path="/dashboard/edit/:id" component={EditListingPage} />
+        <Route path="/admin/login" component={AdminLogin} />
+        <Route path="/admin" component={AdminPanel} />
         <Route component={NotFound} />
       </Switch>
     </>
