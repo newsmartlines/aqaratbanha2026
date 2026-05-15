@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { useLocation } from "wouter";
-import { Menu, X, User, Plus, ArrowLeft, Search } from "lucide-react";
+import { Menu, X, User, Plus, ArrowLeft, Search, LogIn, UserPlus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
 import logoColor from "@assets/rgb_1778457941418.png";
 import logoWhite from "@assets/footer_1778457955133.png";
+
+const PRIMARY = "#123C79";
 
 interface NavbarProps {
   transparent?: boolean;
@@ -30,29 +32,32 @@ export default function Navbar({ transparent = false, scrolled = false, showSear
   const { t, lang, setLang, isRTL } = useLanguage();
 
   const NAV_LINKS = [
-    { label: t("home"), href: "/" },
-    { label: t("properties"), href: "/search" },
+    { label: t("home"),      href: "/" },
+    { label: t("properties"),href: "/search" },
     { label: t("mapSearch"), href: "/map" },
+    { label: t("dashboard"), href: "/dashboard" },
   ];
 
   const isLight = transparent && !scrolled;
   const bgClass = transparent
-    ? scrolled ? "bg-white/95 backdrop-blur-md border-b border-gray-100 py-3" : "bg-transparent py-5"
+    ? scrolled
+      ? "bg-white/95 backdrop-blur-md border-b border-gray-100 py-3"
+      : "bg-transparent py-5"
     : "bg-white border-b border-gray-100 py-3";
 
   return (
     <>
       <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${bgClass}`}>
-        <div className="container mx-auto px-4 md:px-6 flex items-center gap-4">
+        <div className="container mx-auto px-4 md:px-6 flex items-center gap-3">
 
           {/* Logo */}
-          <button onClick={() => navigate("/")} className="focus:outline-none">
+          <button onClick={() => navigate("/")} className="focus:outline-none flex-shrink-0">
             <Logo light={isLight} />
           </button>
 
           {/* Search bar (optional) */}
           {showSearch && (
-            <div className="flex-1 max-w-xl hidden md:flex items-center bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 gap-3 hover:border-[#1EBFD5] focus-within:border-[#1EBFD5] focus-within:ring-2 focus-within:ring-[#1EBFD5]/20 transition-all">
+            <div className="flex-1 max-w-xl hidden md:flex items-center bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 gap-3 hover:border-[#123C79] focus-within:border-[#123C79] focus-within:ring-2 focus-within:ring-[#123C79]/10 transition-all">
               <Search className="w-4 h-4 text-gray-400 flex-shrink-0" />
               <input
                 type="text"
@@ -64,51 +69,65 @@ export default function Navbar({ transparent = false, scrolled = false, showSear
 
           {/* Desktop Nav links */}
           {!showSearch && (
-            <nav className="hidden md:flex items-center gap-7 mr-6">
+            <nav className="hidden lg:flex items-center gap-6 mr-4">
               {NAV_LINKS.map((link) => (
                 <button
-                  key={link.label}
+                  key={link.href}
                   onClick={() => navigate(link.href)}
-                  className={`text-sm font-medium transition-colors hover:text-[#1EBFD5] ${isLight ? "text-white/90" : "text-gray-600"}`}
+                  className={`text-sm font-medium transition-colors hover:opacity-80 ${
+                    isLight ? "text-white/90" : "text-gray-600"
+                  }`}
+                  style={{ ["--hover-color" as string]: PRIMARY }}
                 >
                   {link.label}
                 </button>
               ))}
-              <button
-                onClick={() => navigate("/dashboard")}
-                className={`text-sm font-medium transition-colors hover:text-[#1EBFD5] ${isLight ? "text-white/90" : "text-gray-600"}`}
-              >
-                {t("dashboard")}
-              </button>
             </nav>
           )}
 
-          {/* Right actions */}
+          {/* Right actions — Desktop */}
           <div className="hidden md:flex items-center gap-2 mr-auto">
+
             {/* Language toggle */}
             <button
               onClick={() => setLang(lang === "ar" ? "en" : "ar")}
               className={`text-xs font-bold px-3 py-1.5 rounded-lg border transition-all ${
                 isLight
                   ? "border-white/30 text-white hover:bg-white/10"
-                  : "border-gray-200 text-gray-600 hover:border-[#1EBFD5] hover:text-[#1EBFD5]"
+                  : "border-gray-200 text-gray-500 hover:border-gray-300"
               }`}
             >
               {lang === "ar" ? "EN" : "ع"}
             </button>
 
-            {/* Dashboard Button (replaces sign in/register for demo) */}
+            {/* Login */}
             <button
-              onClick={() => navigate("/dashboard")}
-              className={`text-sm font-semibold px-4 py-2 rounded-xl transition-all ${isLight ? "text-white hover:bg-white/10" : "text-gray-700 hover:bg-gray-50 border border-gray-200 hover:border-gray-300"}`}
+              onClick={() => navigate("/login")}
+              className={`flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-xl border transition-all ${
+                isLight
+                  ? "border-white/30 text-white hover:bg-white/10"
+                  : "border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50"
+              }`}
             >
-              {t("dashboard")}
+              <LogIn className="w-3.5 h-3.5" />
+              {t("login")}
             </button>
 
+            {/* Register */}
+            <button
+              onClick={() => navigate("/register")}
+              className="flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-xl text-white transition-all hover:opacity-90"
+              style={{ backgroundColor: PRIMARY }}
+            >
+              <UserPlus className="w-3.5 h-3.5" />
+              {t("register")}
+            </button>
+
+            {/* Add Property */}
             <button
               onClick={() => navigate("/add-property")}
-              className="flex items-center gap-1.5 text-sm font-bold px-4 py-2 rounded-xl text-white transition-all hover:opacity-90 hover:-translate-y-0.5"
-              style={{ background: "#1EBFD5" }}
+              className="flex items-center gap-1.5 text-sm font-bold px-4 py-2 rounded-xl text-white transition-all hover:opacity-90 border border-white/20"
+              style={{ backgroundColor: "#0D9488" }}
             >
               <Plus className="w-4 h-4" />
               {t("addProperty")}
@@ -117,7 +136,7 @@ export default function Navbar({ transparent = false, scrolled = false, showSear
 
           {/* Mobile hamburger */}
           <button
-            className={`md:hidden p-2 rounded-lg ml-auto ${isLight ? "text-white" : "text-gray-700"}`}
+            className={`md:hidden p-2 rounded-lg mr-auto ${isLight ? "text-white" : "text-gray-700"}`}
             onClick={() => setMobileOpen(true)}
           >
             <Menu className="w-6 h-6" />
@@ -125,7 +144,7 @@ export default function Navbar({ transparent = false, scrolled = false, showSear
         </div>
       </header>
 
-      {/* Mobile Menu */}
+      {/* ── Mobile Menu ──────────────────────────────────────────────────────── */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
@@ -135,6 +154,7 @@ export default function Navbar({ transparent = false, scrolled = false, showSear
             transition={{ type: "spring", damping: 25, stiffness: 200 }}
             className="fixed inset-0 z-[60] bg-white flex flex-col"
           >
+            {/* Mobile header */}
             <div className="flex justify-between items-center p-5 border-b border-gray-100">
               <Logo />
               <div className="flex items-center gap-3">
@@ -144,35 +164,56 @@ export default function Navbar({ transparent = false, scrolled = false, showSear
                 >
                   {lang === "ar" ? "EN" : "ع"}
                 </button>
-                <button onClick={() => setMobileOpen(false)} className="w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center text-gray-600">
+                <button
+                  onClick={() => setMobileOpen(false)}
+                  className="w-9 h-9 bg-gray-100 rounded-full flex items-center justify-center text-gray-600"
+                >
                   <X className="w-5 h-5" />
                 </button>
               </div>
             </div>
-            <div className="flex flex-col p-5 gap-1 flex-1">
+
+            {/* Mobile nav links */}
+            <div className="flex flex-col p-5 gap-0 flex-1 overflow-y-auto">
               {NAV_LINKS.map((link) => (
                 <button
-                  key={link.label}
+                  key={link.href}
                   onClick={() => { setMobileOpen(false); navigate(link.href); }}
-                  className="text-lg font-semibold text-gray-800 border-b border-gray-50 py-4 text-right flex items-center justify-between"
+                  className="text-base font-semibold text-gray-800 border-b border-gray-50 py-4 text-right flex items-center justify-between hover:text-[#123C79] transition-colors"
                 >
                   {link.label}
                   <ArrowLeft className="w-4 h-4 text-gray-300" />
                 </button>
               ))}
-              <button
-                onClick={() => { setMobileOpen(false); navigate("/dashboard"); }}
-                className="text-lg font-semibold text-gray-800 border-b border-gray-50 py-4 text-right flex items-center justify-between"
-              >
-                {t("dashboard")}
-                <ArrowLeft className="w-4 h-4 text-gray-300" />
-              </button>
             </div>
-            <div className="p-5 flex flex-col gap-3 border-t border-gray-100">
+
+            {/* Mobile CTA buttons */}
+            <div className="p-5 flex flex-col gap-2.5 border-t border-gray-100">
+              {/* Login */}
+              <button
+                onClick={() => { setMobileOpen(false); navigate("/login"); }}
+                className="w-full py-3 rounded-xl text-sm font-bold border-2 flex items-center justify-center gap-2 transition-colors"
+                style={{ borderColor: PRIMARY, color: PRIMARY }}
+              >
+                <LogIn className="w-4 h-4" />
+                {t("login")}
+              </button>
+
+              {/* Register */}
+              <button
+                onClick={() => { setMobileOpen(false); navigate("/register"); }}
+                className="w-full py-3 rounded-xl text-white text-sm font-bold flex items-center justify-center gap-2"
+                style={{ backgroundColor: PRIMARY }}
+              >
+                <UserPlus className="w-4 h-4" />
+                {t("register")}
+              </button>
+
+              {/* Add Property */}
               <button
                 onClick={() => { setMobileOpen(false); navigate("/add-property"); }}
                 className="w-full py-3 rounded-xl text-white font-bold text-sm flex items-center justify-center gap-2"
-                style={{ background: "#1EBFD5" }}
+                style={{ backgroundColor: "#0D9488" }}
               >
                 <Plus className="w-4 h-4" /> {t("addProperty")}
               </button>
@@ -180,7 +221,6 @@ export default function Navbar({ transparent = false, scrolled = false, showSear
           </motion.div>
         )}
       </AnimatePresence>
-
     </>
   );
 }
