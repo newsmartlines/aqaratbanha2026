@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { SlimToggle } from "../components/SlimToggle";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
 import Navbar from "@/components/Navbar";
@@ -6,7 +7,7 @@ import {
   LayoutDashboard, Building2, Heart, MessageCircle, Package, Settings,
   Plus, Eye, Phone, Star, Edit3, Trash2, MapPin, LogOut, Search,
   Bell, TrendingUp, Crown, ChevronRight, TrendingDown,
-  ToggleLeft, ToggleRight, Lock, Globe, Shield, Send,
+  Lock, Globe, Shield, Send,
   CheckCircle, X, Menu, ArrowUpRight, Home,
   Check, Clock, XCircle, Zap, Image, Users, BarChart2,
 } from "lucide-react";
@@ -223,11 +224,7 @@ function ListingRow({ listing, onToggle, onEdit, onDelete, onBoost }: {
       </div>
       <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
         {listing.status === "نشط" && (
-          <button onClick={onToggle} className="w-7 h-7 rounded-lg hover:bg-gray-100 flex items-center justify-center transition-colors">
-            {listing.active
-              ? <ToggleRight className="w-5 h-5" style={{ color: PRIMARY }} />
-              : <ToggleLeft className="w-5 h-5 text-gray-300" />}
-          </button>
+          <SlimToggle on={listing.active} onToggle={onToggle} color={PRIMARY} size="sm" />
         )}
         <button onClick={onBoost} className="w-7 h-7 rounded-lg hover:bg-amber-50 text-amber-500 flex items-center justify-center transition-colors" title="تمييز">
           <Star className="w-3.5 h-3.5" />

@@ -1,11 +1,12 @@
 import { useState } from "react";
+import { SlimToggle } from "../components/SlimToggle";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Globe, Search, BarChart2, FileText, Settings, AlertCircle, CheckCircle,
   TrendingUp, Zap, RefreshCw, Download, Edit2, Trash2, Plus, Eye,
   Link, ExternalLink, Target, Activity, Brain, ArrowRight, Copy,
   Shield, Image, Code2, Repeat, Map, ChevronRight, X, Save,
-  ToggleLeft, ToggleRight, Star, Clock, AlertTriangle,
+  Star, Clock, AlertTriangle,
 } from "lucide-react";
 import {
   AreaChart, Area, BarChart, Bar, XAxis, YAxis, Tooltip,
@@ -235,11 +236,7 @@ function GeneralSeoTab() {
             ].map(item => (
               <div key={item.key} className="flex items-center justify-between">
                 <span className="text-sm text-gray-600">{item.label}</span>
-                <button onClick={() => set(item.key, !(form as any)[item.key])}>
-                  {(form as any)[item.key]
-                    ? <ToggleRight className="w-6 h-6" style={{ color: ACCENT }} />
-                    : <ToggleLeft className="w-6 h-6 text-gray-300" />}
-                </button>
+                <SlimToggle on={(form as any)[item.key]} onToggle={() => set(item.key, !(form as any)[item.key])} color={ACCENT} size="sm" />
               </div>
             ))}
           </div>
@@ -396,11 +393,7 @@ function PropertySeoTab() {
                 ))}
                 <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
                   <span className="text-sm text-gray-600">منع الفهرسة (NoIndex)</span>
-                  <button onClick={() => setEditForm(p => ({ ...p, noIndex: !p.noIndex }))}>
-                    {editForm.noIndex
-                      ? <ToggleRight className="w-6 h-6 text-red-400" />
-                      : <ToggleLeft className="w-6 h-6 text-gray-300" />}
-                  </button>
+                  <SlimToggle on={editForm.noIndex} onToggle={() => setEditForm(p => ({ ...p, noIndex: !p.noIndex }))} color="#EF4444" size="sm" />
                 </div>
                 <div className="pt-2">
                   <GooglePreview title={editForm.title} slug={editForm.slug} description={editForm.description} />

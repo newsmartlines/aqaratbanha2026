@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { SlimToggle } from "../components/SlimToggle";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Shield, ShieldCheck, ShieldAlert, ShieldX, ShieldOff,
@@ -8,7 +9,7 @@ import {
   Users, User, UserX, LogIn, LogOut, Key, Fingerprint,
   Upload, FileX, File, Image, Download, Archive,
   Bell, BellOff, Mail, Phone, Send,
-  Settings, Sliders, ToggleLeft, ToggleRight,
+  Settings, Sliders,
   Search, Filter, ChevronDown, ChevronUp, MoreVertical,
   Flame, Bug, Crosshair, Radio, Radar,
   MapPin, Map, Flag, Ban, Check, X, Plus, Trash2,
@@ -378,11 +379,7 @@ function FirewallTab() {
                     {r.hits > 0 && <span className="text-[10px] font-bold" style={{ color: YELLOW }}>{r.hits} إيقاف</span>}
                   </div>
                 </div>
-                <button onClick={() => toggle(i)}>
-                  {states[i]
-                    ? <ToggleRight className="w-8 h-8" style={{ color: GREEN }} />
-                    : <ToggleLeft  className="w-8 h-8" style={{ color: MUTED }} />}
-                </button>
+                <SlimToggle on={states[i]} onToggle={() => toggle(i)} color={GREEN} />
               </div>
             ))}
           </div>
@@ -557,11 +554,7 @@ function AdminProtectionTab() {
                   <p className="text-xs font-semibold" style={{ color: TEXT }}>{f.name}</p>
                   <p className="text-[10px] mt-0.5" style={{ color: MUTED }}>{f.desc}</p>
                 </div>
-                <button onClick={() => toggle(i)}>
-                  {states[i]
-                    ? <ToggleRight className="w-8 h-8" style={{ color: GREEN }} />
-                    : <ToggleLeft  className="w-8 h-8" style={{ color: MUTED }} />}
-                </button>
+                <SlimToggle on={states[i]} onToggle={() => toggle(i)} color={GREEN} />
               </div>
             ))}
           </div>
@@ -666,11 +659,7 @@ function UploadProtectionTab() {
             {rules.map((r, i) => (
               <div key={i} className="px-5 py-3.5 flex items-center gap-3">
                 <p className="flex-1 text-xs font-semibold" style={{ color: TEXT }}>{r.rule}</p>
-                <button onClick={() => toggle(i)}>
-                  {states[i]
-                    ? <ToggleRight className="w-8 h-8" style={{ color: GREEN }} />
-                    : <ToggleLeft  className="w-8 h-8" style={{ color: MUTED }} />}
-                </button>
+                <SlimToggle on={states[i]} onToggle={() => toggle(i)} color={GREEN} />
               </div>
             ))}
           </div>
@@ -845,9 +834,7 @@ function BackupTab() {
                   <p className="text-xs font-semibold" style={{ color: TEXT }}>{s.label}</p>
                   <p className="text-[10px]" style={{ color: MUTED }}>{s.time}</p>
                 </div>
-                {s.on
-                  ? <ToggleRight className="w-8 h-8" style={{ color: GREEN }} />
-                  : <ToggleLeft  className="w-8 h-8" style={{ color: MUTED }} />}
+                <SlimToggle on={s.on} color={GREEN} />
               </div>
             ))}
           </div>
@@ -980,11 +967,7 @@ function NotificationsTab() {
                     <c.icon className="w-4 h-4" style={{ color: CYAN }} />
                     <p className="text-xs font-bold" style={{ color: TEXT }}>{c.name}</p>
                   </div>
-                  <button onClick={() => toggleChan(i)}>
-                    {chanState[i]
-                      ? <ToggleRight className="w-8 h-8" style={{ color: GREEN }} />
-                      : <ToggleLeft  className="w-8 h-8" style={{ color: MUTED }} />}
-                  </button>
+                  <SlimToggle on={chanState[i]} onToggle={() => toggleChan(i)} color={GREEN} />
                 </div>
                 <p className="text-[11px] mb-2" style={{ color: MUTED }}>{c.desc}</p>
                 {chanState[i] && (
@@ -1005,11 +988,7 @@ function NotificationsTab() {
             {triggers.map((t, i) => (
               <div key={i} className="px-5 py-3 flex items-center justify-between">
                 <p className="text-xs font-semibold" style={{ color: TEXT }}>{t.name}</p>
-                <button onClick={() => setTrigState(p => p.map((v, j) => j === i ? !v : v))}>
-                  {trigState[i]
-                    ? <ToggleRight className="w-7 h-7" style={{ color: GREEN }} />
-                    : <ToggleLeft  className="w-7 h-7" style={{ color: MUTED }} />}
-                </button>
+                <SlimToggle on={trigState[i]} onToggle={() => setTrigState(p => p.map((v, j) => j === i ? !v : v))} color={GREEN} size="sm" />
               </div>
             ))}
           </div>

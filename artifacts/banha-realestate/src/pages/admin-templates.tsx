@@ -1,10 +1,11 @@
 import { useState, useRef } from "react";
+import { SlimToggle } from "../components/SlimToggle";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Mail, MessageSquare, Bell, Smartphone, Globe, Shield,
   CreditCard, User, Building2, Tag, ChevronRight, ChevronDown,
   Plus, Edit2, Trash2, Eye, Copy, RotateCcw, Download, Upload,
-  Check, X, Search, Filter, ToggleLeft, ToggleRight,
+  Check, X, Search, Filter,
   Sparkles, Wand2, Send, Code, Monitor, Tablet, Moon, Sun,
   Hash, AlertCircle, CheckCircle, Clock, Zap, Star,
   Languages, MoreVertical, Save, ExternalLink, Layout,
@@ -1201,13 +1202,7 @@ export function TemplatesSection() {
                           <Clock className="w-3 h-3" />
                           {tpl.lastModified}
                         </div>
-                        <button onClick={() => handleToggle(tpl.id)}
-                          className="transition-all"
-                          title={tpl.active ? "تعطيل" : "تفعيل"}>
-                          {tpl.active
-                            ? <ToggleRight style={{ width: 28, height: 28, color: ACCENT }} />
-                            : <ToggleLeft style={{ width: 28, height: 28, color: "#9CA3AF" }} />}
-                        </button>
+                        <SlimToggle on={tpl.active} onToggle={() => handleToggle(tpl.id)} color={ACCENT} />
                         <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                           <button onClick={() => setEditing(tpl)} title="تعديل"
                             className="w-7 h-7 rounded-lg hover:bg-amber-50 text-amber-400 flex items-center justify-center transition-colors">

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { SlimToggle } from "../components/SlimToggle";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
 import {
@@ -6,7 +7,7 @@ import {
   CreditCard, Repeat, BarChart2, Settings, LogOut, Bell, Search,
   Plus, Edit2, Trash2, Eye, Check, X, ChevronRight, Menu,
   TrendingUp, TrendingDown, Home, Star, Shield, Globe, Lock,
-  ToggleLeft, ToggleRight, Download, RefreshCw, Filter,
+  Download, RefreshCw, Filter,
   AlertCircle, CheckCircle, Clock, XCircle, Zap, Crown,
   Phone, Mail, User, ChevronDown, MoreVertical, Map,
   FileText, Activity, DollarSign, Package, UserPlus, Percent,
@@ -1741,11 +1742,7 @@ function WatermarkSection() {
                   {settings.enabled ? "✅ مفعّلة — اللوجو يُضاف على كل صورة" : "⛔ معطّلة — لا يُضاف شيء على الصور"}
                 </p>
               </div>
-              <button onClick={() => set("enabled", !settings.enabled)}>
-                {settings.enabled
-                  ? <ToggleRight className="w-12 h-12" style={{ color: ACCENT }} />
-                  : <ToggleLeft  className="w-12 h-12 text-gray-300" />}
-              </button>
+              <SlimToggle on={settings.enabled} onToggle={() => set("enabled", !settings.enabled)} color={ACCENT} size="lg" />
             </div>
           </div>
 

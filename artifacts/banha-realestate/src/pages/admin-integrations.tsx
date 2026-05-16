@@ -1,9 +1,10 @@
 import { useState } from "react";
+import { SlimToggle } from "../components/SlimToggle";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Search, CheckCircle, XCircle, AlertCircle, Settings, Zap,
   RefreshCw, X, Eye, EyeOff, Copy, ExternalLink, ChevronRight,
-  ToggleLeft, ToggleRight, Activity, Globe, Mail, Shield,
+  Activity, Globe, Mail, Shield,
   MessageSquare, Image, Brain, Map, BarChart2, Clock,
 } from "lucide-react";
 
@@ -313,11 +314,7 @@ function IntegrationCard({ integration, onConfigure }: { integration: Integratio
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
             <StatusBadge status={enabled ? (integration.status === "warning" ? "warning" : "connected") : "disconnected"} />
-            <button onClick={() => setEnabled(p => !p)}>
-              {enabled
-                ? <ToggleRight className="w-7 h-7" style={{ color: ACCENT }} />
-                : <ToggleLeft className="w-7 h-7 text-gray-300" />}
-            </button>
+            <SlimToggle on={enabled} onToggle={() => setEnabled(p => !p)} color={ACCENT} />
           </div>
         </div>
         <p className="text-xs text-gray-500 leading-relaxed">{integration.desc}</p>
