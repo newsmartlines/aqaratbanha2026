@@ -63,6 +63,19 @@ const USERS = [
   { id: 8,  name: "ttt",       email: "ISLAM@smartlines.com", phone: "—",        region: "—",           role: "مسؤول",  status: "نشط",    date: "19 أبريل" },
 ];
 
+const CLIENTS = [
+  { id: 1,  name: "محمد إبراهيم",    email: "m.ibrahim@gmail.com",     phone: "01001234567", region: "بنها",       city: "ميدان بنها",  inquiries: 5,  spent: "2,500", status: "نشط",    date: "14 مايو 26" },
+  { id: 2,  name: "سارة أحمد",       email: "sara.ahmed@outlook.com",  phone: "01112345678", region: "طوخ",         city: "طوخ الجديدة", inquiries: 3,  spent: "750",   status: "نشط",    date: "13 مايو 26" },
+  { id: 3,  name: "خالد محمود",      email: "khalid@hotmail.com",      phone: "01223456789", region: "قليوب",       city: "قليوب",        inquiries: 8,  spent: "4,200", status: "نشط",    date: "11 مايو 26" },
+  { id: 4,  name: "نور حسين",        email: "nour.h@yahoo.com",        phone: "01334567890", region: "شبين الكنائر",city: "شبين",         inquiries: 2,  spent: "300",   status: "معلق",   date: "10 مايو 26" },
+  { id: 5,  name: "أحمد سلامة",      email: "a.salama@gmail.com",      phone: "01445678901", region: "بنها",       city: "وسط البلد",   inquiries: 12, spent: "8,900", status: "نشط",    date: "8 مايو 26"  },
+  { id: 6,  name: "منى يوسف",        email: "mona.y@corp.com",         phone: "01556789012", region: "كفر شكر",    city: "كفر شكر",     inquiries: 1,  spent: "0",     status: "جديد",   date: "7 مايو 26"  },
+  { id: 7,  name: "هاني عبد الله",   email: "hany.a@gmail.com",        phone: "01667890123", region: "بنها",       city: "الشروق",      inquiries: 6,  spent: "3,100", status: "نشط",    date: "5 مايو 26"  },
+  { id: 8,  name: "رانيا فاروق",     email: "rania.f@mail.com",        phone: "01778901234", region: "طوخ",         city: "طوخ",          inquiries: 4,  spent: "1,600", status: "موقوف",  date: "2 مايو 26"  },
+  { id: 9,  name: "كريم عصام",       email: "karim.e@outlook.com",     phone: "01889012345", region: "منية القمح", city: "منية القمح",  inquiries: 9,  spent: "5,400", status: "نشط",    date: "29 أبريل 26"},
+  { id: 10, name: "لمياء صلاح",      email: "lamia.s@gmail.com",       phone: "01990123456", region: "بنها",       city: "بنها الجديدة",inquiries: 7,  spent: "2,800", status: "نشط",    date: "25 أبريل 26"},
+];
+
 const PROPERTIES = [
   { id: 1, title: "شقة 3 غرف - ميدان بنها",      type: "شقة",   loc: "ميدان بنها",    price: "850,000",  status: "نشط",     date: "14 مايو" },
   { id: 2, title: "فيلا كمبوند الشروق",           type: "فيلا",  loc: "الشروق",        price: "3,200,000",status: "نشط",     date: "13 مايو" },
@@ -140,7 +153,7 @@ const SUBS_DATA = [
   { user: "mona@dalel.sa",    plan: "برونزي",   status: "منته", start: "7 مايو 26",  end: "7 يونيو 26",  amount: "99" },
 ];
 
-type Section = "dashboard" | "users" | "properties" | "categories" | "locations" | "messages" | "payments" | "subscriptions" | "commissions" | "reports" | "settings";
+type Section = "dashboard" | "users" | "clients" | "properties" | "categories" | "locations" | "messages" | "payments" | "subscriptions" | "commissions" | "reports" | "settings";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function Badge({ label, color }: { label: string; color: "green" | "amber" | "red" | "blue" | "gray" }) {
@@ -544,6 +557,212 @@ function UsersSection() {
                 <select value={editForm.status} onChange={e => setEditForm(p => ({ ...p, status: e.target.value }))}
                   className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none">
                   <option>نشط</option>
+                  <option>موقوف</option>
+                </select>
+              </div>
+              <button onClick={saveEdit}
+                className="w-full py-2.5 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2"
+                style={{ backgroundColor: ACCENT }}>
+                <CheckCircle className="w-4 h-4" /> حفظ التغييرات
+              </button>
+            </div>
+          </AdminModal>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// ── Clients Section ──────────────────────────────────────────────────────────
+function ClientsSection() {
+  const [clientList, setClientList] = useState(CLIENTS);
+  const [search, setSearch] = useState("");
+  const [regionFilter, setRegionFilter] = useState("كل المناطق");
+  const [viewClient, setViewClient] = useState<typeof CLIENTS[0] | null>(null);
+  const [editClient, setEditClient] = useState<typeof CLIENTS[0] | null>(null);
+  const [editForm, setEditForm] = useState({ name: "", email: "", phone: "", status: "" });
+
+  const filtered = clientList.filter(c =>
+    (c.name.includes(search) || c.email.includes(search) || c.phone.includes(search)) &&
+    (regionFilter === "كل المناطق" || c.region === regionFilter)
+  );
+
+  const handleDelete = (id: number) => {
+    if (window.confirm("هل تريد حذف هذا العميل نهائياً؟"))
+      setClientList(prev => prev.filter(c => c.id !== id));
+  };
+  const openEdit = (c: typeof CLIENTS[0]) => {
+    setEditForm({ name: c.name, email: c.email, phone: c.phone, status: c.status });
+    setEditClient(c);
+  };
+  const saveEdit = () => {
+    setClientList(prev => prev.map(c => c.id === editClient!.id ? { ...c, ...editForm } : c));
+    setEditClient(null);
+  };
+
+  const regions = ["كل المناطق", ...Array.from(new Set(CLIENTS.map(c => c.region)))];
+  const cities  = ["كل المدن",   ...Array.from(new Set(CLIENTS.map(c => c.city)))];
+
+  const palette = ["#0D9488","#6366F1","#F59E0B","#EC4899","#3B82F6","#10B981","#EF4444","#8B5CF6","#F97316","#06B6D4"];
+
+  return (
+    <div className="space-y-5">
+      {/* Stat Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {[
+          { label: "إجمالي العملاء",  value: clientList.length,                                          Icon: Users,       bg: "#EFF6FF", clr: "#2563EB" },
+          { label: "النشطون",         value: clientList.filter(c => c.status === "نشط").length,          Icon: CheckCircle, bg: "#F0FDF4", clr: "#16A34A" },
+          { label: "الجدد",           value: clientList.filter(c => c.status === "جديد").length,         Icon: UserPlus,    bg: "#F5F3FF", clr: "#7C3AED" },
+          { label: "الموقوفون",       value: clientList.filter(c => c.status === "موقوف").length,        Icon: XCircle,     bg: "#FEF2F2", clr: "#DC2626" },
+        ].map((s, i) => (
+          <div key={i} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex items-center gap-4">
+            <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: s.bg }}>
+              <s.Icon className="w-5 h-5" style={{ color: s.clr }} />
+            </div>
+            <div>
+              <p className="text-2xl font-black text-gray-900">{s.value}</p>
+              <p className="text-xs text-gray-400 mt-0.5">{s.label}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Table Card */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-gray-100">
+          <div>
+            <h3 className="font-bold text-gray-900 text-sm">العملاء المسجّلون</h3>
+            <p className="text-xs text-gray-400 mt-0.5">عرض {filtered.length} عميل بعد التصفية والبحث</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input value={search} onChange={e => setSearch(e.target.value)}
+                placeholder="بحث بالاسم أو البريد أو الهاتف..."
+                className="pr-9 pl-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl outline-none w-56" />
+            </div>
+            <select value={regionFilter} onChange={e => setRegionFilter(e.target.value)}
+              className="py-2 px-3 text-sm bg-gray-50 border border-gray-200 rounded-xl outline-none text-gray-600">
+              {regions.map(r => <option key={r}>{r}</option>)}
+            </select>
+            <select className="py-2 px-3 text-sm bg-gray-50 border border-gray-200 rounded-xl outline-none text-gray-600">
+              {cities.map(c => <option key={c}>{c}</option>)}
+            </select>
+            <button className="w-9 h-9 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-500">
+              <RefreshCw className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+
+        <Table headers={["#", "العميل", "البريد الإلكتروني", "الهاتف", "المنطقة", "المدينة", "الاستفسارات", "الإجمالي", "الحالة", "تاريخ الانضمام", "إجراءات"]}>
+          {filtered.map((c, i) => {
+            const avatarBg = palette[c.id % palette.length];
+            return (
+              <Tr key={c.id}>
+                <Td className="text-gray-400 text-xs">{i + 1}</Td>
+                <Td>
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0" style={{ backgroundColor: avatarBg }}>
+                      {c.name[0]}
+                    </div>
+                    <span className="font-semibold text-gray-800 text-sm">{c.name}</span>
+                  </div>
+                </Td>
+                <Td className="text-gray-500 text-xs">{c.email}</Td>
+                <Td className="text-gray-400 text-xs">{c.phone}</Td>
+                <Td className="text-gray-500 text-xs">{c.region}</Td>
+                <Td className="text-gray-400 text-xs">{c.city}</Td>
+                <Td>
+                  <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: ACCENT_LIGHT, color: ACCENT }}>
+                    {c.inquiries} استفسار
+                  </span>
+                </Td>
+                <Td className="font-semibold text-gray-700 text-xs">{c.spent} ج.م</Td>
+                <Td>
+                  <Badge label={c.status}
+                    color={c.status === "نشط" ? "green" : c.status === "جديد" ? "blue" : c.status === "معلق" ? "amber" : "red"} />
+                </Td>
+                <Td className="text-gray-400 text-xs">{c.date}</Td>
+                <Td>
+                  <div className="flex items-center gap-1">
+                    <button onClick={() => setViewClient(c)} className="w-7 h-7 rounded-lg hover:bg-blue-50 text-blue-400 flex items-center justify-center" title="عرض">
+                      <Eye className="w-3.5 h-3.5" />
+                    </button>
+                    <button onClick={() => openEdit(c)} className="w-7 h-7 rounded-lg hover:bg-green-50 text-green-500 flex items-center justify-center" title="تعديل">
+                      <Edit2 className="w-3.5 h-3.5" />
+                    </button>
+                    <button className="w-7 h-7 rounded-lg hover:bg-blue-50 text-blue-500 flex items-center justify-center" title="إدارة">
+                      <UserPlus className="w-3.5 h-3.5" />
+                    </button>
+                    <button onClick={() => handleDelete(c.id)} className="w-7 h-7 rounded-lg hover:bg-red-50 text-red-400 flex items-center justify-center" title="حذف">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </Td>
+              </Tr>
+            );
+          })}
+        </Table>
+      </div>
+
+      {/* View Modal */}
+      <AnimatePresence>
+        {viewClient && (
+          <AdminModal title="تفاصيل العميل" onClose={() => setViewClient(null)}>
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0" style={{ backgroundColor: palette[viewClient.id % palette.length] }}>
+                  {viewClient.name[0]}
+                </div>
+                <div>
+                  <p className="font-bold text-gray-900">{viewClient.name}</p>
+                  <p className="text-sm text-gray-400">{viewClient.city} · {viewClient.region}</p>
+                </div>
+                <Badge label={viewClient.status} color={viewClient.status === "نشط" ? "green" : viewClient.status === "جديد" ? "blue" : viewClient.status === "معلق" ? "amber" : "red"} />
+              </div>
+              {[
+                { label: "البريد الإلكتروني", value: viewClient.email },
+                { label: "الهاتف",            value: viewClient.phone },
+                { label: "المنطقة",           value: viewClient.region },
+                { label: "المدينة",           value: viewClient.city },
+                { label: "عدد الاستفسارات",   value: `${viewClient.inquiries} استفسار` },
+                { label: "الإجمالي المدفوع",  value: `${viewClient.spent} ج.م` },
+                { label: "تاريخ الانضمام",    value: viewClient.date },
+              ].map(row => (
+                <div key={row.label} className="flex justify-between py-2 border-b border-gray-50 last:border-0">
+                  <span className="text-sm text-gray-400">{row.label}</span>
+                  <span className="text-sm font-medium text-gray-700">{row.value}</span>
+                </div>
+              ))}
+            </div>
+          </AdminModal>
+        )}
+      </AnimatePresence>
+
+      {/* Edit Modal */}
+      <AnimatePresence>
+        {editClient && (
+          <AdminModal title="تعديل العميل" onClose={() => setEditClient(null)}>
+            <div className="space-y-4">
+              {[
+                { label: "الاسم",             key: "name",  type: "text" },
+                { label: "البريد الإلكتروني", key: "email", type: "email" },
+                { label: "الهاتف",            key: "phone", type: "tel" },
+              ].map(f => (
+                <div key={f.key}>
+                  <label className="text-xs font-semibold text-gray-500 block mb-1.5">{f.label}</label>
+                  <input type={f.type} value={(editForm as any)[f.key]}
+                    onChange={e => setEditForm(p => ({ ...p, [f.key]: e.target.value }))}
+                    className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-gray-300 transition-all" />
+                </div>
+              ))}
+              <div>
+                <label className="text-xs font-semibold text-gray-500 block mb-1.5">الحالة</label>
+                <select value={editForm.status} onChange={e => setEditForm(p => ({ ...p, status: e.target.value }))}
+                  className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none">
+                  <option>نشط</option>
+                  <option>جديد</option>
+                  <option>معلق</option>
                   <option>موقوف</option>
                 </select>
               </div>
@@ -1529,6 +1748,7 @@ export default function AdminPanel() {
   const NAV = [
     { id: "dashboard",     label: "لوحة التحكم",     icon: LayoutDashboard },
     { id: "users",         label: "المستخدمون",       icon: Users },
+    { id: "clients",       label: "العملاء",           icon: UserPlus },
     { id: "properties",   label: "العقارات",          icon: Building2 },
     { id: "categories",   label: "التصنيفات",         icon: Tag },
     { id: "locations",    label: "المناطق والأحياء",  icon: MapPin },
@@ -1545,6 +1765,7 @@ export default function AdminPanel() {
   const SECTION_MAP: Record<Section, React.ReactNode> = {
     dashboard:     <DashboardSection />,
     users:         <UsersSection />,
+    clients:       <ClientsSection />,
     properties:    <PropertiesSection />,
     categories:    <CategoriesSection />,
     locations:     <LocationsSection />,
