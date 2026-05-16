@@ -856,21 +856,70 @@ function PropertiesSection() {
 function CategoriesSection() {
   const [cats, setCats] = useState(CATEGORIES);
   const [expanded, setExpanded] = useState<number[]>([]);
+
+  // Add category modal
+  const [addCatOpen, setAddCatOpen] = useState(false);
+  const [addCatForm, setAddCatForm] = useState({ name: "", nameEn: "", slug: "", icon: "" });
+
+  // Edit category modal
   const [editCat, setEditCat] = useState<typeof CATEGORIES[0] | null>(null);
-  const [editForm, setEditForm] = useState({ name: "", nameEn: "", slug: "" });
+  const [editCatForm, setEditCatForm] = useState({ name: "", nameEn: "", slug: "", icon: "" });
+
+  // Add sub-category modal
+  const [addSubCatId, setAddSubCatId] = useState<number | null>(null);
+  const [addSubName, setAddSubName] = useState("");
+
+  // Edit sub-category modal
+  const [editSub, setEditSub] = useState<{ catId: number; idx: number; value: string } | null>(null);
+  const [editSubValue, setEditSubValue] = useState("");
 
   const toggleExpand = (id: number) =>
     setExpanded(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
-  const handleDelete = (id: number) => {
-    if (window.confirm("حذف هذا التصنيف؟")) setCats(prev => prev.filter(c => c.id !== id));
+
+  // Category CRUD
+  const addCategory = () => {
+    if (!addCatForm.name.trim()) return;
+    const newId = Math.max(...cats.map(c => c.id)) + 1;
+    setCats(prev => [...prev, { id: newId, ...addCatForm, count: 0, active: true, subs: [] }]);
+    setAddCatForm({ name: "", nameEn: "", slug: "", icon: "" });
+    setAddCatOpen(false);
   };
-  const openEdit = (c: typeof CATEGORIES[0]) => {
-    setEditForm({ name: c.name, nameEn: c.nameEn, slug: c.slug });
+  const openEditCat = (c: typeof CATEGORIES[0]) => {
+    setEditCatForm({ name: c.name, nameEn: c.nameEn, slug: c.slug, icon: c.icon });
     setEditCat(c);
   };
-  const saveEdit = () => {
-    setCats(prev => prev.map(c => c.id === editCat!.id ? { ...c, ...editForm } : c));
+  const saveEditCat = () => {
+    setCats(prev => prev.map(c => c.id === editCat!.id ? { ...c, ...editCatForm } : c));
     setEditCat(null);
+  };
+  const deleteCat = (id: number) => {
+    if (window.confirm("حذف هذا التصنيف وكل تصنيفاته الفرعية؟"))
+      setCats(prev => prev.filter(c => c.id !== id));
+  };
+
+  // Sub-category CRUD
+  const addSub = () => {
+    if (!addSubName.trim() || addSubCatId === null) return;
+    setCats(prev => prev.map(c => c.id === addSubCatId
+      ? { ...c, subs: [...c.subs, addSubName.trim()] } : c));
+    if (!expanded.includes(addSubCatId)) setExpanded(prev => [...prev, addSubCatId]);
+    setAddSubName("");
+    setAddSubCatId(null);
+  };
+  const openEditSub = (catId: number, idx: number, value: string) => {
+    setEditSub({ catId, idx, value });
+    setEditSubValue(value);
+  };
+  const saveEditSub = () => {
+    if (!editSub) return;
+    setCats(prev => prev.map(c => c.id === editSub.catId
+      ? { ...c, subs: c.subs.map((s, i) => i === editSub.idx ? editSubValue : s) } : c));
+    setEditSub(null);
+  };
+  const deleteSub = (catId: number, idx: number) => {
+    if (window.confirm("حذف هذا التصنيف الفرعي؟"))
+      setCats(prev => prev.map(c => c.id === catId
+        ? { ...c, subs: c.subs.filter((_, i) => i !== idx) } : c));
   };
 
   const totalSubs = cats.reduce((acc, c) => acc + c.subs.length, 0);
@@ -884,14 +933,17 @@ function CategoriesSection() {
             <p className="text-xs text-gray-400 mt-0.5">{cats.length} تصنيف · {totalSubs} تصنيف فرعي</p>
           </div>
           <div className="flex items-center gap-2">
-            <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-gray-500 border border-gray-200 hover:bg-gray-50">
+            <button onClick={() => setCats(CATEGORIES)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-gray-500 border border-gray-200 hover:bg-gray-50">
               <RefreshCw className="w-3.5 h-3.5" /> تحديث
             </button>
-            <button className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold text-white" style={{ backgroundColor: ACCENT }}>
+            <button onClick={() => setAddCatOpen(true)}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold text-white" style={{ backgroundColor: ACCENT }}>
               <Plus className="w-3.5 h-3.5" /> إضافة تصنيف
             </button>
           </div>
         </div>
+
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -910,11 +962,9 @@ function CategoriesSection() {
                 <>
                   <tr key={c.id} className="border-b border-gray-50 hover:bg-gray-50/60 transition-colors">
                     <td className="px-4 py-3">
-                      <button
-                        onClick={() => toggleExpand(c.id)}
+                      <button onClick={() => toggleExpand(c.id)}
                         className="w-6 h-6 rounded-md hover:bg-gray-100 flex items-center justify-center text-gray-400 transition-all"
-                        style={{ transform: expanded.includes(c.id) ? "rotate(90deg)" : "rotate(0deg)" }}
-                      >
+                        style={{ transform: expanded.includes(c.id) ? "rotate(90deg)" : "rotate(0deg)" }}>
                         <ChevronRight className="w-4 h-4" />
                       </button>
                     </td>
@@ -933,39 +983,53 @@ function CategoriesSection() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1.5">
-                        <button onClick={() => handleDelete(c.id)} className="w-7 h-7 rounded-lg hover:bg-red-50 text-red-400 flex items-center justify-center">
+                        <button onClick={() => deleteCat(c.id)}
+                          className="w-7 h-7 rounded-lg hover:bg-red-50 text-red-400 flex items-center justify-center" title="حذف التصنيف">
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
-                        <button onClick={() => openEdit(c)} className="w-7 h-7 rounded-lg hover:bg-green-50 text-green-500 flex items-center justify-center">
+                        <button onClick={() => openEditCat(c)}
+                          className="w-7 h-7 rounded-lg hover:bg-green-50 text-green-500 flex items-center justify-center" title="تعديل التصنيف">
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
-                        <button className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold hover:bg-teal-50 transition-colors" style={{ color: ACCENT }}>
+                        <button onClick={() => { setAddSubCatId(c.id); setAddSubName(""); }}
+                          className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold hover:bg-teal-50 transition-colors" style={{ color: ACCENT }}>
                           <Plus className="w-3 h-3" /> إضافة فرعي
                         </button>
                       </div>
                     </td>
                   </tr>
+
                   {expanded.includes(c.id) && c.subs.map((sub, si) => (
                     <tr key={`${c.id}-${si}`} className="border-b border-gray-50 bg-gray-50/40">
                       <td className="px-4 py-2.5"></td>
                       <td className="px-4 py-2.5" colSpan={5}>
                         <div className="flex items-center gap-2 mr-3">
-                          <div className="w-1 h-4 rounded-full bg-gray-300"></div>
+                          <div className="w-1 h-4 rounded-full bg-gray-300 flex-shrink-0"></div>
                           <span className="text-sm text-gray-600">{sub}</span>
                         </div>
                       </td>
                       <td className="px-4 py-2.5">
                         <div className="flex items-center gap-1">
-                          <button className="w-6 h-6 rounded hover:bg-red-50 text-red-300 flex items-center justify-center">
+                          <button onClick={() => deleteSub(c.id, si)}
+                            className="w-6 h-6 rounded hover:bg-red-50 text-red-400 flex items-center justify-center" title="حذف الفرعي">
                             <Trash2 className="w-3 h-3" />
                           </button>
-                          <button className="w-6 h-6 rounded hover:bg-green-50 text-green-400 flex items-center justify-center">
+                          <button onClick={() => openEditSub(c.id, si, sub)}
+                            className="w-6 h-6 rounded hover:bg-green-50 text-green-500 flex items-center justify-center" title="تعديل الفرعي">
                             <Edit2 className="w-3 h-3" />
                           </button>
                         </div>
                       </td>
                     </tr>
                   ))}
+
+                  {expanded.includes(c.id) && c.subs.length === 0 && (
+                    <tr key={`${c.id}-empty`} className="border-b border-gray-50 bg-gray-50/20">
+                      <td className="px-4 py-3" colSpan={7}>
+                        <p className="text-center text-xs text-gray-400">لا توجد تصنيفات فرعية — اضغط "إضافة فرعي" لإضافة واحد</p>
+                      </td>
+                    </tr>
+                  )}
                 </>
               ))}
             </tbody>
@@ -973,6 +1037,35 @@ function CategoriesSection() {
         </div>
       </div>
 
+      {/* ── Modal: Add Category ── */}
+      <AnimatePresence>
+        {addCatOpen && (
+          <AdminModal title="إضافة تصنيف جديد" onClose={() => setAddCatOpen(false)}>
+            <div className="space-y-4">
+              {[
+                { label: "الاسم بالعربي",    key: "name",   ph: "مثل: شقق" },
+                { label: "الاسم بالإنجليزي", key: "nameEn", ph: "e.g. Apartments" },
+                { label: "المعرّف (Slug)",    key: "slug",   ph: "e.g. apartments" },
+                { label: "الأيقونة",         key: "icon",   ph: "مثل: Home" },
+              ].map(f => (
+                <div key={f.key}>
+                  <label className="text-xs font-semibold text-gray-500 block mb-1.5">{f.label}</label>
+                  <input value={(addCatForm as any)[f.key]} placeholder={f.ph}
+                    onChange={e => setAddCatForm(p => ({ ...p, [f.key]: e.target.value }))}
+                    className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-gray-300 transition-all" />
+                </div>
+              ))}
+              <button onClick={addCategory}
+                className="w-full py-2.5 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2"
+                style={{ backgroundColor: ACCENT }}>
+                <Plus className="w-4 h-4" /> إضافة التصنيف
+              </button>
+            </div>
+          </AdminModal>
+        )}
+      </AnimatePresence>
+
+      {/* ── Modal: Edit Category ── */}
       <AnimatePresence>
         {editCat && (
           <AdminModal title={`تعديل تصنيف: ${editCat.name}`} onClose={() => setEditCat(null)}>
@@ -981,15 +1074,62 @@ function CategoriesSection() {
                 { label: "الاسم بالعربي",    key: "name" },
                 { label: "الاسم بالإنجليزي", key: "nameEn" },
                 { label: "المعرّف (Slug)",    key: "slug" },
+                { label: "الأيقونة",         key: "icon" },
               ].map(f => (
                 <div key={f.key}>
                   <label className="text-xs font-semibold text-gray-500 block mb-1.5">{f.label}</label>
-                  <input value={(editForm as any)[f.key]}
-                    onChange={e => setEditForm(p => ({ ...p, [f.key]: e.target.value }))}
+                  <input value={(editCatForm as any)[f.key]}
+                    onChange={e => setEditCatForm(p => ({ ...p, [f.key]: e.target.value }))}
                     className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-gray-300 transition-all" />
                 </div>
               ))}
-              <button onClick={saveEdit}
+              <button onClick={saveEditCat}
+                className="w-full py-2.5 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2"
+                style={{ backgroundColor: ACCENT }}>
+                <CheckCircle className="w-4 h-4" /> حفظ التغييرات
+              </button>
+            </div>
+          </AdminModal>
+        )}
+      </AnimatePresence>
+
+      {/* ── Modal: Add Sub-Category ── */}
+      <AnimatePresence>
+        {addSubCatId !== null && (
+          <AdminModal
+            title={`إضافة فرعي لـ: ${cats.find(c => c.id === addSubCatId)?.name ?? ""}`}
+            onClose={() => setAddSubCatId(null)}>
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-semibold text-gray-500 block mb-1.5">اسم التصنيف الفرعي</label>
+                <input value={addSubName} placeholder="مثل: شقق مفروشة"
+                  onChange={e => setAddSubName(e.target.value)}
+                  onKeyDown={e => e.key === "Enter" && addSub()}
+                  className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-gray-300 transition-all" />
+              </div>
+              <button onClick={addSub}
+                className="w-full py-2.5 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2"
+                style={{ backgroundColor: ACCENT }}>
+                <Plus className="w-4 h-4" /> إضافة
+              </button>
+            </div>
+          </AdminModal>
+        )}
+      </AnimatePresence>
+
+      {/* ── Modal: Edit Sub-Category ── */}
+      <AnimatePresence>
+        {editSub && (
+          <AdminModal title="تعديل التصنيف الفرعي" onClose={() => setEditSub(null)}>
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-semibold text-gray-500 block mb-1.5">اسم التصنيف الفرعي</label>
+                <input value={editSubValue}
+                  onChange={e => setEditSubValue(e.target.value)}
+                  onKeyDown={e => e.key === "Enter" && saveEditSub()}
+                  className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-gray-300 transition-all" />
+              </div>
+              <button onClick={saveEditSub}
                 className="w-full py-2.5 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2"
                 style={{ backgroundColor: ACCENT }}>
                 <CheckCircle className="w-4 h-4" /> حفظ التغييرات
