@@ -1,0 +1,161 @@
+اعمل صفحة جديدة داخل لوحة تحكم الأدمن باسم Integrations أو التكاملات، وأضف لينك لها داخل الـ Navbar بجوار SEO Management.
+الصفحة تكون احترافية جدًا ومخصصة لربط الموقع بجميع الخدمات الخارجية المهمة لموقع عقارات احترافي.
+
+الموقع عبارة عن منصة عقارات، لذلك لازم التكاملات تكون مفيدة فعليًا للسيو، الخرائط، التحليلات، الأداء، والإعلانات.
+
+المطلوب داخل صفحة Integrations
+
+اعمل الصفحة بشكل Dashboard حديث يحتوي على:
+
+Cards لكل خدمة
+حالة الاتصال:
+Connected
+Not Connected
+Warning
+أزرار:
+Connect
+Disconnect
+Configure
+Logs وآخر عمليات الربط
+اختبار الاتصال Test Connection
+Search داخل التكاملات
+تصنيفات للخدمات
+الأقسام الرئيسية
+1. Google Services
+
+اعمل قسم كامل لخدمات جوجل:
+
+Google Maps API
+ربط الخرائط للعقارات.
+Auto Location Picker.
+Nearby Places.
+حساب المسافات.
+Street View.
+Geocoding تلقائي للعناوين.
+إظهار العقارات على الخريطة.
+رسم حدود المناطق.
+Google Analytics 4
+ربط GA4.
+تتبع الزوار.
+تتبع التحويلات.
+تتبع مشاهدة العقارات.
+تتبع النقر على الواتساب والاتصال.
+Google Search Console
+إرسال Sitemap تلقائي.
+فحص الصفحات المؤرشفة.
+مراقبة أخطاء الفهرسة.
+الكلمات المفتاحية.
+CTR و Impressions.
+Google Tag Manager
+إدارة جميع التاجات بسهولة.
+Facebook Pixel.
+TikTok Pixel.
+Conversion Tracking.
+Google reCAPTCHA
+حماية تسجيل الدخول والفورمز.
+v2 و v3.
+Google OAuth
+تسجيل الدخول بجوجل.
+2. SEO & Marketing Tools
+Microsoft Clarity
+Heatmaps
+Session Recording
+Meta Pixel
+Facebook Ads Tracking
+TikTok Pixel
+تتبع الحملات الإعلانية.
+Ahrefs / SEMrush Integration
+Keyword Tracking
+Backlinks
+SEO Audits
+Schema Validator
+اختبار الـ Structured Data.
+Sitemap Monitor
+مراقبة حالة Sitemap.
+3. Property & Maps Services
+Mapbox
+
+بديل احترافي لجوجل ماب.
+
+OpenStreetMap
+
+خيار مجاني احتياطي.
+
+Geo APIs
+تحديد الموقع تلقائي.
+اقتراح المناطق والمدن.
+Nearby Services APIs
+المدارس
+المستشفيات
+المولات
+المواصلات
+حول العقار تلقائيًا.
+4. Notifications & Communication
+WhatsApp API
+إرسال إشعارات للعملاء.
+إشعارات الملاك.
+Telegram Bot
+تنبيهات الأدمن.
+SMS Providers
+Twilio
+Vonage
+Email Services
+Resend
+SendGrid
+Mailgun
+5. Performance & Security
+Cloudflare
+CDN
+حماية
+Cache
+Image Optimization
+ضغط الصور تلقائي.
+تحويل WebP.
+CDN Manager
+إدارة ملفات الموقع.
+Backup Services
+نسخ احتياطي تلقائي.
+Monitoring
+مراقبة السيرفر.
+Uptime Monitoring.
+6. AI Integrations
+OpenAI Integration
+توليد وصف العقارات.
+تحسين SEO.
+كتابة Meta Descriptions.
+AI Chat Assistant.
+AI Image Optimization
+تحسين الصور تلقائيًا.
+Smart Property Recommendations
+اقتراح عقارات مشابهة.
+داخل كل Integration
+
+اعمل:
+
+API Key Inputs
+Secret Key Inputs
+Toggle Enable/Disable
+Save Config
+Test Connection
+Status Indicator
+Error Handling
+Logs Viewer
+التصميم المطلوب
+تصميم احترافي جدًا شبيه:
+Vercel
+Stripe
+Firebase Console
+Modern Cards
+Animations بسيطة.
+Tabs أو Sidebar داخلي.
+Responsive كامل.
+Dark / Light Mode.
+أيقونات لكل خدمة.
+Search + Filters.
+مهم جدًا
+لا تفسد أي تصميم موجود.
+استخدم Architecture نظيف وقابل للتوسع.
+كل Integration يكون Modular.
+أضف صفحة Integrations داخل Navbar الأدمن.
+اجعل إضافة أي خدمة جديدة مستقبلًا سهلة جدًا.
+استخدم أفضل UX/UI ممكن للوحة تحكم احترافية خاصة بمنصة عقارات.

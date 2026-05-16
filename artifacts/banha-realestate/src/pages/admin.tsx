@@ -11,6 +11,7 @@ import {
   Phone, Mail, User, ChevronDown, MoreVertical, Map,
   FileText, Activity, DollarSign, Package, UserPlus, Percent,
 } from "lucide-react";
+import { SEOSection } from "./admin-seo";
 import {
   AreaChart, Area, LineChart, Line, BarChart, Bar,
   PieChart, Pie, Cell, XAxis, YAxis, Tooltip,
@@ -153,7 +154,7 @@ const SUBS_DATA = [
   { user: "mona@dalel.sa",    plan: "برونزي",   status: "منته", start: "7 مايو 26",  end: "7 يونيو 26",  amount: "99" },
 ];
 
-type Section = "dashboard" | "users" | "clients" | "properties" | "categories" | "locations" | "messages" | "payments" | "subscriptions" | "commissions" | "reports" | "settings";
+type Section = "dashboard" | "users" | "clients" | "properties" | "categories" | "locations" | "messages" | "payments" | "subscriptions" | "commissions" | "reports" | "settings" | "seo";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function Badge({ label, color }: { label: string; color: "green" | "amber" | "red" | "blue" | "gray" }) {
@@ -1896,6 +1897,7 @@ export default function AdminPanel() {
     { id: "payments",      label: "المدفوعات",         icon: CreditCard },
     { id: "subscriptions", label: "الاشتراكات",        icon: Repeat },
     { id: "commissions",   label: "العمولات",          icon: Percent },
+    { id: "seo",           label: "إدارة السيو",       icon: Globe },
     { id: "reports",       label: "التقارير",          icon: BarChart2 },
     { id: "settings",     label: "الإعدادات",         icon: Settings },
   ];
@@ -1913,6 +1915,7 @@ export default function AdminPanel() {
     payments:      <PaymentsSection />,
     subscriptions: <SubscriptionsSection />,
     commissions:   <CommissionsSection />,
+    seo:           <SEOSection />,
     reports:       <ReportsSection />,
     settings:      <SettingsSection />,
   };
