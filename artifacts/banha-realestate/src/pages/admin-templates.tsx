@@ -1050,44 +1050,22 @@ export function TemplatesSection() {
         </div>
       </div>
 
-      {/* Stats row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {[
-          { label: "إجمالي القوالب", value: templates.length.toString(), icon: Layout,       color: ACCENT    },
-          { label: "قوالب نشطة",     value: totalActive.toString(),      icon: CheckCircle,  color: "#16A34A" },
-          { label: "قوالب معطّلة",   value: totalInactive.toString(),    icon: Clock,        color: "#F59E0B" },
-          { label: "التصنيفات",      value: CATEGORIES.length.toString(),icon: Tag,          color: "#6366F1" },
-        ].map((s, i) => (
-          <motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
-            <div className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: s.color + "15" }}>
-                <s.icon style={{ width: 16, height: 16, color: s.color }} />
-              </div>
-              <div>
-                <p className="text-xl font-bold text-gray-900">{s.value}</p>
-                <p className="text-[10px] text-gray-400">{s.label}</p>
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
-
       {/* ── Top Category Tabs ── */}
-      <div className="flex items-end gap-0 border-b-2 border-gray-100 overflow-x-auto pb-0">
+      <div className="flex items-end gap-0 border-b border-gray-200" style={{ overflowX: "auto", overflowY: "visible" }}>
         {/* "الكل" tab */}
         {(() => {
           const active = activeCategory === "all";
           return (
             <button
               onClick={() => setActiveCategory("all")}
-              className="relative flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold transition-all border-b-2 -mb-0.5 whitespace-nowrap flex-shrink-0"
-              style={active ? { color: SB_ACTIVE, borderColor: SB_ACTIVE } : { color: "#9CA3AF", borderColor: "transparent" }}>
+              className="relative flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold transition-all border-b-2 -mb-px whitespace-nowrap flex-shrink-0"
+              style={active ? { color: SB_ACTIVE, borderColor: SB_ACTIVE } : { color: "#111827", borderColor: "transparent" }}>
               <Globe style={{ width: 13, height: 13 }} />
               الكل
               <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold"
                 style={active
                   ? { backgroundColor: SB_ACTIVE, color: "white" }
-                  : { backgroundColor: "#F1F5F9", color: "#9CA3AF" }}>
+                  : { backgroundColor: "#F1F5F9", color: "#6B7280" }}>
                 {templates.length}
               </span>
             </button>
@@ -1101,14 +1079,14 @@ export function TemplatesSection() {
             <button
               key={cat.id}
               onClick={() => setActiveCategory(cat.id)}
-              className="relative flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold transition-all border-b-2 -mb-0.5 whitespace-nowrap flex-shrink-0"
-              style={active ? { color: cat.color, borderColor: cat.color } : { color: "#9CA3AF", borderColor: "transparent" }}>
+              className="relative flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold transition-all border-b-2 -mb-px whitespace-nowrap flex-shrink-0"
+              style={active ? { color: cat.color, borderColor: cat.color } : { color: "#111827", borderColor: "transparent" }}>
               <Icon style={{ width: 13, height: 13 }} />
               {cat.label}
               <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold"
                 style={active
                   ? { backgroundColor: cat.color, color: "white" }
-                  : { backgroundColor: "#F1F5F9", color: "#9CA3AF" }}>
+                  : { backgroundColor: "#F1F5F9", color: "#6B7280" }}>
                 {count}
               </span>
             </button>

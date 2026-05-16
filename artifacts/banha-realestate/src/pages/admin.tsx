@@ -11,7 +11,7 @@ import {
   AlertCircle, CheckCircle, Clock, XCircle, Zap, Crown,
   Phone, Mail, User, ChevronDown, MoreVertical, Map,
   FileText, Activity, DollarSign, Package, UserPlus, Percent,
-  Stamp, Type, Upload, Image,
+  Stamp, Type, Upload, Image, Send,
 } from "lucide-react";
 import { SEOSection } from "./admin-seo";
 import { IntegrationsSection } from "./admin-integrations";
@@ -1317,129 +1317,227 @@ function CommissionsSection() {
 }
 
 // ── Messages Section ─────────────────────────────────────────────────────────
+const PRIORITY_CONFIG: Record<string, { label: string; dot: string; text: string; bg: string }> = {
+  "عالية":    { label: "عالية",    dot: "#EF4444", text: "#DC2626", bg: "#FEF2F2" },
+  "متوسطة":  { label: "متوسطة",  dot: "#F59E0B", text: "#B45309", bg: "#FFFBEB" },
+  "منخفضة":  { label: "منخفضة",  dot: "#10B981", text: "#065F46", bg: "#ECFDF5" },
+};
+const STATUS_CONFIG: Record<string, { label: string; dot: string; text: string; bg: string }> = {
+  "جديد":   { label: "جديد",   dot: "#3B82F6", text: "#1D4ED8", bg: "#EFF6FF" },
+  "مفتوح":  { label: "مفتوح",  dot: "#F59E0B", text: "#92400E", bg: "#FFFBEB" },
+  "مغلق":   { label: "مغلق",   dot: "#10B981", text: "#065F46", bg: "#ECFDF5" },
+};
+
+function MsgPill({ cfg }: { cfg: { label: string; dot: string; text: string; bg: string } }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold"
+      style={{ color: cfg.text, backgroundColor: cfg.bg }}>
+      <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: cfg.dot }} />
+      {cfg.label}
+    </span>
+  );
+}
+
 function MessagesSection() {
   const [msgList, setMsgList] = useState(MESSAGES_DATA);
   const [viewMsg, setViewMsg] = useState<typeof MESSAGES_DATA[0] | null>(null);
   const [msgTab, setMsgTab] = useState<"الكل" | "جديد" | "مفتوح" | "مغلق" | "عالية">("الكل");
+  const [replyText, setReplyText] = useState("");
 
   const handleDelete = (id: number) => {
     if (window.confirm("حذف هذه الرسالة؟")) setMsgList(prev => prev.filter(m => m.id !== id));
   };
 
-  const MSG_TABS: { id: "الكل" | "جديد" | "مفتوح" | "مغلق" | "عالية"; label: string; color: string }[] = [
-    { id: "الكل",   label: `الكل (${msgList.length})`,                                               color: ACCENT    },
-    { id: "جديد",   label: `جديد (${msgList.filter(m => m.status === "جديد").length})`,              color: "#EF4444" },
-    { id: "مفتوح",  label: `مفتوح (${msgList.filter(m => m.status === "مفتوح").length})`,            color: "#F59E0B" },
-    { id: "مغلق",   label: `مغلق (${msgList.filter(m => m.status === "مغلق").length})`,              color: "#10B981" },
-    { id: "عالية",  label: `أولوية عالية (${msgList.filter(m => m.priority === "عالية").length})`,   color: "#EF4444" },
+  const handleClose = (id: number) => {
+    setMsgList(prev => prev.map(m => m.id === id ? { ...m, status: "مغلق" } : m));
+  };
+
+  const MSG_TABS: { id: "الكل" | "جديد" | "مفتوح" | "مغلق" | "عالية"; label: string; count: number }[] = [
+    { id: "الكل",   label: "الكل",          count: msgList.length },
+    { id: "جديد",   label: "جديد",          count: msgList.filter(m => m.status === "جديد").length },
+    { id: "مفتوح",  label: "مفتوح",         count: msgList.filter(m => m.status === "مفتوح").length },
+    { id: "مغلق",   label: "مغلق",          count: msgList.filter(m => m.status === "مغلق").length },
+    { id: "عالية",  label: "أولوية عالية",  count: msgList.filter(m => m.priority === "عالية").length },
   ];
 
   const filtered = msgTab === "الكل"   ? msgList
     : msgTab === "عالية" ? msgList.filter(m => m.priority === "عالية")
     : msgList.filter(m => m.status === msgTab);
 
+  const AVATAR_COLORS = ["#2563EB", "#7C3AED", "#059669", "#DC2626", "#D97706", "#0891B2"];
+
   return (
     <div className="space-y-5">
 
-      {/* ── Top Tabs ── */}
-      <div className="flex items-end gap-0 border-b-2 border-gray-100">
+      {/* ── Header ── */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-lg font-bold text-gray-900">الرسائل والاستفسارات</h2>
+          <p className="text-sm text-gray-400 mt-0.5">تواصل من المستخدمين والعملاء</p>
+        </div>
+        <button className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-gray-600 border border-gray-200 hover:bg-gray-50 transition-all">
+          <Download className="w-3.5 h-3.5" /> تصدير
+        </button>
+      </div>
+
+      {/* ── Filter Tabs ── */}
+      <div className="flex gap-1 flex-wrap">
         {MSG_TABS.map(t => {
           const active = msgTab === t.id;
           return (
-            <button
-              key={t.id}
-              onClick={() => setMsgTab(t.id)}
-              className="relative px-5 py-2.5 text-sm font-semibold transition-all border-b-2 -mb-0.5 whitespace-nowrap"
+            <button key={t.id} onClick={() => setMsgTab(t.id)}
+              className="flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm font-semibold transition-all border"
               style={active
-                ? { color: t.color, borderColor: t.color }
-                : { color: "#9CA3AF", borderColor: "transparent" }}>
+                ? { backgroundColor: ACCENT, borderColor: ACCENT, color: "white" }
+                : { backgroundColor: "white", borderColor: "#E5E7EB", color: "#111827" }}>
               {t.label}
-              {active && (
-                <motion.span
-                  layoutId="msg-tab-indicator"
-                  className="absolute inset-x-0 -bottom-0.5 h-0.5 rounded-full"
-                  style={{ backgroundColor: t.color }}
-                />
-              )}
+              <span className={`text-[11px] font-bold px-1.5 py-0.5 rounded-full min-w-[20px] text-center leading-none transition-all`}
+                style={active
+                  ? { backgroundColor: "rgba(255,255,255,0.25)", color: "white" }
+                  : { backgroundColor: "#F3F4F6", color: "#6B7280" }}>
+                {t.count}
+              </span>
             </button>
           );
         })}
       </div>
 
-      {/* ── Table Card ── */}
+      {/* ── Messages List ── */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-          <h3 className="font-bold text-gray-900 text-sm">الرسائل والاستفسارات</h3>
-          <button className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-gray-500 border border-gray-200 hover:bg-gray-50">
-            <Filter className="w-3.5 h-3.5" /> تصفية
-          </button>
-        </div>
-        <Table headers={["#", "المُرسِل", "الموضوع", "الأولوية", "الحالة", "الوقت", "إجراءات"]}>
-          {filtered.length === 0 ? (
-            <Tr onClick={() => {}}>
-              <Td><span /></Td>
-              <Td><span /></Td>
-              <Td><p className="text-gray-400 text-sm py-8 text-center whitespace-nowrap">لا توجد رسائل في هذا التبويب</p></Td>
-              <Td><span /></Td>
-              <Td><span /></Td>
-              <Td><span /></Td>
-              <Td><span /></Td>
-            </Tr>
-          ) : filtered.map(m => (
-            <Tr key={m.id} onClick={() => setViewMsg(m)}>
-              <Td className="text-gray-400 text-xs">{m.id}</Td>
-              <Td>
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-xs font-bold" style={{ backgroundColor: ACCENT }}>
+        {filtered.length === 0 ? (
+          <div className="flex flex-col items-center py-16 text-center">
+            <MessageSquare className="w-12 h-12 text-gray-200 mb-3" />
+            <p className="text-gray-400 font-medium">لا توجد رسائل</p>
+            <p className="text-gray-300 text-sm mt-1">جرّب تغيير الفلتر</p>
+          </div>
+        ) : (
+          <div>
+            {filtered.map((m, i) => {
+              const avatarColor = AVATAR_COLORS[m.id % AVATAR_COLORS.length];
+              const priCfg = PRIORITY_CONFIG[m.priority];
+              const stCfg  = STATUS_CONFIG[m.status];
+              const isLast = i === filtered.length - 1;
+              return (
+                <motion.div
+                  key={m.id}
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.04 }}
+                  className={`flex items-center gap-4 px-5 py-4 hover:bg-gray-50/70 cursor-pointer transition-all group ${!isLast ? "border-b border-gray-50" : ""}`}
+                  onClick={() => setViewMsg(m)}>
+
+                  {/* Avatar */}
+                  <div className="w-9 h-9 rounded-xl flex items-center justify-center text-white text-sm font-bold flex-shrink-0"
+                    style={{ backgroundColor: avatarColor }}>
                     {m.from[0]}
                   </div>
-                  <span className="font-medium text-gray-800 text-sm">{m.from}</span>
-                </div>
-              </Td>
-              <Td className="text-gray-600 text-sm">{m.subject}</Td>
-              <Td>
-                <Badge label={m.priority} color={m.priority === "عالية" ? "red" : m.priority === "متوسطة" ? "amber" : "gray"} />
-              </Td>
-              <Td>
-                <Badge label={m.status} color={m.status === "جديد" ? "blue" : m.status === "مفتوح" ? "amber" : "green"} />
-              </Td>
-              <Td className="text-gray-400 text-xs">{m.time}</Td>
-              <Td><ActionBtns onView={() => setViewMsg(m)} onDelete={() => handleDelete(m.id)} /></Td>
-            </Tr>
-          ))}
-        </Table>
+
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="font-semibold text-gray-900 text-sm">{m.from}</span>
+                      {m.status === "جديد" && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0" />
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-500 truncate">{m.subject}</p>
+                  </div>
+
+                  {/* Right side */}
+                  <div className="flex items-center gap-2.5 flex-shrink-0">
+                    <span className="text-xs text-gray-400 hidden sm:block">{m.time}</span>
+                    {priCfg && <MsgPill cfg={priCfg} />}
+                    {stCfg  && <MsgPill cfg={stCfg}  />}
+
+                    {/* Action buttons — visible on hover */}
+                    <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={e => e.stopPropagation()}>
+                      <button onClick={() => setViewMsg(m)} title="عرض"
+                        className="w-7 h-7 rounded-lg hover:bg-blue-50 text-blue-400 flex items-center justify-center transition-colors">
+                        <Eye className="w-3.5 h-3.5" />
+                      </button>
+                      {m.status !== "مغلق" && (
+                        <button onClick={() => handleClose(m.id)} title="إغلاق"
+                          className="w-7 h-7 rounded-lg hover:bg-green-50 text-green-500 flex items-center justify-center transition-colors">
+                          <CheckCircle className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                      <button onClick={() => handleDelete(m.id)} title="حذف"
+                        className="w-7 h-7 rounded-lg hover:bg-red-50 text-red-400 flex items-center justify-center transition-colors">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
+      {/* ── Message Detail Modal ── */}
       <AnimatePresence>
         {viewMsg && (
-          <AdminModal title="تفاصيل الرسالة" onClose={() => setViewMsg(null)}>
+          <AdminModal title="تفاصيل الرسالة" onClose={() => { setViewMsg(null); setReplyText(""); }}>
             <div className="space-y-4">
+
+              {/* Sender info */}
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold flex-shrink-0" style={{ backgroundColor: ACCENT }}>
+                <div className="w-11 h-11 rounded-xl flex items-center justify-center text-white font-bold text-base flex-shrink-0"
+                  style={{ backgroundColor: AVATAR_COLORS[viewMsg.id % AVATAR_COLORS.length] }}>
                   {viewMsg.from[0]}
                 </div>
-                <div>
+                <div className="flex-1 min-w-0">
                   <p className="font-bold text-gray-900">{viewMsg.from}</p>
                   <p className="text-xs text-gray-400">{viewMsg.time}</p>
                 </div>
-                <div className="mr-auto flex gap-2">
-                  <Badge label={viewMsg.priority} color={viewMsg.priority === "عالية" ? "red" : viewMsg.priority === "متوسطة" ? "amber" : "gray"} />
-                  <Badge label={viewMsg.status} color={viewMsg.status === "جديد" ? "blue" : viewMsg.status === "مفتوح" ? "amber" : "green"} />
+                <div className="flex gap-1.5 flex-shrink-0">
+                  {PRIORITY_CONFIG[viewMsg.priority] && <MsgPill cfg={PRIORITY_CONFIG[viewMsg.priority]} />}
+                  {STATUS_CONFIG[viewMsg.status]     && <MsgPill cfg={STATUS_CONFIG[viewMsg.status]}     />}
                 </div>
               </div>
+
+              {/* Divider */}
+              <div className="border-t border-gray-100" />
+
+              {/* Message body */}
               <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-                <p className="text-sm font-semibold text-gray-700 mb-2">الموضوع</p>
-                <p className="text-sm text-gray-600">{viewMsg.subject}</p>
+                <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wide mb-2">الموضوع</p>
+                <p className="text-sm text-gray-700 leading-relaxed">{viewMsg.subject}</p>
               </div>
-              <div className="flex gap-2 pt-2">
+
+              {/* Reply box */}
+              <div className="space-y-2">
+                <p className="text-xs font-semibold text-gray-500">الرد</p>
+                <textarea
+                  value={replyText}
+                  onChange={e => setReplyText(e.target.value)}
+                  rows={3}
+                  placeholder="اكتب ردك هنا..."
+                  className="w-full text-sm bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:bg-white focus:border-gray-300 transition-all resize-none"
+                />
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-2">
                 <button
-                  onClick={() => { setMsgList(prev => prev.map(m => m.id === viewMsg.id ? { ...m, status: "مغلق" } : m)); setViewMsg(null); }}
-                  className="flex-1 py-2 rounded-xl text-sm font-bold text-white" style={{ backgroundColor: ACCENT }}>
-                  إغلاق الرسالة
+                  onClick={() => { handleClose(viewMsg.id); setViewMsg(null); setReplyText(""); }}
+                  className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-bold text-white transition-all"
+                  style={{ backgroundColor: ACCENT }}>
+                  <CheckCircle className="w-4 h-4" />
+                  {viewMsg.status === "مغلق" ? "تم الإغلاق" : "إغلاق الرسالة"}
                 </button>
-                <button onClick={() => setViewMsg(null)}
-                  className="flex-1 py-2 rounded-xl text-sm font-bold text-gray-500 border border-gray-200 hover:bg-gray-50">
-                  إغلاق
+                {replyText.trim() && (
+                  <button
+                    onClick={() => { setReplyText(""); }}
+                    className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-bold text-white transition-all"
+                    style={{ backgroundColor: "#16A34A" }}>
+                    <Send className="w-4 h-4" /> إرسال الرد
+                  </button>
+                )}
+                <button onClick={() => { setViewMsg(null); setReplyText(""); }}
+                  className="mr-auto px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-500 border border-gray-200 hover:bg-gray-50 transition-all">
+                  إلغاء
                 </button>
               </div>
             </div>
