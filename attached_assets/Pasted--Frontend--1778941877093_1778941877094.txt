@@ -1,0 +1,144 @@
+اربط لوحة تحكم الأدمن بالكامل مع الـ Frontend الحقيقي للموقع بحيث أي تعديل يتم من الأدمن ينعكس مباشرة على الموقع، لكن بدون حذف أو استبدال البيانات الوهمية الحالية، لأنني أريد الاستمرار في التطوير والتجربة عليها مؤقتًا.
+
+المطلوب الأساسي
+
+اعمل ربط حقيقي بين:
+
+Admin Dashboard
+Frontend Website
+Database
+APIs
+
+بحيث النظام يصبح Dynamic بالكامل بدل البيانات الثابتة أو الـ Mock Data.
+
+مهم جدًا
+لا تحذف:
+أي بيانات وهمية حالية.
+أي عقارات تجريبية.
+أي Users تجريبية.
+أي UI Demo Data.
+
+خليها موجودة كـ Seed / Demo Data لحين الانتهاء من التطوير.
+
+المطلوب في الربط
+أي شيء يتم من الأدمن:
+إضافة عقار
+تعديل عقار
+حذف عقار
+تعديل الباقات
+تغيير الإعدادات
+تعديل السيو
+الرسائل
+التقييمات
+الإشعارات
+
+ينعكس مباشرة على الموقع الحقيقي.
+
+Database Layer
+
+اعمل:
+
+Real Database Integration
+API Layer منظمة
+Models / Services Architecture
+Validation Layer
+Error Handling
+Data Strategy
+المطلوب:
+استخدام البيانات الحقيقية أولًا.
+ولو لا توجد بيانات:
+استخدم البيانات الوهمية تلقائيًا.
+
+يعني:
+
+Hybrid Data System.
+Fallback Demo Data.
+Admin Actions
+
+أي عملية داخل الأدمن:
+
+تحدث الـ Frontend مباشرة.
+بدون Refresh كامل.
+باستخدام:
+Realtime Updates
+API Fetching
+State Synchronization
+API System
+
+اعمل APIs احترافية لكل:
+
+العقارات
+المستخدمين
+الرسائل
+الباقات
+السيو
+الإشعارات
+التقييمات
+الـ AI Chat
+المطلوب في الـ Frontend
+
+خلي الموقع:
+
+يقرأ البيانات من الـ APIs.
+يقرأ إعدادات الأدمن مباشرة.
+يقرأ الثيمات.
+يقرأ الـ SEO Settings.
+يقرأ الباقات والعمولات.
+يقرأ الرسائل والقوالب.
+Real-time Features
+
+لو الأدمن:
+
+أضاف عقار → يظهر فورًا بالموقع.
+غيّر السعر → يتحدث فورًا.
+حذف إعلان → يختفي فورًا.
+غيّر الباقات → تتحدث صفحة الباقات.
+Architecture
+
+اعمل Architecture نظيف جدًا:
+
+Scalable
+Modular
+API-driven
+Reusable
+Production Ready
+مهم جدًا بخصوص البيانات الوهمية
+لا تعمل:
+Delete للـ Mock Data.
+Reset للـ Database.
+Override للـ Demo Content.
+
+بدل ذلك:
+
+اجعل البيانات الوهمية تعمل بجانب البيانات الحقيقية.
+مع إمكانية حذفها لاحقًا من الأدمن.
+الأداء
+Optimized Fetching
+Lazy Loading
+Smart Caching
+Pagination
+Infinite Scroll
+Debounced Search
+الأمان
+Secure APIs
+Authentication
+Role Permissions
+Admin Protection
+Validation
+Rate Limiting
+التصميم
+لا تفسد أي تصميم موجود.
+حافظ على نفس الـ UI الحالي.
+لا تغيّر الـ Layouts.
+فقط اجعل النظام Dynamic وحقيقي.
+المطلوب النهائي
+
+أريد المشروع يتحول من:
+
+Static Demo Project
+
+إلى:
+
+Real Full Stack Real Estate Platform
+
+لكن مع الاحتفاظ الكامل بكل البيانات التجريبية الحالية وعدم حذف أي شيء منها.

@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronUp } from "lucide-react";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Search from "@/pages/search";
@@ -23,6 +24,10 @@ import { LanguageProvider, useLanguage } from "@/contexts/LanguageContext";
 import { SiteLogosProvider } from "@/contexts/SiteLogosContext";
 
 const queryClient = new QueryClient();
+
+function getGoogleClientId(): string {
+  try { return localStorage.getItem("oauth_google_client_id") ?? ""; } catch { return ""; }
+}
 
 function ScrollToTop() {
   const [location] = useLocation();
@@ -97,16 +102,19 @@ function AppInner() {
 }
 
 function App() {
+  const clientId = getGoogleClientId();
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <LanguageProvider>
-          <SiteLogosProvider>
-            <AppInner />
-          </SiteLogosProvider>
-        </LanguageProvider>
-      </TooltipProvider>
-    </QueryClientProvider>
+    <GoogleOAuthProvider clientId={clientId || "placeholder-configure-in-admin"}>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <LanguageProvider>
+            <SiteLogosProvider>
+              <AppInner />
+            </SiteLogosProvider>
+          </LanguageProvider>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </GoogleOAuthProvider>
   );
 }
 

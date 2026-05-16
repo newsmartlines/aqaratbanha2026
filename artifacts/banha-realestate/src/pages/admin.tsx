@@ -19,6 +19,7 @@ import { ZARASecuritySection } from "./admin-zara-security";
 import { TemplatesSection } from "./admin-templates";
 import { GeoManagerSection } from "./admin-geo-manager";
 import { PlansCommissionsSection } from "./admin-plans";
+import { AuthSettingsSection } from "./admin-auth-settings";
 import {
   getWatermarkSettings, saveWatermarkSettings,
   DEFAULT_WATERMARK,
@@ -152,7 +153,7 @@ const SUBS_DATA = [
   { user: "mona@dalel.sa",    plan: "برونزي",   status: "منته", start: "7 مايو 26",  end: "7 يونيو 26",  amount: "99" },
 ];
 
-type Section = "dashboard" | "users" | "clients" | "properties" | "categories" | "locations" | "messages" | "payments" | "subscriptions" | "commissions" | "reports" | "settings" | "seo" | "integrations" | "watermark" | "security" | "templates" | "plans";
+type Section = "dashboard" | "users" | "clients" | "properties" | "categories" | "locations" | "messages" | "payments" | "subscriptions" | "commissions" | "reports" | "settings" | "seo" | "integrations" | "watermark" | "security" | "templates" | "plans" | "auth";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function Badge({ label, color }: { label: string; color: "green" | "amber" | "red" | "blue" | "gray" }) {
@@ -2346,6 +2347,7 @@ export default function AdminPanel() {
     { id: "locations",    label: "المناطق والأحياء",  icon: MapPin },
     { id: "messages",     label: "الرسائل",           icon: MessageSquare, badge: 2 },
     { id: "plans",         label: "الباقات والعمولات", icon: Package },
+    { id: "auth",          label: "إعدادات المصادقة",  icon: Shield },
     { id: "payments",      label: "المدفوعات",         icon: CreditCard },
     { id: "subscriptions", label: "الاشتراكات",        icon: Repeat },
     { id: "commissions",   label: "العمولات",          icon: Percent },
@@ -2369,6 +2371,7 @@ export default function AdminPanel() {
     locations:     <LocationsSection />,
     messages:      <MessagesSection />,
     plans:         <PlansCommissionsSection />,
+    auth:          <AuthSettingsSection />,
     payments:      <PaymentsSection />,
     subscriptions: <SubscriptionsSection />,
     commissions:   <CommissionsSection />,

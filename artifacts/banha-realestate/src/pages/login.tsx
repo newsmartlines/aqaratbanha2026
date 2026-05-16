@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useLocation } from "wouter";
 import { Eye, EyeOff, ChevronLeft } from "lucide-react";
 import { useSiteLogos } from "@/contexts/SiteLogosContext";
+import { GoogleAuthButton } from "@/components/GoogleAuthButton";
 
 export default function LoginPage() {
   const [, navigate] = useLocation();
@@ -48,6 +49,16 @@ export default function LoginPage() {
               <>
                 <h1 className="text-3xl font-black text-gray-900 mb-1">مرحباً بعودتك</h1>
                 <p className="text-gray-400 text-sm mb-8">سجّل دخولك للمتابعة</p>
+
+                {/* Google Sign-In */}
+                <GoogleAuthButton mode="login" className="mb-5" />
+
+                {/* Divider */}
+                <div className="flex items-center gap-3 mb-5">
+                  <div className="flex-1 h-px bg-gray-100" />
+                  <span className="text-xs text-gray-300 font-medium">أو سجّل بالإيميل</span>
+                  <div className="flex-1 h-px bg-gray-100" />
+                </div>
 
                 <form onSubmit={handleLogin} className="space-y-5">
                   <div>
@@ -122,7 +133,9 @@ export default function LoginPage() {
 
                 <p className="mt-6 text-center text-xs text-gray-400">
                   أنت مسؤول النظام؟{" "}
-                  <button className="text-[#123C79] font-bold hover:underline">تسجيل دخول الإدارة</button>
+                  <button onClick={() => navigate("/admin/login")} className="text-[#123C79] font-bold hover:underline">
+                    تسجيل دخول الإدارة
+                  </button>
                 </p>
               </>
             )}

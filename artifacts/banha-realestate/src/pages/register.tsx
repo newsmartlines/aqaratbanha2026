@@ -4,6 +4,7 @@ import { useLocation } from "wouter";
 import { Eye, EyeOff, Mail, Lock, User, Phone, Building2, Briefcase, ChevronLeft } from "lucide-react";
 import logoColor from "@assets/rgb_1778457941418.png";
 import logoWhite from "@assets/footer_1778457955133.png";
+import { GoogleAuthButton } from "@/components/GoogleAuthButton";
 
 type AccountType = "user" | "company" | "broker" | null;
 
@@ -138,9 +139,11 @@ export default function RegisterPage() {
 
                   <div className="flex items-center gap-3 mt-5">
                     <div className="flex-1 h-px bg-gray-100" />
-                    <span className="text-xs text-gray-300 flex-shrink-0">أو</span>
+                    <span className="text-xs text-gray-300 flex-shrink-0">أو سجّل بسرعة عبر</span>
                     <div className="flex-1 h-px bg-gray-100" />
                   </div>
+
+                  <GoogleAuthButton mode="register" className="mt-3" />
 
                   <p className="text-center text-xs text-gray-400 mt-4">
                     أنت مسؤول النظام؟{" "}

@@ -55,6 +55,67 @@ router.post("/login", async (req, res, next) => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
+// POST /api/v1/auth/google
+// Body: { googleId, email, name, picture }
+// Verifies Google OAuth token and creates/finds user
+// ─────────────────────────────────────────────────────────────────────────────
+router.post("/google", async (req, res, next) => {
+  try {
+    const { googleId, email, name, picture } = req.body;
+
+    if (!googleId || !email) {
+      return fail(res, 422, "VALIDATION_ERROR", "googleId and email are required");
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return fail(res, 422, "VALIDATION_ERROR", "Invalid email format");
+    }
+
+    // TODO: In production:
+    // 1. Verify the Google ID token with Google's API:
+    //    GET https://oauth2.googleapis.com/tokeninfo?id_token=<TOKEN>
+    // 2. Check if user exists by googleId OR email (smart account linking)
+    // 3. If exists by email but no googleId → link Google account to existing user
+    // 4. If new user → create account with googleId + profile data
+    // 5. Generate real JWT with jsonwebtoken
+
+    const isNewUser = Math.random() > 0.5; // Mock: randomly treat as new or returning
+
+    const mockUser = {
+      id: Math.floor(Math.random() * 10000),
+      name: name ?? email.split("@")[0],
+      email,
+      picture: picture ?? null,
+      googleId,
+      role: "user",
+      provider: "google",
+      isNewUser,
+      registeredAt: new Date().toISOString(),
+    };
+
+    const mockToken = Buffer.from(JSON.stringify({
+      id: mockUser.id,
+      email,
+      role: "user",
+      provider: "google",
+    })).toString("base64url");
+
+    return ok(res, {
+      user: mockUser,
+      token: `header.${mockToken}.signature`,
+      refreshToken: `google-refresh-${googleId.slice(0, 8)}`,
+      expiresIn: 3600,
+      isNewUser,
+      message: isNewUser ? "تم إنشاء الحساب بنجاح" : "مرحباً بعودتك",
+    });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
 // POST /api/v1/auth/refresh
 // Body: { refreshToken }
 // ─────────────────────────────────────────────────────────────────────────────

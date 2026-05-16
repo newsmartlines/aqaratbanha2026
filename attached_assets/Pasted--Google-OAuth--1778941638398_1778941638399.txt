@@ -1,0 +1,138 @@
+اعمل نظام تسجيل دخول و تسجيل حساب باستخدام Google OAuth بشكل احترافي جدًا داخل منصة عقارات بنها، مع إضافة صفحة كاملة داخل لوحة تحكم الأدمن لإدارة إعدادات الربط الخاصة بـ Google Authentication APIs.
+
+المطلوب يكون النظام مشابه لـ:
+
+Airbnb Login
+Notion Auth
+Stripe Auth
+Clerk Authentication
+Firebase Auth
+المطلوب في صفحة Login / Register
+إضافة زر:
+Continue with Google
+
+أو:
+
+تسجيل الدخول باستخدام Google
+
+ويكون:
+
+احترافي جدًا.
+Modern UI.
+يحتوي على:
+Google Icon
+Hover Effects
+Loading State
+Smooth Animation
+طريقة العمل
+
+عند الضغط:
+
+يتم فتح Google OAuth Popup.
+المستخدم يختار الحساب.
+يتم إنشاء الحساب تلقائيًا إذا لم يكن موجود.
+أو تسجيل الدخول مباشرة إذا الحساب موجود.
+البيانات المطلوبة من Google
+
+احفظ:
+
+الاسم
+الإيميل
+الصورة الشخصية
+Google ID
+تاريخ التسجيل
+Smart Account Linking
+
+لو المستخدم سجل سابقًا بالإيميل العادي:
+
+يتم ربط حساب جوجل بنفس الحساب تلقائيًا.
+بدون إنشاء حساب مكرر.
+User Experience
+
+بعد تسجيل الدخول:
+
+Redirect تلقائي.
+Welcome Message.
+Session Management.
+Remember Login.
+Secure Authentication.
+داخل لوحة الأدمن
+
+اعمل صفحة جديدة داخل:
+
+Integrations
+
+أو
+
+Authentication Settings
+Google OAuth Settings
+
+الأدمن يقدر يضيف:
+
+Google Client ID
+Google Client Secret
+Redirect URL
+Authorized Domains
+Features داخل لوحة التحكم
+
+اعمل:
+
+Enable / Disable Google Login
+Test Connection
+OAuth Status
+Connection Logs
+Error Logs
+Last Authentication Attempts
+Security
+
+طبق:
+
+CSRF Protection
+Secure Tokens
+Session Validation
+OAuth State Validation
+Refresh Token Handling
+Rate Limiting
+Multiple Providers Ready
+
+جهز Architecture يسمح بإضافة:
+
+Facebook Login
+Apple Login
+LinkedIn Login
+GitHub Login
+Twitter/X Login
+
+مستقبلًا بسهولة.
+
+التصميم المطلوب
+صفحة Login/Register:
+Minimal جدًا.
+فخمة.
+Modern SaaS Style.
+Glassmorphism خفيف.
+Animations ناعمة.
+Responsive كامل.
+شكل زر جوجل
+خلفية بيضاء نظيفة.
+Border خفيف.
+Google Icon رسمي.
+Hover احترافي.
+Loading Spinner أثناء تسجيل الدخول.
+Admin UI
+
+صفحة الإعدادات تكون:
+
+احترافية مثل Firebase Console.
+تحتوي على:
+API Inputs
+Status Indicators
+Security Notes
+Connection Testing
+مهم جدًا
+لا تفسد نظام التسجيل الحالي.
+اجعل النظام Modular.
+دعم كامل للهواتف.
+استخدم أفضل Practices للـ OAuth.
+اجعل التجربة سريعة وسلسة جدًا.
+أضف Google Authentication بشكل Enterprise-Level حقيقي.
