@@ -21,19 +21,19 @@ import {
   RadarChart, PolarGrid, PolarAngleAxis, Radar as ReRadar,
 } from "recharts";
 
-// ── Design tokens (dark futuristic) ──────────────────────────────────────────
-const BG      = "#080E1A";
-const PANEL   = "#0D1628";
-const CARD    = "#111827";
-const BORDER  = "#1E2D45";
-const BORDER2 = "#253550";
-const GREEN   = "#00D97E";
-const RED     = "#FF3B5C";
+// ── Design tokens (light / white) ────────────────────────────────────────────
+const BG      = "#F1F5F9";
+const PANEL   = "#FFFFFF";
+const CARD    = "#FFFFFF";
+const BORDER  = "#E2E8F0";
+const BORDER2 = "#CBD5E1";
+const GREEN   = "#059669";
+const RED     = "#EF4444";
 const BLUE    = "#3B82F6";
-const YELLOW  = "#F59E0B";
-const PURPLE  = "#8B5CF6";
-const CYAN    = "#06B6D4";
-const TEXT    = "#E2E8F0";
+const YELLOW  = "#D97706";
+const PURPLE  = "#7C3AED";
+const CYAN    = "#0891B2";
+const TEXT    = "#1E293B";
 const MUTED   = "#64748B";
 
 // ── Mock live data generators ─────────────────────────────────────────────────
@@ -1042,11 +1042,10 @@ export function ZARASecuritySection() {
   };
 
   return (
-    <div className="rounded-2xl overflow-hidden min-h-screen -m-6"
-      style={{ backgroundColor: BG, margin: "-1.5rem" }}>
+    <div className="space-y-5">
 
       {/* Header */}
-      <div className="px-6 py-5 border-b" style={{ borderColor: BORDER, backgroundColor: PANEL }}>
+      <div className="bg-white rounded-2xl border px-6 py-5" style={{ borderColor: BORDER }}>
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center"
@@ -1102,7 +1101,7 @@ export function ZARASecuritySection() {
       </div>
 
       {/* Content */}
-      <div className="p-6">
+      <div>
         <AnimatePresence mode="wait">
           <motion.div key={tab}
             initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
