@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
+import Navbar from "@/components/Navbar";
 import {
   LayoutDashboard, Building2, Heart, MessageCircle, Package, Settings,
   Plus, Eye, Phone, Star, Edit3, Trash2, MapPin, LogOut, Search,
@@ -310,7 +311,9 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8F9FC] flex" dir="rtl">
+    <>
+    <Navbar />
+    <div className="min-h-screen bg-[#F8F9FC] flex pt-16" dir="rtl">
 
       {/* Mobile overlay */}
       <AnimatePresence>
@@ -930,5 +933,6 @@ export default function DashboardPage() {
         </main>
       </div>
     </div>
+    </>
   );
 }
