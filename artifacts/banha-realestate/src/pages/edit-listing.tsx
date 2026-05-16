@@ -121,7 +121,7 @@ function PhotoGrid({ images, onAdd, onRemove, onSetMain }: {
         <p className="text-sm text-gray-500">{images.length} صورة مرفوعة</p>
         <button
           onClick={() => inputRef.current?.click()}
-          className="flex items-center gap-1.5 bg-[#1EBFD5] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#17a8bd] transition-colors"
+          className="flex items-center gap-1.5 bg-[#0F5373] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#17a8bd] transition-colors"
         >
           <Upload className="w-4 h-4" /> رفع صور
         </button>
@@ -131,7 +131,7 @@ function PhotoGrid({ images, onAdd, onRemove, onSetMain }: {
       {images.length === 0 ? (
         <div
           onClick={() => inputRef.current?.click()}
-          className="border-2 border-dashed border-gray-200 rounded-xl py-14 flex flex-col items-center gap-3 cursor-pointer hover:border-[#1EBFD5]/40 hover:bg-gray-50 transition-all"
+          className="border-2 border-dashed border-gray-200 rounded-xl py-14 flex flex-col items-center gap-3 cursor-pointer hover:border-[#0F5373]/40 hover:bg-gray-50 transition-all"
         >
           <ImageIcon className="w-10 h-10 text-gray-300" />
           <p className="font-medium text-gray-400 text-sm">اضغط لرفع صور العقار</p>
@@ -148,14 +148,14 @@ function PhotoGrid({ images, onAdd, onRemove, onSetMain }: {
             >
               <img src={src} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
               {i === 0 && (
-                <span className="absolute top-2 right-2 bg-[#1EBFD5] text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
+                <span className="absolute top-2 right-2 bg-[#0F5373] text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
                   رئيسية
                 </span>
               )}
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/35 transition-all flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
                 {i !== 0 && (
                   <button onClick={e => { e.stopPropagation(); onSetMain(i); }}
-                    className="w-7 h-7 bg-[#1EBFD5] rounded-full flex items-center justify-center text-white text-[10px]" title="رئيسية">★</button>
+                    className="w-7 h-7 bg-[#0F5373] rounded-full flex items-center justify-center text-white text-[10px]" title="رئيسية">★</button>
                 )}
                 <button onClick={e => { e.stopPropagation(); onRemove(i); }}
                   className="w-7 h-7 bg-red-500 rounded-full flex items-center justify-center text-white" title="حذف">
@@ -166,7 +166,7 @@ function PhotoGrid({ images, onAdd, onRemove, onSetMain }: {
           ))}
           <motion.div whileHover={{ scale: 1.02 }}
             onClick={() => inputRef.current?.click()}
-            className="aspect-[4/3] border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center gap-1.5 cursor-pointer hover:border-[#1EBFD5]/40 hover:bg-gray-50 transition-all">
+            className="aspect-[4/3] border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center gap-1.5 cursor-pointer hover:border-[#0F5373]/40 hover:bg-gray-50 transition-all">
             <Plus className="w-5 h-5 text-gray-300" />
             <span className="text-xs text-gray-300">إضافة</span>
           </motion.div>
@@ -188,14 +188,14 @@ function Field({ label, required, children }: { label: string; required?: boolea
   return (
     <div className="space-y-1.5">
       <label className="text-xs font-medium text-gray-500 flex items-center gap-1">
-        {label} {required && <span className="text-[#1EBFD5]">*</span>}
+        {label} {required && <span className="text-[#0F5373]">*</span>}
       </label>
       {children}
     </div>
   );
 }
 
-const inputCls  = "w-full py-2.5 px-3.5 rounded-lg bg-gray-50 border border-gray-200 text-sm text-gray-900 outline-none focus:border-[#1EBFD5]/60 focus:bg-white transition-all placeholder:text-gray-400";
+const inputCls  = "w-full py-2.5 px-3.5 rounded-lg bg-gray-50 border border-gray-200 text-sm text-gray-900 outline-none focus:border-[#0F5373]/60 focus:bg-white transition-all placeholder:text-gray-400";
 const selectCls = inputCls + " appearance-none cursor-pointer";
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
@@ -277,7 +277,7 @@ export default function EditListingPage() {
         </div>
 
         <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-[#1EBFD5] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">أ</div>
+          <div className="w-9 h-9 rounded-full bg-[#0F5373] flex items-center justify-center text-white font-bold text-sm flex-shrink-0">أ</div>
           <div className="min-w-0">
             <p className="font-semibold text-gray-900 text-sm truncate">أحمد محمد</p>
             <p className="text-[11px] text-gray-400">المسيّر</p>
@@ -291,12 +291,12 @@ export default function EditListingPage() {
               onClick={() => { navigate("/dashboard"); setSidebarOpen(false); }}
               className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-medium transition-all
                 ${item.id === "listings"
-                  ? "bg-[#EBF9FB] text-[#1EBFD5]"
+                  ? "bg-[#EBF9FB] text-[#0F5373]"
                   : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"}`}
             >
               <item.icon style={{ width: 17, height: 17 }} />
               {item.label}
-              {item.id === "listings" && <ChevronRight className="w-3.5 h-3.5 mr-auto text-[#1EBFD5]" />}
+              {item.id === "listings" && <ChevronRight className="w-3.5 h-3.5 mr-auto text-[#0F5373]" />}
             </button>
           ))}
         </nav>
@@ -323,7 +323,7 @@ export default function EditListingPage() {
             </button>
             <button
               onClick={() => navigate("/dashboard")}
-              className="flex items-center gap-1.5 text-gray-500 hover:text-[#1EBFD5] font-medium text-sm transition-colors"
+              className="flex items-center gap-1.5 text-gray-500 hover:text-[#0F5373] font-medium text-sm transition-colors"
             >
               <ArrowRight className="w-4 h-4" />
               <span className="hidden sm:block">إعلاناتي</span>
@@ -356,7 +356,7 @@ export default function EditListingPage() {
               className={`flex items-center gap-1.5 px-4 py-2 rounded-lg font-semibold text-sm transition-all ${
                 saved   ? "bg-emerald-500 text-white" :
                 saving  ? "bg-gray-200 text-gray-400 cursor-not-allowed" :
-                          "bg-[#1EBFD5] text-white hover:bg-[#17a8bd]"
+                          "bg-[#0F5373] text-white hover:bg-[#17a8bd]"
               }`}
             >
               {saved   ? <><CheckCircle className="w-4 h-4" /> تم الحفظ</> :
@@ -374,7 +374,7 @@ export default function EditListingPage() {
             <img src={images[0] ?? property.image} alt={title} className="w-16 h-11 rounded-lg object-cover flex-shrink-0" />
             <div className="flex-1 min-w-0">
               <p className="font-semibold text-gray-900 text-sm truncate">{title || "بدون عنوان"}</p>
-              <p className="text-xs text-gray-400 mt-0.5">{area} · <span className="text-[#1EBFD5] font-medium">{Number(price || 0).toLocaleString("ar")} ج.م</span></p>
+              <p className="text-xs text-gray-400 mt-0.5">{area} · <span className="text-[#0F5373] font-medium">{Number(price || 0).toLocaleString("ar")} ج.م</span></p>
             </div>
             <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${active ? "bg-emerald-50 text-emerald-600" : "bg-gray-100 text-gray-400"}`}>
               {active ? "نشط" : "موقوف"}
@@ -390,12 +390,12 @@ export default function EditListingPage() {
                   onClick={() => setTab(t.id)}
                   className={`flex items-center gap-2 px-5 py-3.5 text-sm font-medium whitespace-nowrap border-b-2 transition-all -mb-px flex-1 justify-center ${
                     tab === t.id
-                      ? "border-[#1EBFD5] text-[#1EBFD5] bg-[#EBF9FB]/40"
+                      ? "border-[#0F5373] text-[#0F5373] bg-[#EBF9FB]/40"
                       : "border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50"
                   }`}
                 >
                   <span className={`w-5 h-5 rounded-full text-[10px] font-bold flex items-center justify-center flex-shrink-0 ${
-                    tab === t.id ? "bg-[#1EBFD5] text-white" : "bg-gray-100 text-gray-400"
+                    tab === t.id ? "bg-[#0F5373] text-white" : "bg-gray-100 text-gray-400"
                   }`}>{i + 1}</span>
                   <t.icon style={{ width: 15, height: 15 }} />
                   <span className="hidden sm:block">{t.label}</span>
@@ -428,7 +428,7 @@ export default function EditListingPage() {
                         {DEAL_TYPES.map(dt => (
                           <button key={dt} type="button" onClick={() => setDealType(dt as any)}
                             className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
-                              dealType === dt ? "bg-[#1EBFD5] text-white" : "bg-gray-50 text-gray-500 hover:bg-gray-100"
+                              dealType === dt ? "bg-[#0F5373] text-white" : "bg-gray-50 text-gray-500 hover:bg-gray-100"
                             }`}>
                             {dt}
                           </button>
@@ -496,7 +496,7 @@ export default function EditListingPage() {
                       <button key={a.id} type="button" onClick={() => toggleAmenity(a.label)}
                         className={`flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium border transition-all ${
                           amenities.includes(a.label)
-                            ? "bg-[#EBF9FB] border-[#1EBFD5]/40 text-[#1EBFD5]"
+                            ? "bg-[#EBF9FB] border-[#0F5373]/40 text-[#0F5373]"
                             : "bg-gray-50 border-transparent text-gray-500 hover:border-gray-200"
                         }`}>
                         <a.icon className="w-3.5 h-3.5 flex-shrink-0" />
@@ -528,7 +528,7 @@ export default function EditListingPage() {
 
                 <div className="flex justify-end">
                   <button onClick={() => setTab("photos")}
-                    className="bg-[#1EBFD5] text-white px-5 py-2.5 rounded-lg font-semibold text-sm flex items-center gap-1.5 hover:bg-[#17a8bd] transition-colors">
+                    className="bg-[#0F5373] text-white px-5 py-2.5 rounded-lg font-semibold text-sm flex items-center gap-1.5 hover:bg-[#17a8bd] transition-colors">
                     التالي: الصور <ArrowRight className="w-4 h-4 rotate-180" />
                   </button>
                 </div>
@@ -551,7 +551,7 @@ export default function EditListingPage() {
                     السابق
                   </button>
                   <button onClick={() => setTab("location")}
-                    className="bg-[#1EBFD5] text-white px-5 py-2.5 rounded-lg font-semibold text-sm flex items-center gap-1.5 hover:bg-[#17a8bd] transition-colors">
+                    className="bg-[#0F5373] text-white px-5 py-2.5 rounded-lg font-semibold text-sm flex items-center gap-1.5 hover:bg-[#17a8bd] transition-colors">
                     التالي: الموقع <ArrowRight className="w-4 h-4 rotate-180" />
                   </button>
                 </div>
@@ -590,7 +590,7 @@ export default function EditListingPage() {
                   <button onClick={() => setTab("photos")}
                     className="px-4 py-2.5 rounded-lg font-medium text-sm text-gray-500 hover:bg-white border border-gray-200 transition-colors">السابق</button>
                   <button onClick={() => setTab("contact")}
-                    className="bg-[#1EBFD5] text-white px-5 py-2.5 rounded-lg font-semibold text-sm flex items-center gap-1.5 hover:bg-[#17a8bd] transition-colors">
+                    className="bg-[#0F5373] text-white px-5 py-2.5 rounded-lg font-semibold text-sm flex items-center gap-1.5 hover:bg-[#17a8bd] transition-colors">
                     التالي: التواصل <ArrowRight className="w-4 h-4 rotate-180" />
                   </button>
                 </div>
@@ -613,7 +613,7 @@ export default function EditListingPage() {
                       {([
                         { id: "phone",    label: "هاتف فقط",   icon: Phone,         active: "bg-blue-50 border-blue-300 text-blue-600" },
                         { id: "whatsapp", label: "واتساب فقط", icon: MessageCircle, active: "bg-emerald-50 border-emerald-300 text-emerald-600" },
-                        { id: "both",     label: "كلاهما",     icon: CheckCircle,   active: "bg-[#EBF9FB] border-[#1EBFD5] text-[#1EBFD5]" },
+                        { id: "both",     label: "كلاهما",     icon: CheckCircle,   active: "bg-[#EBF9FB] border-[#0F5373] text-[#0F5373]" },
                       ] as { id: ContactMode; label: string; icon: any; active: string }[]).map(mode => (
                         <button
                           key={mode.id}
@@ -699,7 +699,7 @@ export default function EditListingPage() {
                       className={`flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-6 py-2.5 rounded-lg font-semibold text-sm transition-all ${
                         saved   ? "bg-emerald-500 text-white" :
                         saving  ? "bg-gray-200 text-gray-400 cursor-not-allowed" :
-                                  "bg-[#1EBFD5] text-white hover:bg-[#17a8bd]"
+                                  "bg-[#0F5373] text-white hover:bg-[#17a8bd]"
                       }`}>
                       {saved   ? <><CheckCircle className="w-4 h-4" /> تم الحفظ</> :
                        saving  ? "جار الحفظ..." :

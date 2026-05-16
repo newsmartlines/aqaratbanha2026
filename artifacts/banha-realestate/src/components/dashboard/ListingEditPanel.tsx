@@ -110,7 +110,7 @@ function MapPicker({ address, onAddressChange }: { address: string; onAddressCha
         <input
           value={address}
           onChange={e => onAddressChange(e.target.value)}
-          className="w-full py-3 px-4 rounded-xl bg-[#F4F7FD] border border-gray-100 text-sm font-semibold outline-none focus:border-[#1EBFD5]/50 focus:bg-white transition-all"
+          className="w-full py-3 px-4 rounded-xl bg-[#F4F7FD] border border-gray-100 text-sm font-semibold outline-none focus:border-[#0F5373]/50 focus:bg-white transition-all"
           placeholder="مثال: شارع الجمهورية، بنها، القليوبية"
         />
       </div>
@@ -200,7 +200,7 @@ export default function ListingEditPanel({ listing, onClose, onSave }: ListingEd
               onClick={handleSave}
               className={`flex items-center gap-2 px-5 py-2 rounded-xl font-black text-sm transition-all ${saved
                 ? "bg-green-500 text-white"
-                : "bg-gradient-to-l from-[#1EBFD5] to-[#123C79] text-white shadow-sm"}`}
+                : "bg-gradient-to-l from-[#0F5373] to-[#123C79] text-white shadow-sm"}`}
             >
               {saved ? <><CheckCircle className="w-4 h-4" /> تم الحفظ</> : <><CheckCircle className="w-4 h-4" /> حفظ التغييرات</>}
             </motion.button>
@@ -212,12 +212,12 @@ export default function ListingEditPanel({ listing, onClose, onSave }: ListingEd
               <button
                 key={t.id}
                 onClick={() => setTab(t.id as any)}
-                className={`flex-1 flex flex-col items-center gap-1 py-3 text-xs font-bold transition-all relative ${tab === t.id ? "text-[#1EBFD5]" : "text-gray-400 hover:text-gray-600"}`}
+                className={`flex-1 flex flex-col items-center gap-1 py-3 text-xs font-bold transition-all relative ${tab === t.id ? "text-[#0F5373]" : "text-gray-400 hover:text-gray-600"}`}
               >
                 <t.icon className="w-4 h-4" />
                 <span className="hidden sm:block">{t.label}</span>
                 {tab === t.id && (
-                  <motion.div layoutId="tab-indicator" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#1EBFD5] rounded-full" />
+                  <motion.div layoutId="tab-indicator" className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#0F5373] rounded-full" />
                 )}
               </button>
             ))}
@@ -236,7 +236,7 @@ export default function ListingEditPanel({ listing, onClose, onSave }: ListingEd
                     <input
                       value={form.title}
                       onChange={e => update("title", e.target.value)}
-                      className="w-full py-3 px-4 rounded-xl bg-[#F4F7FD] border border-gray-100 text-sm font-semibold outline-none focus:border-[#1EBFD5]/50 focus:bg-white transition-all"
+                      className="w-full py-3 px-4 rounded-xl bg-[#F4F7FD] border border-gray-100 text-sm font-semibold outline-none focus:border-[#0F5373]/50 focus:bg-white transition-all"
                       placeholder="مثال: شقة فاخرة في منطقة الفلل"
                     />
                   </div>
@@ -247,7 +247,7 @@ export default function ListingEditPanel({ listing, onClose, onSave }: ListingEd
                       <div className="flex rounded-xl overflow-hidden border border-gray-100">
                         {DEAL_TYPES.map(dt => (
                           <button key={dt} onClick={() => update("type", dt)}
-                            className={`flex-1 py-2.5 text-sm font-bold transition-colors ${form.type === dt ? "bg-[#1EBFD5] text-white" : "bg-[#F4F7FD] text-gray-500 hover:bg-gray-100"}`}>
+                            className={`flex-1 py-2.5 text-sm font-bold transition-colors ${form.type === dt ? "bg-[#0F5373] text-white" : "bg-[#F4F7FD] text-gray-500 hover:bg-gray-100"}`}>
                             {dt}
                           </button>
                         ))}
@@ -258,7 +258,7 @@ export default function ListingEditPanel({ listing, onClose, onSave }: ListingEd
                       <select
                         value={form.category}
                         onChange={e => update("category", e.target.value)}
-                        className="w-full py-3 px-4 rounded-xl bg-[#F4F7FD] border border-gray-100 text-sm font-semibold outline-none focus:border-[#1EBFD5]/50 focus:bg-white transition-all appearance-none"
+                        className="w-full py-3 px-4 rounded-xl bg-[#F4F7FD] border border-gray-100 text-sm font-semibold outline-none focus:border-[#0F5373]/50 focus:bg-white transition-all appearance-none"
                       >
                         {CATEGORIES.map(c => <option key={c}>{c}</option>)}
                       </select>
@@ -272,7 +272,7 @@ export default function ListingEditPanel({ listing, onClose, onSave }: ListingEd
                         type="number"
                         value={form.price}
                         onChange={e => update("price", Number(e.target.value))}
-                        className="w-full py-3 pr-4 pl-16 rounded-xl bg-[#F4F7FD] border border-gray-100 text-sm font-semibold outline-none focus:border-[#1EBFD5]/50 focus:bg-white transition-all"
+                        className="w-full py-3 pr-4 pl-16 rounded-xl bg-[#F4F7FD] border border-gray-100 text-sm font-semibold outline-none focus:border-[#0F5373]/50 focus:bg-white transition-all"
                         placeholder="0"
                       />
                       <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xs font-black text-gray-400">ج.م</span>
@@ -292,7 +292,7 @@ export default function ListingEditPanel({ listing, onClose, onSave }: ListingEd
                           min={f.min}
                           value={(form as any)[f.key]}
                           onChange={e => update(f.key as keyof Listing, Number(e.target.value))}
-                          className="w-full py-3 px-4 rounded-xl bg-[#F4F7FD] border border-gray-100 text-sm font-semibold outline-none focus:border-[#1EBFD5]/50 focus:bg-white transition-all text-center"
+                          className="w-full py-3 px-4 rounded-xl bg-[#F4F7FD] border border-gray-100 text-sm font-semibold outline-none focus:border-[#0F5373]/50 focus:bg-white transition-all text-center"
                         />
                       </div>
                     ))}
@@ -304,7 +304,7 @@ export default function ListingEditPanel({ listing, onClose, onSave }: ListingEd
                       value={form.description}
                       onChange={e => update("description", e.target.value)}
                       rows={5}
-                      className="w-full py-3 px-4 rounded-xl bg-[#F4F7FD] border border-gray-100 text-sm font-semibold outline-none focus:border-[#1EBFD5]/50 focus:bg-white transition-all resize-none"
+                      className="w-full py-3 px-4 rounded-xl bg-[#F4F7FD] border border-gray-100 text-sm font-semibold outline-none focus:border-[#0F5373]/50 focus:bg-white transition-all resize-none"
                       placeholder="أدخل وصفاً تفصيلياً للعقار..."
                     />
                   </div>
@@ -315,7 +315,7 @@ export default function ListingEditPanel({ listing, onClose, onSave }: ListingEd
                       {AMENITIES_LIST.map(a => (
                         <button key={a.id} onClick={() => toggleAmenity(a.label)}
                           className={`flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold border transition-all ${amenities.includes(a.label)
-                            ? "bg-[#1EBFD5]/10 border-[#1EBFD5]/30 text-[#1EBFD5]"
+                            ? "bg-[#0F5373]/10 border-[#0F5373]/30 text-[#0F5373]"
                             : "bg-gray-50 border-gray-100 text-gray-500 hover:border-gray-200"}`}>
                           <a.icon className="w-3.5 h-3.5 flex-shrink-0" />
                           {a.label}
@@ -350,7 +350,7 @@ export default function ListingEditPanel({ listing, onClose, onSave }: ListingEd
                     <motion.button
                       whileTap={{ scale: 0.95 }}
                       onClick={() => fileInputRef.current?.click()}
-                      className="flex items-center gap-2 bg-gradient-to-l from-[#1EBFD5] to-[#123C79] text-white px-4 py-2 rounded-xl text-sm font-black shadow-sm"
+                      className="flex items-center gap-2 bg-gradient-to-l from-[#0F5373] to-[#123C79] text-white px-4 py-2 rounded-xl text-sm font-black shadow-sm"
                     >
                       <Upload className="w-4 h-4" /> رفع صور
                     </motion.button>
@@ -360,7 +360,7 @@ export default function ListingEditPanel({ listing, onClose, onSave }: ListingEd
                   {images.length === 0 && (
                     <div
                       onClick={() => fileInputRef.current?.click()}
-                      className="border-2 border-dashed border-gray-200 rounded-2xl p-12 text-center cursor-pointer hover:border-[#1EBFD5]/40 hover:bg-[#F4F7FD] transition-all"
+                      className="border-2 border-dashed border-gray-200 rounded-2xl p-12 text-center cursor-pointer hover:border-[#0F5373]/40 hover:bg-[#F4F7FD] transition-all"
                     >
                       <ImageIcon className="w-10 h-10 text-gray-300 mx-auto mb-3" />
                       <p className="font-bold text-gray-400 text-sm">اضغط لرفع صور العقار</p>
@@ -374,7 +374,7 @@ export default function ListingEditPanel({ listing, onClose, onSave }: ListingEd
                         className="relative group rounded-xl overflow-hidden aspect-[4/3] bg-gray-100">
                         <img src={img} alt={`صورة ${idx + 1}`} className="w-full h-full object-cover" />
                         {idx === 0 && (
-                          <span className="absolute top-2 right-2 bg-[#1EBFD5] text-white text-[10px] font-black px-2 py-0.5 rounded-md">رئيسية</span>
+                          <span className="absolute top-2 right-2 bg-[#0F5373] text-white text-[10px] font-black px-2 py-0.5 rounded-md">رئيسية</span>
                         )}
                         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
                           <button
@@ -393,7 +393,7 @@ export default function ListingEditPanel({ listing, onClose, onSave }: ListingEd
                     <motion.div
                       whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
                       onClick={() => fileInputRef.current?.click()}
-                      className="aspect-[4/3] border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-[#1EBFD5]/40 hover:bg-[#F4F7FD] transition-all"
+                      className="aspect-[4/3] border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center gap-2 cursor-pointer hover:border-[#0F5373]/40 hover:bg-[#F4F7FD] transition-all"
                     >
                       <Plus className="w-6 h-6 text-gray-300" />
                       <span className="text-xs text-gray-300 font-bold">إضافة صورة</span>
@@ -420,7 +420,7 @@ export default function ListingEditPanel({ listing, onClose, onSave }: ListingEd
                     <input
                       value={form.location}
                       onChange={e => update("location", e.target.value)}
-                      className="w-full py-3 px-4 rounded-xl bg-[#F4F7FD] border border-gray-100 text-sm font-semibold outline-none focus:border-[#1EBFD5]/50 focus:bg-white transition-all"
+                      className="w-full py-3 px-4 rounded-xl bg-[#F4F7FD] border border-gray-100 text-sm font-semibold outline-none focus:border-[#0F5373]/50 focus:bg-white transition-all"
                       placeholder="مثال: الفلل، بنها"
                     />
                   </div>
@@ -444,7 +444,7 @@ export default function ListingEditPanel({ listing, onClose, onSave }: ListingEd
                     {[
                       { id: "phone", label: "هاتف فقط", icon: Phone, color: "text-blue-500 bg-blue-50 border-blue-200" },
                       { id: "whatsapp", label: "واتساب فقط", icon: MessageCircle, color: "text-green-500 bg-green-50 border-green-200" },
-                      { id: "both", label: "كلاهما", icon: Phone, color: "text-[#1EBFD5] bg-[#1EBFD5]/10 border-[#1EBFD5]/30" },
+                      { id: "both", label: "كلاهما", icon: Phone, color: "text-[#0F5373] bg-[#0F5373]/10 border-[#0F5373]/30" },
                     ].map(mode => (
                       <button key={mode.id} onClick={() => setForm(prev => ({ ...prev, contactMode: mode.id as any }))}
                         className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 font-bold text-sm transition-all ${form.contactMode === mode.id
@@ -465,7 +465,7 @@ export default function ListingEditPanel({ listing, onClose, onSave }: ListingEd
                           <input
                             value={form.agent.phone.replace("+20", "")}
                             onChange={e => setForm(prev => ({ ...prev, agent: { ...prev.agent, phone: "+20" + e.target.value } }))}
-                            className="flex-1 py-3 px-4 rounded-xl bg-[#F4F7FD] border border-gray-100 text-sm font-semibold outline-none focus:border-[#1EBFD5]/50 focus:bg-white transition-all"
+                            className="flex-1 py-3 px-4 rounded-xl bg-[#F4F7FD] border border-gray-100 text-sm font-semibold outline-none focus:border-[#0F5373]/50 focus:bg-white transition-all"
                             placeholder="1012345678"
                             dir="ltr"
                           />
@@ -483,7 +483,7 @@ export default function ListingEditPanel({ listing, onClose, onSave }: ListingEd
                           <input
                             value={form.agent.whatsapp.replace("+20", "")}
                             onChange={e => setForm(prev => ({ ...prev, agent: { ...prev.agent, whatsapp: "+20" + e.target.value } }))}
-                            className="flex-1 py-3 px-4 rounded-xl bg-[#F4F7FD] border border-gray-100 text-sm font-semibold outline-none focus:border-[#1EBFD5]/50 focus:bg-white transition-all"
+                            className="flex-1 py-3 px-4 rounded-xl bg-[#F4F7FD] border border-gray-100 text-sm font-semibold outline-none focus:border-[#0F5373]/50 focus:bg-white transition-all"
                             placeholder="1012345678"
                             dir="ltr"
                           />
@@ -521,13 +521,13 @@ export default function ListingEditPanel({ listing, onClose, onSave }: ListingEd
             <div className="flex gap-2">
               {TABS.map((t, i) => (
                 <button key={t.id} onClick={() => setTab(t.id as any)}
-                  className={`w-2 h-2 rounded-full transition-all ${tab === t.id ? "bg-[#1EBFD5] w-6" : "bg-gray-200"}`} />
+                  className={`w-2 h-2 rounded-full transition-all ${tab === t.id ? "bg-[#0F5373] w-6" : "bg-gray-200"}`} />
               ))}
             </div>
             <motion.button
               whileTap={{ scale: 0.97 }}
               onClick={handleSave}
-              className="bg-gradient-to-l from-[#1EBFD5] to-[#123C79] text-white px-6 py-2.5 rounded-xl font-black text-sm shadow-sm flex items-center gap-2"
+              className="bg-gradient-to-l from-[#0F5373] to-[#123C79] text-white px-6 py-2.5 rounded-xl font-black text-sm shadow-sm flex items-center gap-2"
             >
               <CheckCircle className="w-4 h-4" />
               حفظ التغييرات
