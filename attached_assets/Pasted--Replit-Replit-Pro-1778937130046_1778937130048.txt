@@ -1,0 +1,118 @@
+راجع المشروع بالكامل واحذف أي شيء متعلق بـ Replit أو أي إعدادات خاصة ببيئة Replit، واجعل المشروع Production Ready للعمل على:
+
+cPanel Hosting
+Shared Hosting
+VPS
+Desktop Local Server
+Windows / Linux
+
+المطلوب تنظيف المشروع بالكامل وتحويله إلى مشروع احترافي مستقل قابل للنشر على أي استضافة بدون مشاكل.
+
+المطلوب حذفه بالكامل
+
+احذف أي ملفات أو إعدادات أو Dependencies خاصة بـ:
+
+Replit
+Replit DB
+Replit Secrets
+Replit Auth
+Replit Environment
+Replit Runtime
+Replit Configs
+ابحث واحذف أي ملفات مثل:
+.replit
+replit.nix
+أي references لـ:
+REPL_ID
+REPLIT_DB_URL
+replit
+@replit
+replit-dev
+replit-auth
+replit plugins
+تنظيف الـ package.json
+احذف أي Packages خاصة بـ Replit.
+احذف أي Scripts غير مهمة للإنتاج.
+نظف الـ dependencies.
+تأكد أن المشروع يعمل بدون أي أدوات خارجية خاصة بـ Replit.
+إعداد المشروع لـ cPanel
+اجعل المشروع:
+Production Ready.
+قابل للرفع مباشرة على cPanel.
+يعمل بـ:
+Node.js Hosting
+PHP Hosting (لو يوجد Backend PHP)
+Static Hosting
+المطلوب إضافته
+Production Build System
+
+اعمل:
+
+Build Production Optimized
+Minification
+Compression
+Lazy Loading
+Asset Optimization
+SEO Friendly Build
+Environment System
+
+اعمل:
+
+.env.example
+فصل كامل للـ Secrets.
+Environment Variables واضحة.
+Production / Development Configs.
+إعدادات التشغيل
+وفر:
+Start Script
+Build Script
+Production Script
+Local Development Script
+Desktop Compatibility
+
+خلّي المشروع يعمل بسهولة على:
+
+XAMPP
+Laragon
+Localhost
+Node.js Local Server
+
+بدون أي Dependencies سحابية إجبارية.
+
+Database
+
+لو فيه قاعدة بيانات:
+
+استخدم:
+MySQL
+MariaDB
+PostgreSQL
+مع إعدادات سهلة من .env.
+الملفات المطلوبة
+
+اعمل:
+
+README احترافي جدًا.
+Installation Guide.
+Deployment Guide لـ cPanel.
+خطوات تشغيل Local.
+شرح Environment Variables.
+Troubleshooting Section.
+تحسينات مهمة
+Security
+تعطيل Debug Mode في الإنتاج.
+حماية Environment Files.
+تحسين Headers.
+منع كشف البيانات الحساسة.
+Performance
+ضغط الصور.
+Cache Headers.
+Code Splitting.
+إزالة أي أكواد غير مستخدمة.
+مهم جدًا
+لا تكسر أي Feature موجودة.
+لا تغيّر التصميم الحالي.
+حافظ على Architecture نظيف.
+اجعل المشروع مستقل بالكامل عن أي منصة تطوير.
+اجعل المشروع يبدو Enterprise Production Ready حقيقي.
+تأكد أن أي شخص يقدر يرفع المشروع على cPanel بسهولة ويشتغل بدون مشاكل.
