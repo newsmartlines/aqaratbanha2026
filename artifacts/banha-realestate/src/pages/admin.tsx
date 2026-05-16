@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { SEOSection } from "./admin-seo";
 import { IntegrationsSection } from "./admin-integrations";
+import { ZARASecuritySection } from "./admin-zara-security";
 import {
   getWatermarkSettings, saveWatermarkSettings,
   DEFAULT_WATERMARK,
@@ -161,7 +162,7 @@ const SUBS_DATA = [
   { user: "mona@dalel.sa",    plan: "برونزي",   status: "منته", start: "7 مايو 26",  end: "7 يونيو 26",  amount: "99" },
 ];
 
-type Section = "dashboard" | "users" | "clients" | "properties" | "categories" | "locations" | "messages" | "payments" | "subscriptions" | "commissions" | "reports" | "settings" | "seo" | "integrations" | "watermark";
+type Section = "dashboard" | "users" | "clients" | "properties" | "categories" | "locations" | "messages" | "payments" | "subscriptions" | "commissions" | "reports" | "settings" | "seo" | "integrations" | "watermark" | "security";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function Badge({ label, color }: { label: string; color: "green" | "amber" | "red" | "blue" | "gray" }) {
@@ -2146,6 +2147,7 @@ export default function AdminPanel() {
     { id: "payments",      label: "المدفوعات",         icon: CreditCard },
     { id: "subscriptions", label: "الاشتراكات",        icon: Repeat },
     { id: "commissions",   label: "العمولات",          icon: Percent },
+    { id: "security",      label: "ZARA Security AI",  icon: Shield },
     { id: "seo",           label: "إدارة السيو",       icon: Globe },
     { id: "integrations",  label: "التكاملات",         icon: Zap },
     { id: "watermark",     label: "العلامة المائية",   icon: Stamp },
@@ -2166,6 +2168,7 @@ export default function AdminPanel() {
     payments:      <PaymentsSection />,
     subscriptions: <SubscriptionsSection />,
     commissions:   <CommissionsSection />,
+    security:      <ZARASecuritySection />,
     seo:           <SEOSection />,
     integrations:  <IntegrationsSection />,
     watermark:     <WatermarkSection />,
