@@ -75,7 +75,7 @@ router.put("/me/password", async (req, res, next) => {
     // TODO: verify current password, hash and update new password
     return ok(res, { message: "Password updated successfully" });
   } catch (err) {
-    next(err);
+    return next(err);
   }
 });
 
@@ -88,7 +88,7 @@ router.delete("/me", async (req, res, next) => {
     // TODO: soft-delete user, revoke all tokens
     return ok(res, { message: "Account deleted" });
   } catch (err) {
-    next(err);
+    return next(err);
   }
 });
 

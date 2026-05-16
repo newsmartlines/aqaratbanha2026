@@ -44,6 +44,14 @@ Thumbs.db
 .cursor/rules/nx-rules.mdc
 .github/instructions/nx.instructions.md
 
-# Replit
+# Environment — NEVER commit secrets
+.env
+.env.local
+.env.*.local
+
+# Uploads
+uploads/
+
+# Replit (dev environment only)
 .cache/
 .local/

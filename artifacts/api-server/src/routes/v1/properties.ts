@@ -7,9 +7,6 @@ const router = Router();
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GET /api/v1/properties
-// Query: page, limit, type, listingType, city, area, minPrice, maxPrice,
-//        minArea, maxArea, bedrooms, bathrooms, featured, sort, q
-// Public — no auth required. Mobile app and website use this endpoint.
 // ─────────────────────────────────────────────────────────────────────────────
 router.get("/", optionalAuth, async (req, res, next) => {
   try {
@@ -44,30 +41,28 @@ router.get("/", optionalAuth, async (req, res, next) => {
 
     return paginate(res, mockProperties, 1, page, limit);
   } catch (err) {
-    next(err);
+    return next(err);
   }
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GET /api/v1/properties/featured
-// Returns featured/promoted listings for homepage and app home screen.
 // ─────────────────────────────────────────────────────────────────────────────
 router.get("/featured", async (_req, res, next) => {
   try {
     // TODO: query DB for featured = true, ordered by boost_until DESC
     return ok(res, []);
   } catch (err) {
-    next(err);
+    return next(err);
   }
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GET /api/v1/properties/:id
-// Public endpoint — returns full property detail.
 // ─────────────────────────────────────────────────────────────────────────────
 router.get("/:id", optionalAuth, async (req, res, next) => {
   try {
-    const id = parseInt(req.params.id, 10);
+    const id = parseInt(String(req.params["id"]), 10);
     if (isNaN(id)) throw new NotFoundError("Property");
 
     // TODO: query DB by id, increment view_count
@@ -101,13 +96,12 @@ router.get("/:id", optionalAuth, async (req, res, next) => {
 
     return ok(res, mock);
   } catch (err) {
-    next(err);
+    return next(err);
   }
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/v1/properties
-// Auth required. Create a new property listing.
 // ─────────────────────────────────────────────────────────────────────────────
 router.post("/", requireAuth, async (req, res, next) => {
   try {
@@ -115,40 +109,37 @@ router.post("/", requireAuth, async (req, res, next) => {
     const newProperty = { id: Date.now(), ...req.body, ownerId: req.user!.id };
     return created(res, newProperty);
   } catch (err) {
-    next(err);
+    return next(err);
   }
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
 // PUT /api/v1/properties/:id
-// Auth required. Owner or admin can update.
 // ─────────────────────────────────────────────────────────────────────────────
 router.put("/:id", requireAuth, async (req, res, next) => {
   try {
-    const id = parseInt(req.params.id, 10);
+    const id = parseInt(String(req.params["id"]), 10);
     if (isNaN(id)) throw new NotFoundError("Property");
 
-    // TODO: verify ownership (req.user.id === property.ownerId || req.user.role === "admin")
-    // TODO: update in DB
+    // TODO: verify ownership, update in DB
     return ok(res, { id, ...req.body, updatedAt: new Date().toISOString() });
   } catch (err) {
-    next(err);
+    return next(err);
   }
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
 // DELETE /api/v1/properties/:id
-// Auth required. Owner or admin can delete.
 // ─────────────────────────────────────────────────────────────────────────────
 router.delete("/:id", requireAuth, async (req, res, next) => {
   try {
-    const id = parseInt(req.params.id, 10);
+    const id = parseInt(String(req.params["id"]), 10);
     if (isNaN(id)) throw new NotFoundError("Property");
 
     // TODO: soft-delete in DB (set deleted_at = now())
     return ok(res, { message: `Property ${id} deleted` });
   } catch (err) {
-    next(err);
+    return next(err);
   }
 });
 

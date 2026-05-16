@@ -24,7 +24,7 @@ router.post("/register", async (req, res, next) => {
       refreshToken: "refresh-token-placeholder",
     });
   } catch (err) {
-    next(err);
+    return next(err);
   }
 });
 
@@ -50,14 +50,13 @@ router.post("/login", async (req, res, next) => {
       expiresIn: 3600,
     });
   } catch (err) {
-    next(err);
+    return next(err);
   }
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/v1/auth/refresh
 // Body: { refreshToken }
-// Used by mobile apps to silently refresh the access token.
 // ─────────────────────────────────────────────────────────────────────────────
 router.post("/refresh", async (req, res, next) => {
   try {
@@ -72,7 +71,7 @@ router.post("/refresh", async (req, res, next) => {
       expiresIn: 3600,
     });
   } catch (err) {
-    next(err);
+    return next(err);
   }
 });
 
@@ -85,7 +84,7 @@ router.post("/logout", async (_req, res, next) => {
     // TODO: invalidate refresh token in DB
     return ok(res, { message: "Logged out successfully" });
   } catch (err) {
-    next(err);
+    return next(err);
   }
 });
 

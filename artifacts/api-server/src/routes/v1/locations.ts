@@ -5,7 +5,6 @@ const router = Router();
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GET /api/v1/locations/governorates
-// Returns all governorates. Used by website and mobile app search filters.
 // ─────────────────────────────────────────────────────────────────────────────
 router.get("/governorates", async (_req, res, next) => {
   try {
@@ -15,7 +14,7 @@ router.get("/governorates", async (_req, res, next) => {
     ];
     return ok(res, governorates);
   } catch (err) {
-    next(err);
+    return next(err);
   }
 });
 
@@ -29,7 +28,6 @@ router.get("/cities", async (req, res, next) => {
       ? parseInt(String(req.query.governorateId), 10)
       : null;
 
-    // TODO: query cities WHERE active = true AND (governorate_id = $1 OR $1 IS NULL)
     const cities = [
       { id: 1, name: "بنها",          nameEn: "Banha",             governorateId: 1 },
       { id: 2, name: "منية القمح",    nameEn: "Minyet El-Qamh",    governorateId: 1 },
@@ -41,7 +39,7 @@ router.get("/cities", async (req, res, next) => {
 
     return ok(res, cities);
   } catch (err) {
-    next(err);
+    return next(err);
   }
 });
 
@@ -55,7 +53,6 @@ router.get("/areas", async (req, res, next) => {
       ? parseInt(String(req.query.cityId), 10)
       : null;
 
-    // TODO: query areas WHERE active = true AND (city_id = $1 OR $1 IS NULL)
     const areas = [
       { id: 1, name: "ميدان بنها",  nameEn: "Banha Square",    cityId: 1 },
       { id: 2, name: "الشروق",      nameEn: "El-Shorouk",      cityId: 1 },
@@ -65,18 +62,16 @@ router.get("/areas", async (req, res, next) => {
 
     return ok(res, areas);
   } catch (err) {
-    next(err);
+    return next(err);
   }
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GET /api/v1/locations/all
 // Returns the full tree (governorates → cities → areas) in one request.
-// Useful for mobile apps that want to cache the entire hierarchy.
 // ─────────────────────────────────────────────────────────────────────────────
 router.get("/all", async (_req, res, next) => {
   try {
-    // TODO: query all three tables and build the nested structure
     return ok(res, {
       governorates: [
         {
@@ -98,7 +93,7 @@ router.get("/all", async (_req, res, next) => {
       ],
     });
   } catch (err) {
-    next(err);
+    return next(err);
   }
 });
 

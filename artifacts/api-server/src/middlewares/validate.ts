@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import type { ZodTypeAny, z } from "zod/v4";
+import type { ZodTypeAny, z } from "zod";
 import { ValidationError } from "../lib/errors.js";
 
 interface Schemas {

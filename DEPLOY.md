@@ -1,41 +1,65 @@
-# دليل نشر عقارات بنها على cPanel
+# دليل النشر الكامل — عقارات بنها
 
-## طريقة البناء والرفع
+> للتوثيق الكامل انظر [README.md](./README.md)
 
-### 1. بناء المشروع (Build)
+---
+
+## ⚡ النشر السريع على cPanel (Static Hosting)
 
 ```bash
-# من مجلد Replit أو جهازك
+# 1. ثبّت الحزم
 pnpm install
+
+# 2. ابنِ الفرونتند
 pnpm --filter @workspace/banha-realestate run build
+
+# 3. ارفع محتويات هذا المجلد على public_html في cPanel:
+#    artifacts/banha-realestate/dist/public/
 ```
 
-ستجد ملفات الإنتاج في: `artifacts/banha-realestate/dist/public/`
+**الملفات التي ترفعها على public_html:**
+```
+index.html
+.htaccess          ← مهم للـ SPA routing
+assets/
+favicon.svg
+robots.txt
+opengraph.jpg
+```
 
-### 2. رفع الملفات على cPanel
+---
 
-1. ادخل على **File Manager** في cPanel
-2. انتقل إلى مجلد `public_html` (أو المجلد الجذر للدومين)
-3. ارفع **محتويات** مجلد `dist/public/` كلها  
-   (index.html، مجلد assets، .htaccess، favicon، إلخ)
+## ⚡ النشر على VPS (Frontend + Backend)
 
-### 3. إعداد .htaccess
+```bash
+# 1. على السيرفر
+git clone <repo> /var/www/banha
+cd /var/www/banha
+cp .env.example .env && nano .env
 
-الملف `.htaccess` موجود بالفعل في `public/` وسيُنسخ تلقائياً عند البناء.  
-يضمن أن جميع الروابط (مثل `/admin`, `/search`, `/property/1`) تعمل بشكل صحيح.
+# 2. ثبّت وابنِ
+pnpm install
+pnpm build:prod
+pnpm db:push
+
+# 3. شغّل مع PM2
+npm i -g pm2
+pm2 start "NODE_ENV=production PORT=3001 node artifacts/api-server/dist/index.mjs" --name banha
+pm2 save && pm2 startup
+```
 
 ---
 
 ## بيانات دخول لوحة الأدمن
 
-- **الرابط:** `https://yourdomain.com/admin/login`
-- **البريد:** `admin@banha.com`
-- **كلمة المرور:** `admin123`
+| | |
+|--|--|
+| الرابط | `https://yourdomain.com/admin/login` |
+| البريد | `admin@banha.com` |
+| كلمة المرور | `admin123` |
+
+> ⚠️ غيّر كلمة المرور فوراً بعد أول تسجيل دخول.
 
 ---
 
-## ملاحظات مهمة
-
-- الموقع **React SPA** — كل الصفحات تعمل من `index.html`
-- لا يحتاج PHP أو قاعدة بيانات لتشغيل الواجهة الأمامية
-- إذا أردت ربط backend حقيقي، عدّل `proxy` في `vite.config.ts` قبل البناء
+للتفاصيل الكاملة (Windows، MySQL، Nginx، HTTPS): راجع **[README.md](./README.md)**

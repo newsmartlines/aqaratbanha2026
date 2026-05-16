@@ -10,48 +10,44 @@ router.use(requireAuth);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // GET /api/v1/favorites
-// Returns all properties saved by the authenticated user.
 // ─────────────────────────────────────────────────────────────────────────────
 router.get("/", async (req, res, next) => {
   try {
     // TODO: query favorites JOIN properties WHERE user_id = req.user.id
     return ok(res, []);
   } catch (err) {
-    next(err);
+    return next(err);
   }
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
 // POST /api/v1/favorites/:propertyId
-// Save a property to favorites.
 // ─────────────────────────────────────────────────────────────────────────────
 router.post("/:propertyId", async (req, res, next) => {
   try {
-    const propertyId = parseInt(req.params.propertyId, 10);
+    const propertyId = parseInt(String(req.params["propertyId"]), 10);
     if (isNaN(propertyId)) throw new NotFoundError("Property");
 
-    // TODO: check if property exists, check if already favorited (throw ConflictError)
-    // TODO: insert into favorites table
-    void ConflictError; // will be used when DB is connected
+    // TODO: check if already favorited (throw ConflictError), insert into favorites table
+    void ConflictError;
     return created(res, { userId: req.user!.id, propertyId });
   } catch (err) {
-    next(err);
+    return next(err);
   }
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
 // DELETE /api/v1/favorites/:propertyId
-// Remove a property from favorites.
 // ─────────────────────────────────────────────────────────────────────────────
 router.delete("/:propertyId", async (req, res, next) => {
   try {
-    const propertyId = parseInt(req.params.propertyId, 10);
+    const propertyId = parseInt(String(req.params["propertyId"]), 10);
     if (isNaN(propertyId)) throw new NotFoundError("Property");
 
     // TODO: delete from favorites WHERE user_id = req.user.id AND property_id = propertyId
     return ok(res, { message: "Removed from favorites" });
   } catch (err) {
-    next(err);
+    return next(err);
   }
 });
 
