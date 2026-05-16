@@ -1071,89 +1071,99 @@ export function TemplatesSection() {
         ))}
       </div>
 
-      <div className="flex gap-4">
-        {/* Categories Sidebar */}
-        <div className="w-48 flex-shrink-0 space-y-1">
-          <button
-            onClick={() => setActiveCategory("all")}
-            className={`w-full text-right px-3 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center justify-between ${activeCategory === "all" ? "text-white" : "text-gray-500 hover:bg-gray-50"}`}
-            style={activeCategory === "all" ? { backgroundColor: SB_ACTIVE } : {}}>
-            <span className="flex items-center gap-2">
-              <Globe style={{ width: 14, height: 14 }} />
+      {/* ── Top Category Tabs ── */}
+      <div className="flex items-end gap-0 border-b-2 border-gray-100 overflow-x-auto pb-0">
+        {/* "الكل" tab */}
+        {(() => {
+          const active = activeCategory === "all";
+          return (
+            <button
+              onClick={() => setActiveCategory("all")}
+              className="relative flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold transition-all border-b-2 -mb-0.5 whitespace-nowrap flex-shrink-0"
+              style={active ? { color: SB_ACTIVE, borderColor: SB_ACTIVE } : { color: "#9CA3AF", borderColor: "transparent" }}>
+              <Globe style={{ width: 13, height: 13 }} />
               الكل
-            </span>
-            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-current/10">{templates.length}</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold"
+                style={active
+                  ? { backgroundColor: SB_ACTIVE, color: "white" }
+                  : { backgroundColor: "#F1F5F9", color: "#9CA3AF" }}>
+                {templates.length}
+              </span>
+            </button>
+          );
+        })()}
+        {CATEGORIES.map(cat => {
+          const Icon = cat.icon;
+          const count = templates.filter(t => t.category === cat.id).length;
+          const active = activeCategory === cat.id;
+          return (
+            <button
+              key={cat.id}
+              onClick={() => setActiveCategory(cat.id)}
+              className="relative flex items-center gap-1.5 px-4 py-2.5 text-sm font-semibold transition-all border-b-2 -mb-0.5 whitespace-nowrap flex-shrink-0"
+              style={active ? { color: cat.color, borderColor: cat.color } : { color: "#9CA3AF", borderColor: "transparent" }}>
+              <Icon style={{ width: 13, height: 13 }} />
+              {cat.label}
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold"
+                style={active
+                  ? { backgroundColor: cat.color, color: "white" }
+                  : { backgroundColor: "#F1F5F9", color: "#9CA3AF" }}>
+                {count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* ── Filters + Templates List ── */}
+      <div className="space-y-3">
+        {/* Filters */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="relative flex-1 min-w-[160px]">
+            <Search className="w-3.5 h-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="w-full bg-white border border-gray-200 rounded-xl py-2 pr-9 pl-3 text-xs outline-none focus:border-gray-300 transition-all"
+              placeholder="بحث في القوالب..."
+            />
+          </div>
+          <div className="flex bg-white border border-gray-200 rounded-xl overflow-hidden">
+            <button onClick={() => setFilterChannel("all")}
+              className={`px-3 py-2 text-[11px] font-semibold transition-all ${filterChannel === "all" ? "text-white" : "text-gray-400"}`}
+              style={filterChannel === "all" ? { backgroundColor: ACCENT } : {}}>
+              الكل
+            </button>
+            {(Object.entries(CHANNEL_CONFIG) as [Channel, typeof CHANNEL_CONFIG[Channel]][]).map(([ch, cfg]) => {
+              const Icon = cfg.icon;
+              return (
+                <button key={ch} onClick={() => setFilterChannel(ch)}
+                  className={`px-3 py-2 transition-all border-r border-gray-100`}
+                  style={filterChannel === ch ? { backgroundColor: cfg.bg } : {}}>
+                  <Icon style={{ width: 12, height: 12, color: filterChannel === ch ? cfg.color : "#9CA3AF" }} />
+                </button>
+              );
+            })}
+          </div>
+          <button onClick={() => setShowOnlyActive(!showOnlyActive)}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-[11px] font-semibold border transition-all ${showOnlyActive ? "border-current" : "border-gray-200 text-gray-400"}`}
+            style={showOnlyActive ? { color: "#16A34A", borderColor: "#BBF7D0", backgroundColor: "#F0FDF4" } : {}}>
+            <Filter className="w-3 h-3" />
+            النشطة فقط
           </button>
-          {CATEGORIES.map(cat => {
-            const Icon = cat.icon;
-            const count = templates.filter(t => t.category === cat.id).length;
-            const active = activeCategory === cat.id;
-            return (
-              <button key={cat.id} onClick={() => setActiveCategory(cat.id)}
-                className={`w-full text-right px-3 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center justify-between group ${active ? "text-white shadow-sm" : "text-gray-500 hover:bg-gray-50"}`}
-                style={active ? { backgroundColor: cat.color } : {}}>
-                <span className="flex items-center gap-2">
-                  <Icon style={{ width: 14, height: 14 }} />
-                  {cat.label}
-                </span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded-full"
-                  style={{ backgroundColor: active ? "rgba(255,255,255,0.25)" : "rgba(0,0,0,0.06)", color: active ? "white" : "#9CA3AF" }}>
-                  {count}
-                </span>
-              </button>
-            );
-          })}
         </div>
 
-        {/* Templates List */}
-        <div className="flex-1 space-y-3">
-          {/* Filters */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <div className="relative flex-1 min-w-[160px]">
-              <Search className="w-3.5 h-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                className="w-full bg-white border border-gray-200 rounded-xl py-2 pr-9 pl-3 text-xs outline-none focus:border-gray-300 transition-all"
-                placeholder="بحث في القوالب..."
-              />
-            </div>
-            <div className="flex bg-white border border-gray-200 rounded-xl overflow-hidden">
-              <button onClick={() => setFilterChannel("all")}
-                className={`px-3 py-2 text-[11px] font-semibold transition-all ${filterChannel === "all" ? "text-white" : "text-gray-400"}`}
-                style={filterChannel === "all" ? { backgroundColor: ACCENT } : {}}>
-                الكل
-              </button>
-              {(Object.entries(CHANNEL_CONFIG) as [Channel, typeof CHANNEL_CONFIG[Channel]][]).map(([ch, cfg]) => {
-                const Icon = cfg.icon;
-                return (
-                  <button key={ch} onClick={() => setFilterChannel(ch)}
-                    className={`px-3 py-2 transition-all border-r border-gray-100`}
-                    style={filterChannel === ch ? { backgroundColor: cfg.bg } : {}}>
-                    <Icon style={{ width: 12, height: 12, color: filterChannel === ch ? cfg.color : "#9CA3AF" }} />
-                  </button>
-                );
-              })}
-            </div>
-            <button onClick={() => setShowOnlyActive(!showOnlyActive)}
-              className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-[11px] font-semibold border transition-all ${showOnlyActive ? "border-current" : "border-gray-200 text-gray-400"}`}
-              style={showOnlyActive ? { color: "#16A34A", borderColor: "#BBF7D0", backgroundColor: "#F0FDF4" } : {}}>
-              <Filter className="w-3 h-3" />
-              النشطة فقط
-            </button>
-          </div>
-
-          {/* Templates Grid */}
-          <div className="space-y-2">
-            <AnimatePresence>
-              {filtered.length === 0 ? (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                  className="bg-white rounded-2xl border border-gray-100 p-12 flex flex-col items-center">
-                  <Mail className="w-12 h-12 text-gray-200 mb-3" />
-                  <p className="text-gray-400 font-medium">لا توجد قوالب</p>
-                  <p className="text-gray-300 text-sm">جرّب تغيير معايير البحث</p>
-                </motion.div>
-              ) : filtered.map((tpl, i) => {
+        {/* Templates Grid */}
+        <div className="space-y-2">
+          <AnimatePresence>
+            {filtered.length === 0 ? (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                className="bg-white rounded-2xl border border-gray-100 p-12 flex flex-col items-center">
+                <Mail className="w-12 h-12 text-gray-200 mb-3" />
+                <p className="text-gray-400 font-medium">لا توجد قوالب</p>
+                <p className="text-gray-300 text-sm">جرّب تغيير معايير البحث</p>
+              </motion.div>
+            ) : filtered.map((tpl, i) => {
                 const cat = CATEGORIES.find(c => c.id === tpl.category);
                 const CatIcon = cat?.icon ?? Tag;
                 return (
@@ -1235,7 +1245,6 @@ export function TemplatesSection() {
             </AnimatePresence>
           </div>
         </div>
-      </div>
 
       {/* Editor Drawer */}
       <AnimatePresence>

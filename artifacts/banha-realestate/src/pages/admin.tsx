@@ -1317,21 +1317,53 @@ function CommissionsSection() {
 function MessagesSection() {
   const [msgList, setMsgList] = useState(MESSAGES_DATA);
   const [viewMsg, setViewMsg] = useState<typeof MESSAGES_DATA[0] | null>(null);
+  const [msgTab, setMsgTab] = useState<"الكل" | "جديد" | "مفتوح" | "مغلق" | "عالية">("الكل");
 
   const handleDelete = (id: number) => {
     if (window.confirm("حذف هذه الرسالة؟")) setMsgList(prev => prev.filter(m => m.id !== id));
   };
 
+  const MSG_TABS: { id: "الكل" | "جديد" | "مفتوح" | "مغلق" | "عالية"; label: string; color: string }[] = [
+    { id: "الكل",   label: `الكل (${msgList.length})`,                                               color: ACCENT    },
+    { id: "جديد",   label: `جديد (${msgList.filter(m => m.status === "جديد").length})`,              color: "#EF4444" },
+    { id: "مفتوح",  label: `مفتوح (${msgList.filter(m => m.status === "مفتوح").length})`,            color: "#F59E0B" },
+    { id: "مغلق",   label: `مغلق (${msgList.filter(m => m.status === "مغلق").length})`,              color: "#10B981" },
+    { id: "عالية",  label: `أولوية عالية (${msgList.filter(m => m.priority === "عالية").length})`,   color: "#EF4444" },
+  ];
+
+  const filtered = msgTab === "الكل"   ? msgList
+    : msgTab === "عالية" ? msgList.filter(m => m.priority === "عالية")
+    : msgList.filter(m => m.status === msgTab);
+
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        {[
-          { label: "جديد",      value: String(msgList.filter(m => m.status === "جديد").length),   color: "#EF4444" },
-          { label: "مفتوح",     value: String(msgList.filter(m => m.status === "مفتوح").length),  color: "#F59E0B" },
-          { label: "مغلق",      value: String(msgList.filter(m => m.status === "مغلق").length),   color: "#10B981" },
-          { label: "الإجمالي",  value: String(msgList.length),                                    color: ACCENT },
-        ].map((s, i) => <StatCard key={i} {...s} />)}
+
+      {/* ── Top Tabs ── */}
+      <div className="flex items-end gap-0 border-b-2 border-gray-100">
+        {MSG_TABS.map(t => {
+          const active = msgTab === t.id;
+          return (
+            <button
+              key={t.id}
+              onClick={() => setMsgTab(t.id)}
+              className="relative px-5 py-2.5 text-sm font-semibold transition-all border-b-2 -mb-0.5 whitespace-nowrap"
+              style={active
+                ? { color: t.color, borderColor: t.color }
+                : { color: "#9CA3AF", borderColor: "transparent" }}>
+              {t.label}
+              {active && (
+                <motion.span
+                  layoutId="msg-tab-indicator"
+                  className="absolute inset-x-0 -bottom-0.5 h-0.5 rounded-full"
+                  style={{ backgroundColor: t.color }}
+                />
+              )}
+            </button>
+          );
+        })}
       </div>
+
+      {/* ── Table Card ── */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
           <h3 className="font-bold text-gray-900 text-sm">الرسائل والاستفسارات</h3>
@@ -1340,7 +1372,17 @@ function MessagesSection() {
           </button>
         </div>
         <Table headers={["#", "المُرسِل", "الموضوع", "الأولوية", "الحالة", "الوقت", "إجراءات"]}>
-          {msgList.map(m => (
+          {filtered.length === 0 ? (
+            <Tr onClick={() => {}}>
+              <Td><span /></Td>
+              <Td><span /></Td>
+              <Td><p className="text-gray-400 text-sm py-8 text-center whitespace-nowrap">لا توجد رسائل في هذا التبويب</p></Td>
+              <Td><span /></Td>
+              <Td><span /></Td>
+              <Td><span /></Td>
+              <Td><span /></Td>
+            </Tr>
+          ) : filtered.map(m => (
             <Tr key={m.id} onClick={() => setViewMsg(m)}>
               <Td className="text-gray-400 text-xs">{m.id}</Td>
               <Td>
