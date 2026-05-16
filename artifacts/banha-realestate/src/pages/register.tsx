@@ -135,6 +135,22 @@ export default function RegisterPage() {
                       سجّل دخولك
                     </button>
                   </p>
+
+                  <div className="flex items-center gap-3 mt-5">
+                    <div className="flex-1 h-px bg-gray-100" />
+                    <span className="text-xs text-gray-300 flex-shrink-0">أو</span>
+                    <div className="flex-1 h-px bg-gray-100" />
+                  </div>
+
+                  <p className="text-center text-xs text-gray-400 mt-4">
+                    أنت مسؤول النظام؟{" "}
+                    <button
+                      onClick={() => navigate("/admin-login")}
+                      className="text-[#123C79] font-bold hover:underline inline-flex items-center gap-1"
+                    >
+                      تسجيل دخول الإدارة
+                    </button>
+                  </p>
                 </motion.div>
               )}
 
