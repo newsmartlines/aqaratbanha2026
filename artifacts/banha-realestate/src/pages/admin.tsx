@@ -20,7 +20,7 @@ import logoColor from "@assets/rgb_1778457941418.png";
 
 // ── Design tokens ────────────────────────────────────────────────────────────
 const SB = "#1E293B";          // sidebar bg
-const SB_ACTIVE = "#0F766E";   // active nav item
+const SB_ACTIVE = "#123C79";   // active nav item
 const ACCENT = "#0D9488";      // primary accent (teal)
 const ACCENT_LIGHT = "#CCFBF1";
 

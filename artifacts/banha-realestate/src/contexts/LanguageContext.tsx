@@ -91,6 +91,7 @@ const translations = {
     registerFree: "سجل مجاناً",
     properties_count: "عقار",
     signIn: "تسجيل",
+    dashboard: "لوحة تحكم",
   },
   en: {
     home: "Home",
@@ -180,6 +181,7 @@ const translations = {
     registerFree: "Register Free",
     properties_count: "properties",
     signIn: "Sign In",
+    dashboard: "Dashboard",
   },
 };
 
