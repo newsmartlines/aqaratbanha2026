@@ -201,9 +201,31 @@ function Td({ children, className = "" }: { children: React.ReactNode; className
 function ActionBtns({ onEdit, onDelete, onView }: { onEdit?: () => void; onDelete?: () => void; onView?: () => void }) {
   return (
     <div className="flex items-center gap-1">
-      {onView && <button onClick={onView} className="w-7 h-7 rounded-lg hover:bg-blue-50 text-blue-400 flex items-center justify-center"><Eye className="w-3.5 h-3.5" /></button>}
-      {onEdit && <button onClick={onEdit} className="w-7 h-7 rounded-lg hover:bg-amber-50 text-amber-500 flex items-center justify-center"><Edit2 className="w-3.5 h-3.5" /></button>}
-      {onDelete && <button onClick={onDelete} className="w-7 h-7 rounded-lg hover:bg-red-50 text-red-400 flex items-center justify-center"><Trash2 className="w-3.5 h-3.5" /></button>}
+      {onView && <button onClick={e => { e.stopPropagation(); onView(); }} className="w-7 h-7 rounded-lg hover:bg-blue-50 text-blue-400 flex items-center justify-center"><Eye className="w-3.5 h-3.5" /></button>}
+      {onEdit && <button onClick={e => { e.stopPropagation(); onEdit(); }} className="w-7 h-7 rounded-lg hover:bg-amber-50 text-amber-500 flex items-center justify-center"><Edit2 className="w-3.5 h-3.5" /></button>}
+      {onDelete && <button onClick={e => { e.stopPropagation(); onDelete(); }} className="w-7 h-7 rounded-lg hover:bg-red-50 text-red-400 flex items-center justify-center"><Trash2 className="w-3.5 h-3.5" /></button>}
+    </div>
+  );
+}
+
+function AdminModal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
+  return (
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <h3 className="font-bold text-gray-900">{title}</h3>
+          <button onClick={onClose} className="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center text-gray-500 transition-colors">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+        <div className="p-6">{children}</div>
+      </motion.div>
     </div>
   );
 }
@@ -329,20 +351,41 @@ function DashboardSection() {
 // ── Users Section ────────────────────────────────────────────────────────────
 function UsersSection() {
   const [search, setSearch] = useState("");
-  const filtered = USERS.filter(u => u.name.includes(search) || u.email.includes(search));
+  const [userList, setUserList] = useState(USERS);
+  const [viewUser, setViewUser] = useState<typeof USERS[0] | null>(null);
+  const [editUser, setEditUser] = useState<typeof USERS[0] | null>(null);
+  const [editForm, setEditForm] = useState({ name: "", email: "", phone: "", role: "", status: "" });
+
+  const filtered = userList.filter(u => u.name.includes(search) || u.email.includes(search));
+
+  const handleDelete = (id: number) => {
+    if (window.confirm("هل تريد حذف هذا المستخدم نهائياً؟"))
+      setUserList(prev => prev.filter(u => u.id !== id));
+  };
+
+  const openEdit = (u: typeof USERS[0]) => {
+    setEditForm({ name: u.name, email: u.email, phone: u.phone, role: u.role, status: u.status });
+    setEditUser(u);
+  };
+
+  const saveEdit = () => {
+    setUserList(prev => prev.map(u => u.id === editUser!.id ? { ...u, ...editForm } : u));
+    setEditUser(null);
+  };
+
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: "إجمالي المستخدمين", value: "7",  color: ACCENT },
-          { label: "النشطون",           value: "6",  color: "#10B981" },
-          { label: "الموقوفون",         value: "0",  color: "#EF4444" },
+          { label: "إجمالي المستخدمين", value: String(userList.length), color: ACCENT },
+          { label: "النشطون",           value: String(userList.filter(u => u.status === "نشط").length),    color: "#10B981" },
+          { label: "الموقوفون",         value: String(userList.filter(u => u.status === "موقوف").length),  color: "#EF4444" },
           { label: "جدد هذا الشهر",    value: "1",  color: "#6366F1" },
         ].map((s, i) => <StatCard key={i} {...s} />)}
       </div>
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-gray-100">
-          <h3 className="font-bold text-gray-900 text-sm">المستخدمون المسجّلون <span className="text-gray-400 font-normal ml-1">({filtered.length} مستخدم بعد التصفية)</span></h3>
+          <h3 className="font-bold text-gray-900 text-sm">المستخدمون المسجّلون <span className="text-gray-400 font-normal ml-1">({filtered.length} مستخدم)</span></h3>
           <div className="flex items-center gap-2">
             <div className="relative">
               <Search className="w-3.5 h-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -371,29 +414,103 @@ function UsersSection() {
               <Td><span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full">{u.role}</span></Td>
               <Td><Badge label={u.status} color={u.status === "نشط" ? "green" : "red"} /></Td>
               <Td className="text-gray-400 text-xs">{u.date}</Td>
-              <Td><ActionBtns onView={() => {}} onEdit={() => {}} onDelete={() => {}} /></Td>
+              <Td><ActionBtns onView={() => setViewUser(u)} onEdit={() => openEdit(u)} onDelete={() => handleDelete(u.id)} /></Td>
             </Tr>
           ))}
         </Table>
       </div>
+
+      {/* View Modal */}
+      <AnimatePresence>
+        {viewUser && (
+          <AdminModal title="تفاصيل المستخدم" onClose={() => setViewUser(null)}>
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-lg flex-shrink-0" style={{ backgroundColor: ACCENT }}>
+                  {viewUser.name[0].toUpperCase()}
+                </div>
+                <div>
+                  <p className="font-bold text-gray-900">{viewUser.name}</p>
+                  <p className="text-sm text-gray-400">{viewUser.role}</p>
+                </div>
+                <Badge label={viewUser.status} color={viewUser.status === "نشط" ? "green" : "red"} />
+              </div>
+              {[
+                { label: "البريد الإلكتروني", value: viewUser.email },
+                { label: "الهاتف",            value: viewUser.phone },
+                { label: "المنطقة",           value: viewUser.region },
+                { label: "تاريخ الانضمام",   value: viewUser.date },
+              ].map(row => (
+                <div key={row.label} className="flex justify-between py-2 border-b border-gray-50 last:border-0">
+                  <span className="text-sm text-gray-400">{row.label}</span>
+                  <span className="text-sm font-medium text-gray-700">{row.value}</span>
+                </div>
+              ))}
+            </div>
+          </AdminModal>
+        )}
+      </AnimatePresence>
+
+      {/* Edit Modal */}
+      <AnimatePresence>
+        {editUser && (
+          <AdminModal title="تعديل المستخدم" onClose={() => setEditUser(null)}>
+            <div className="space-y-4">
+              {[
+                { label: "الاسم",             key: "name",   type: "text" },
+                { label: "البريد الإلكتروني", key: "email",  type: "email" },
+                { label: "الهاتف",            key: "phone",  type: "tel" },
+              ].map(f => (
+                <div key={f.key}>
+                  <label className="text-xs font-semibold text-gray-500 block mb-1.5">{f.label}</label>
+                  <input type={f.type} value={(editForm as any)[f.key]}
+                    onChange={e => setEditForm(p => ({ ...p, [f.key]: e.target.value }))}
+                    className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-gray-300 transition-all" />
+                </div>
+              ))}
+              <div>
+                <label className="text-xs font-semibold text-gray-500 block mb-1.5">الحالة</label>
+                <select value={editForm.status} onChange={e => setEditForm(p => ({ ...p, status: e.target.value }))}
+                  className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none">
+                  <option>نشط</option>
+                  <option>موقوف</option>
+                </select>
+              </div>
+              <button onClick={saveEdit}
+                className="w-full py-2.5 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2"
+                style={{ backgroundColor: ACCENT }}>
+                <CheckCircle className="w-4 h-4" /> حفظ التغييرات
+              </button>
+            </div>
+          </AdminModal>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
 
 // ── Properties Section ───────────────────────────────────────────────────────
 function PropertiesSection() {
+  const [, navigate] = useLocation();
   const [statusF, setStatusF] = useState("الكل");
   const [search, setSearch] = useState("");
+  const [propList, setPropList] = useState(PROPERTIES);
   const tabs = ["الكل", "نشط", "معلق", "مرفوض"];
-  const filtered = PROPERTIES.filter(p => (statusF === "الكل" || p.status === statusF) && (p.title.includes(search) || p.loc.includes(search)));
+  const filtered = propList.filter(p => (statusF === "الكل" || p.status === statusF) && (p.title.includes(search) || p.loc.includes(search)));
+
+  const handleDelete = (id: number) => {
+    if (window.confirm("هل تريد حذف هذا العقار نهائياً؟"))
+      setPropList(prev => prev.filter(p => p.id !== id));
+  };
+
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: "إجمالي العقارات", value: "534", sub: "+22 هذا الشهر", trend: "up" as const, color: ACCENT },
-          { label: "نشط",             value: "412", color: "#10B981" },
-          { label: "معلق",            value: "89",  color: "#F59E0B" },
-          { label: "مرفوض",           value: "33",  color: "#EF4444" },
+          { label: "إجمالي العقارات", value: String(propList.length), sub: "+22 هذا الشهر", trend: "up" as const, color: ACCENT },
+          { label: "نشط",             value: String(propList.filter(p => p.status === "نشط").length),    color: "#10B981" },
+          { label: "معلق",            value: String(propList.filter(p => p.status === "معلق").length),   color: "#F59E0B" },
+          { label: "مرفوض",           value: String(propList.filter(p => p.status === "مرفوض").length),  color: "#EF4444" },
         ].map((s, i) => <StatCard key={i} {...s} />)}
       </div>
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
@@ -430,7 +547,13 @@ function PropertiesSection() {
                   color={p.status === "نشط" ? "green" : p.status === "معلق" ? "amber" : "red"} />
               </Td>
               <Td className="text-gray-400 text-xs">{p.date}</Td>
-              <Td><ActionBtns onView={() => {}} onEdit={() => {}} onDelete={() => {}} /></Td>
+              <Td>
+                <ActionBtns
+                  onView={() => navigate(`/property/${p.id}`)}
+                  onEdit={() => navigate(`/dashboard/edit/${p.id}`)}
+                  onDelete={() => handleDelete(p.id)}
+                />
+              </Td>
             </Tr>
           ))}
         </Table>
@@ -442,7 +565,22 @@ function PropertiesSection() {
 // ── Categories Section ───────────────────────────────────────────────────────
 function CategoriesSection() {
   const [cats, setCats] = useState(CATEGORIES);
+  const [editCat, setEditCat] = useState<typeof CATEGORIES[0] | null>(null);
+  const [editForm, setEditForm] = useState({ name: "", nameEn: "", slug: "" });
+
   const toggleCat = (id: number) => setCats(prev => prev.map(c => c.id === id ? { ...c, active: !c.active } : c));
+  const handleDelete = (id: number) => {
+    if (window.confirm("حذف هذا التصنيف؟")) setCats(prev => prev.filter(c => c.id !== id));
+  };
+  const openEdit = (c: typeof CATEGORIES[0]) => {
+    setEditForm({ name: c.name, nameEn: c.nameEn, slug: c.slug });
+    setEditCat(c);
+  };
+  const saveEdit = () => {
+    setCats(prev => prev.map(c => c.id === editCat!.id ? { ...c, ...editForm } : c));
+    setEditCat(null);
+  };
+
   return (
     <div className="space-y-5">
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
@@ -477,11 +615,37 @@ function CategoriesSection() {
                     : <ToggleLeft className="w-8 h-8 text-gray-300" />}
                 </button>
               </Td>
-              <Td><ActionBtns onEdit={() => {}} onDelete={() => {}} /></Td>
+              <Td><ActionBtns onEdit={() => openEdit(c)} onDelete={() => handleDelete(c.id)} /></Td>
             </Tr>
           ))}
         </Table>
       </div>
+
+      <AnimatePresence>
+        {editCat && (
+          <AdminModal title={`تعديل تصنيف: ${editCat.name}`} onClose={() => setEditCat(null)}>
+            <div className="space-y-4">
+              {[
+                { label: "الاسم بالعربي",    key: "name" },
+                { label: "الاسم بالإنجليزي", key: "nameEn" },
+                { label: "المعرّف (Slug)",    key: "slug" },
+              ].map(f => (
+                <div key={f.key}>
+                  <label className="text-xs font-semibold text-gray-500 block mb-1.5">{f.label}</label>
+                  <input value={(editForm as any)[f.key]}
+                    onChange={e => setEditForm(p => ({ ...p, [f.key]: e.target.value }))}
+                    className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-gray-300 transition-all" />
+                </div>
+              ))}
+              <button onClick={saveEdit}
+                className="w-full py-2.5 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2"
+                style={{ backgroundColor: ACCENT }}>
+                <CheckCircle className="w-4 h-4" /> حفظ التغييرات
+              </button>
+            </div>
+          </AdminModal>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -490,8 +654,24 @@ function CategoriesSection() {
 function LocationsSection() {
   const [locs, setLocs] = useState(LOCATIONS);
   const [tab, setTab] = useState<"حي" | "مدينة">("مدينة");
+  const [editLoc, setEditLoc] = useState<typeof LOCATIONS[0] | null>(null);
+  const [editForm, setEditForm] = useState({ name: "", nameEn: "" });
+
   const toggle = (id: number) => setLocs(prev => prev.map(l => l.id === id ? { ...l, active: !l.active } : l));
+  const handleDelete = (id: number) => {
+    if (window.confirm("حذف هذه المنطقة؟")) setLocs(prev => prev.filter(l => l.id !== id));
+  };
+  const openEdit = (l: typeof LOCATIONS[0]) => {
+    setEditForm({ name: l.name, nameEn: l.nameEn });
+    setEditLoc(l);
+  };
+  const saveEdit = () => {
+    setLocs(prev => prev.map(l => l.id === editLoc!.id ? { ...l, ...editForm } : l));
+    setEditLoc(null);
+  };
+
   const filtered = locs.filter(l => l.type === tab);
+
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-3 gap-4">
@@ -543,26 +723,58 @@ function LocationsSection() {
                 <button onClick={() => toggle(l.id)}>
                   {l.active ? <ToggleRight className="w-8 h-8" style={{ color: ACCENT }} /> : <ToggleLeft className="w-8 h-8 text-gray-300" />}
                 </button>
-                <ActionBtns onEdit={() => {}} onDelete={() => {}} />
+                <ActionBtns onEdit={() => openEdit(l)} onDelete={() => handleDelete(l.id)} />
               </div>
             </div>
           ))}
         </div>
       </div>
+
+      <AnimatePresence>
+        {editLoc && (
+          <AdminModal title={`تعديل: ${editLoc.name}`} onClose={() => setEditLoc(null)}>
+            <div className="space-y-4">
+              {[
+                { label: "الاسم بالعربي",    key: "name" },
+                { label: "الاسم بالإنجليزي", key: "nameEn" },
+              ].map(f => (
+                <div key={f.key}>
+                  <label className="text-xs font-semibold text-gray-500 block mb-1.5">{f.label}</label>
+                  <input value={(editForm as any)[f.key]}
+                    onChange={e => setEditForm(p => ({ ...p, [f.key]: e.target.value }))}
+                    className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-gray-300 transition-all" />
+                </div>
+              ))}
+              <button onClick={saveEdit}
+                className="w-full py-2.5 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2"
+                style={{ backgroundColor: ACCENT }}>
+                <CheckCircle className="w-4 h-4" /> حفظ التغييرات
+              </button>
+            </div>
+          </AdminModal>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
 
 // ── Messages Section ─────────────────────────────────────────────────────────
 function MessagesSection() {
+  const [msgList, setMsgList] = useState(MESSAGES_DATA);
+  const [viewMsg, setViewMsg] = useState<typeof MESSAGES_DATA[0] | null>(null);
+
+  const handleDelete = (id: number) => {
+    if (window.confirm("حذف هذه الرسالة؟")) setMsgList(prev => prev.filter(m => m.id !== id));
+  };
+
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: "جديد",   value: "2", color: "#EF4444" },
-          { label: "مفتوح",  value: "2", color: "#F59E0B" },
-          { label: "مغلق",   value: "1", color: "#10B981" },
-          { label: "الإجمالي",value:"5", color: ACCENT },
+          { label: "جديد",      value: String(msgList.filter(m => m.status === "جديد").length),   color: "#EF4444" },
+          { label: "مفتوح",     value: String(msgList.filter(m => m.status === "مفتوح").length),  color: "#F59E0B" },
+          { label: "مغلق",      value: String(msgList.filter(m => m.status === "مغلق").length),   color: "#10B981" },
+          { label: "الإجمالي",  value: String(msgList.length),                                    color: ACCENT },
         ].map((s, i) => <StatCard key={i} {...s} />)}
       </div>
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
@@ -573,8 +785,8 @@ function MessagesSection() {
           </button>
         </div>
         <Table headers={["#", "المُرسِل", "الموضوع", "الأولوية", "الحالة", "الوقت", "إجراءات"]}>
-          {MESSAGES_DATA.map(m => (
-            <Tr key={m.id}>
+          {msgList.map(m => (
+            <Tr key={m.id} onClick={() => setViewMsg(m)}>
               <Td className="text-gray-400 text-xs">{m.id}</Td>
               <Td>
                 <div className="flex items-center gap-2">
@@ -592,17 +804,56 @@ function MessagesSection() {
                 <Badge label={m.status} color={m.status === "جديد" ? "blue" : m.status === "مفتوح" ? "amber" : "green"} />
               </Td>
               <Td className="text-gray-400 text-xs">{m.time}</Td>
-              <Td><ActionBtns onView={() => {}} onDelete={() => {}} /></Td>
+              <Td><ActionBtns onView={() => setViewMsg(m)} onDelete={() => handleDelete(m.id)} /></Td>
             </Tr>
           ))}
         </Table>
       </div>
+
+      <AnimatePresence>
+        {viewMsg && (
+          <AdminModal title="تفاصيل الرسالة" onClose={() => setViewMsg(null)}>
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold flex-shrink-0" style={{ backgroundColor: ACCENT }}>
+                  {viewMsg.from[0]}
+                </div>
+                <div>
+                  <p className="font-bold text-gray-900">{viewMsg.from}</p>
+                  <p className="text-xs text-gray-400">{viewMsg.time}</p>
+                </div>
+                <div className="mr-auto flex gap-2">
+                  <Badge label={viewMsg.priority} color={viewMsg.priority === "عالية" ? "red" : viewMsg.priority === "متوسطة" ? "amber" : "gray"} />
+                  <Badge label={viewMsg.status} color={viewMsg.status === "جديد" ? "blue" : viewMsg.status === "مفتوح" ? "amber" : "green"} />
+                </div>
+              </div>
+              <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                <p className="text-sm font-semibold text-gray-700 mb-2">الموضوع</p>
+                <p className="text-sm text-gray-600">{viewMsg.subject}</p>
+              </div>
+              <div className="flex gap-2 pt-2">
+                <button
+                  onClick={() => { setMsgList(prev => prev.map(m => m.id === viewMsg.id ? { ...m, status: "مغلق" } : m)); setViewMsg(null); }}
+                  className="flex-1 py-2 rounded-xl text-sm font-bold text-white" style={{ backgroundColor: ACCENT }}>
+                  إغلاق الرسالة
+                </button>
+                <button onClick={() => setViewMsg(null)}
+                  className="flex-1 py-2 rounded-xl text-sm font-bold text-gray-500 border border-gray-200 hover:bg-gray-50">
+                  إغلاق
+                </button>
+              </div>
+            </div>
+          </AdminModal>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
 
 // ── Payments Section ─────────────────────────────────────────────────────────
 function PaymentsSection() {
+  const [viewPayment, setViewPayment] = useState<typeof PAYMENTS_DATA[0] | null>(null);
+
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-3 gap-4">
@@ -628,7 +879,7 @@ function PaymentsSection() {
         </div>
         <Table headers={["رقم المعاملة", "المستخدم", "النوع", "المبلغ", "الحالة", "التاريخ", "إجراءات"]}>
           {PAYMENTS_DATA.map(p => (
-            <Tr key={p.id}>
+            <Tr key={p.id} onClick={() => setViewPayment(p)}>
               <Td><code className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">{p.id}</code></Td>
               <Td><span className="font-medium text-gray-800">{p.user}</span></Td>
               <Td className="text-gray-500 text-sm">{p.type}</Td>
@@ -637,33 +888,64 @@ function PaymentsSection() {
                 <Badge label={p.status} color={p.status === "مكتمل" ? "green" : p.status === "معلق" ? "amber" : "red"} />
               </Td>
               <Td className="text-gray-400 text-xs">{p.date}</Td>
-              <Td><ActionBtns onView={() => {}} /></Td>
+              <Td><ActionBtns onView={() => setViewPayment(p)} /></Td>
             </Tr>
           ))}
         </Table>
       </div>
+
+      <AnimatePresence>
+        {viewPayment && (
+          <AdminModal title="تفاصيل المعاملة" onClose={() => setViewPayment(null)}>
+            <div className="space-y-3">
+              <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 text-center">
+                <p className="text-3xl font-black text-gray-900">{viewPayment.amount} ج.م</p>
+                <Badge label={viewPayment.status} color={viewPayment.status === "مكتمل" ? "green" : viewPayment.status === "معلق" ? "amber" : "red"} />
+              </div>
+              {[
+                { label: "رقم المعاملة", value: viewPayment.id },
+                { label: "المستخدم",     value: viewPayment.user },
+                { label: "نوع الدفعة",   value: viewPayment.type },
+                { label: "التاريخ",      value: viewPayment.date },
+              ].map(row => (
+                <div key={row.label} className="flex justify-between py-2 border-b border-gray-50 last:border-0">
+                  <span className="text-sm text-gray-400">{row.label}</span>
+                  <span className="text-sm font-semibold text-gray-700">{row.value}</span>
+                </div>
+              ))}
+            </div>
+          </AdminModal>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
 
 // ── Subscriptions Section ────────────────────────────────────────────────────
 function SubscriptionsSection() {
+  const [subsList, setSubsList] = useState(SUBS_DATA);
+  const [viewSub, setViewSub] = useState<typeof SUBS_DATA[0] | null>(null);
+
+  const handleDelete = (idx: number) => {
+    if (window.confirm("إلغاء هذا الاشتراك؟")) setSubsList(prev => prev.filter((_, i) => i !== idx));
+  };
+
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
           { label: "الإيراد المتكرر شهرياً", value: "4,455 ج.م", color: "#10B981" },
-          { label: "اشتراكات أساسية",         value: "12",        color: ACCENT },
-          { label: "اشتراكات بسعر أعلى",      value: "5",         color: "#6366F1" },
+          { label: "اشتراكات نشطة",           value: String(subsList.filter(s => s.status === "نشط").length),  color: ACCENT },
+          { label: "اشتراكات منتهية",          value: String(subsList.filter(s => s.status === "منته").length), color: "#6366F1" },
         ].map((s, i) => <StatCard key={i} {...s} />)}
       </div>
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-          <h3 className="font-bold text-gray-900 text-sm">جميع الاشتراكات</h3>
+          <h3 className="font-bold text-gray-900 text-sm">جميع الاشتراكات <span className="text-gray-400 font-normal">({subsList.length})</span></h3>
         </div>
         <Table headers={["مقدم الخدمة", "الباقة", "الحالة", "تاريخ البداية", "تاريخ الانتهاء", "المبلغ", "إجراءات"]}>
-          {SUBS_DATA.map((s, i) => (
-            <Tr key={i}>
+          {subsList.map((s, i) => (
+            <Tr key={i} onClick={() => setViewSub(s)}>
               <Td className="text-gray-500 text-xs">{s.user}</Td>
               <Td>
                 <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${s.plan === "مجاني" ? "bg-gray-100 text-gray-500" : "text-white"}`}
@@ -675,11 +957,38 @@ function SubscriptionsSection() {
               <Td className="text-gray-400 text-xs">{s.start}</Td>
               <Td className="text-gray-400 text-xs">{s.end}</Td>
               <Td><span className="font-bold text-gray-700">{s.amount} ج.م</span></Td>
-              <Td><ActionBtns onView={() => {}} onDelete={() => {}} /></Td>
+              <Td><ActionBtns onView={() => setViewSub(s)} onDelete={() => handleDelete(i)} /></Td>
             </Tr>
           ))}
         </Table>
       </div>
+
+      <AnimatePresence>
+        {viewSub && (
+          <AdminModal title="تفاصيل الاشتراك" onClose={() => setViewSub(null)}>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between mb-2">
+                <span className={`text-sm font-bold px-3 py-1 rounded-full ${viewSub.plan === "مجاني" ? "bg-gray-100 text-gray-500" : "text-white"}`}
+                  style={viewSub.plan !== "مجاني" ? { backgroundColor: ACCENT } : {}}>
+                  {viewSub.plan}
+                </span>
+                <Badge label={viewSub.status} color={viewSub.status === "نشط" ? "green" : "red"} />
+              </div>
+              {[
+                { label: "المستخدم",         value: viewSub.user },
+                { label: "تاريخ البداية",    value: viewSub.start },
+                { label: "تاريخ الانتهاء",  value: viewSub.end },
+                { label: "المبلغ",           value: `${viewSub.amount} ج.م` },
+              ].map(row => (
+                <div key={row.label} className="flex justify-between py-2 border-b border-gray-50 last:border-0">
+                  <span className="text-sm text-gray-400">{row.label}</span>
+                  <span className="text-sm font-semibold text-gray-700">{row.value}</span>
+                </div>
+              ))}
+            </div>
+          </AdminModal>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

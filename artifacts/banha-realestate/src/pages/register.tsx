@@ -145,7 +145,7 @@ export default function RegisterPage() {
                   <p className="text-center text-xs text-gray-400 mt-4">
                     أنت مسؤول النظام؟{" "}
                     <button
-                      onClick={() => navigate("/admin-login")}
+                      onClick={() => navigate("/admin/login")}
                       className="text-[#123C79] font-bold hover:underline inline-flex items-center gap-1"
                     >
                       تسجيل دخول الإدارة
