@@ -10,7 +10,7 @@ import {
   Heart, Package, Settings, Bell, Menu, ChevronRight,
 } from "lucide-react";
 import "leaflet/dist/leaflet.css";
-import logoColor from "@assets/rgb_1778457941418.png";
+import { useSiteLogos } from "@/contexts/SiteLogosContext";
 import { PROPERTIES } from "@/data/properties";
 
 const DEAL_TYPES = ["للبيع", "للإيجار"];
@@ -202,6 +202,7 @@ const selectCls = inputCls + " appearance-none cursor-pointer";
 export default function EditListingPage() {
   const params    = useParams<{ id: string }>();
   const [, navigate]      = useLocation();
+  const { logos } = useSiteLogos();
   const [tab, setTab]     = useState<TabId>("info");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [saving, setSaving]   = useState(false);
@@ -273,7 +274,7 @@ export default function EditListingPage() {
         ${sidebarOpen ? "translate-x-0" : "translate-x-full lg:translate-x-0"}`}>
 
         <div className="px-5 py-4 border-b border-gray-100">
-          <img src={logoColor} alt="عقارات بنها" className="h-7 w-auto" />
+          <img src={logos.headerLogo} alt="عقارات بنها" className="h-7 w-auto" />
         </div>
 
         <div className="px-4 py-3 border-b border-gray-100 flex items-center gap-3">

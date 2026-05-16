@@ -28,7 +28,9 @@ import {
   PieChart, Pie, Cell, XAxis, YAxis, Tooltip,
   ResponsiveContainer, CartesianGrid, Legend,
 } from "recharts";
-import logoColor from "@assets/rgb_1778457941418.png";
+import { useSiteLogos } from "../contexts/SiteLogosContext";
+import type { SiteLogos } from "../utils/siteLogos";
+import { DEFAULT_LOGOS } from "../utils/siteLogos";
 
 // ── Design tokens ────────────────────────────────────────────────────────────
 const SB = "#0F172A";          // sidebar bg  (deep navy)
@@ -1990,9 +1992,61 @@ function WatermarkSection() {
   );
 }
 
+function LogoUploadCard({
+  label, hint, current, defaultSrc, onUpload, onReset,
+}: {
+  label: string; hint: string; current: string; defaultSrc: string;
+  onUpload: (url: string) => void; onReset: () => void;
+}) {
+  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => onUpload(ev.target?.result as string);
+    reader.readAsDataURL(file);
+  };
+  const isDefault = current === defaultSrc;
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-3">
+      <div>
+        <p className="font-bold text-gray-800 text-sm">{label}</p>
+        <p className="text-xs text-gray-400 mt-0.5">{hint}</p>
+      </div>
+      <div className="flex items-center gap-4">
+        <div className="w-28 h-16 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden flex-shrink-0">
+          {current
+            ? <img src={current} alt={label} className="w-full h-full object-contain p-2" onError={onReset} />
+            : <Upload className="w-6 h-6 text-gray-300" />}
+        </div>
+        <div className="flex flex-col gap-2 flex-1">
+          <label className="flex items-center gap-2 px-4 py-2 rounded-xl border-2 border-blue-200 text-blue-600 hover:bg-blue-50 cursor-pointer transition-all text-xs font-bold w-fit">
+            <Upload className="w-3.5 h-3.5" /> رفع صورة جديدة
+            <input type="file" accept="image/*" className="hidden" onChange={handleFile} />
+          </label>
+          {!isDefault && (
+            <button onClick={onReset}
+              className="text-xs text-gray-400 hover:text-red-500 transition-colors text-right">
+              ← استعادة الافتراضي
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function SettingsSection() {
   const [tab, setTab] = useState("عام");
-  const tabs = ["عام", "التواصل", "محتوى الصفحات", "الأمان", "الأسئلة الشائعة"];
+  const { logos, updateLogos, resetLogos } = useSiteLogos();
+  const [localLogos, setLocalLogos] = useState<SiteLogos>(logos);
+  const [logosSaved, setLogosSaved] = useState(false);
+  const tabs = ["عام", "الشعارات", "التواصل", "محتوى الصفحات", "الأمان", "الأسئلة الشائعة"];
+
+  const handleSaveLogos = () => {
+    updateLogos(localLogos);
+    setLogosSaved(true);
+    setTimeout(() => setLogosSaved(false), 2500);
+  };
   return (
     <div className="space-y-5">
       <div className="flex gap-1 border-b border-gray-200 overflow-x-auto pb-0">
@@ -2020,7 +2074,6 @@ function SettingsSection() {
               { label: "اسم الموقع (إنجليزي)",    placeholder: "Banha Real Estate",    type: "text" },
               { label: "ساعات العمل (عربي)",       placeholder: "يومياً 9:00 ص - 10:00 م", type: "text" },
               { label: "ساعات العمل (إنجليزي)",   placeholder: "Daily 9:00 AM - 10:00 PM", type: "text" },
-              { label: "رابط الشعار",              placeholder: "https://example.com/logo.png", type: "url" },
             ].map((f, i) => (
               <div key={i}>
                 <label className="text-xs font-semibold text-gray-500 block mb-1.5">{f.label}</label>
@@ -2032,6 +2085,87 @@ function SettingsSection() {
           <button className="mt-6 flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white" style={{ backgroundColor: ACCENT }}>
             <CheckCircle className="w-4 h-4" /> حفظ الإعدادات العامة
           </button>
+        </div>
+      )}
+
+      {tab === "الشعارات" && (
+        <div className="space-y-4">
+          <div>
+            <h3 className="font-bold text-gray-900">شعارات الموقع</h3>
+            <p className="text-xs text-gray-400 mt-0.5">
+              بعد الحفظ تتغير الشعارات فوراً في كل صفحات الموقع بدون إعادة تحميل
+            </p>
+          </div>
+
+          <LogoUploadCard
+            label="شعار الهيدر (الرأسية)"
+            hint="يظهر في شريط التنقل، لوحة الأدمن، وصفحات تسجيل الدخول. يُفضَّل PNG بخلفية شفافة."
+            current={localLogos.headerLogo}
+            defaultSrc={DEFAULT_LOGOS.headerLogo}
+            onUpload={url => setLocalLogos(p => ({ ...p, headerLogo: url }))}
+            onReset={() => setLocalLogos(p => ({ ...p, headerLogo: DEFAULT_LOGOS.headerLogo }))}
+          />
+
+          <LogoUploadCard
+            label="شعار الفوتر (التذييل)"
+            hint="يظهر في التذييل والأقسام ذات الخلفية الداكنة. يُفضَّل PNG أبيض بخلفية شفافة."
+            current={localLogos.footerLogo}
+            defaultSrc={DEFAULT_LOGOS.footerLogo}
+            onUpload={url => setLocalLogos(p => ({ ...p, footerLogo: url }))}
+            onReset={() => setLocalLogos(p => ({ ...p, footerLogo: DEFAULT_LOGOS.footerLogo }))}
+          />
+
+          {/* Favicon */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-3">
+            <div>
+              <p className="font-bold text-gray-800 text-sm">Favicon (أيقونة التبويب)</p>
+              <p className="text-xs text-gray-400 mt-0.5">
+                الأيقونة الصغيرة التي تظهر في تبويب المتصفح. يُفضَّل PNG أو ICO بحجم 32×32 أو 64×64.
+              </p>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden flex-shrink-0">
+                {localLogos.faviconUrl
+                  ? <img src={localLogos.faviconUrl} alt="favicon" className="w-10 h-10 object-contain"
+                      onError={() => setLocalLogos(p => ({ ...p, faviconUrl: DEFAULT_LOGOS.faviconUrl }))} />
+                  : <Image className="w-6 h-6 text-gray-300" />}
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="flex items-center gap-2 px-4 py-2 rounded-xl border-2 border-blue-200 text-blue-600 hover:bg-blue-50 cursor-pointer transition-all text-xs font-bold w-fit">
+                  <Upload className="w-3.5 h-3.5" /> رفع Favicon
+                  <input type="file" accept="image/*,.ico" className="hidden"
+                    onChange={e => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      const reader = new FileReader();
+                      reader.onload = ev => setLocalLogos(p => ({ ...p, faviconUrl: ev.target?.result as string }));
+                      reader.readAsDataURL(file);
+                    }} />
+                </label>
+                {localLogos.faviconUrl !== DEFAULT_LOGOS.faviconUrl && (
+                  <button onClick={() => setLocalLogos(p => ({ ...p, faviconUrl: DEFAULT_LOGOS.faviconUrl }))}
+                    className="text-xs text-gray-400 hover:text-red-500 transition-colors text-right">
+                    ← استعادة الافتراضي
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Save + Reset */}
+          <div className="flex gap-3 pt-1">
+            <button onClick={() => { resetLogos(); setLocalLogos({ ...DEFAULT_LOGOS }); }}
+              className="flex-1 py-3 rounded-xl font-bold text-sm border-2 border-gray-200 text-gray-600 hover:bg-gray-50 transition-all flex items-center justify-center gap-2">
+              <RefreshCw className="w-4 h-4" /> استعادة الكل
+            </button>
+            <button onClick={handleSaveLogos}
+              className="flex-[2] py-3 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2 transition-all"
+              style={{ backgroundColor: logosSaved ? "#16A34A" : ACCENT }}>
+              {logosSaved
+                ? <><CheckCircle className="w-4 h-4" /> تم الحفظ وتطبيق الشعارات!</>
+                : <><Check className="w-4 h-4" /> حفظ وتطبيق الشعارات</>}
+            </button>
+          </div>
         </div>
       )}
 
@@ -2102,6 +2236,7 @@ export default function AdminPanel() {
   const [section, setSection] = useState<Section>("dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [, navigate] = useLocation();
+  const { logos } = useSiteLogos();
 
   const NAV = [
     { id: "dashboard",     label: "لوحة التحكم",     icon: LayoutDashboard },
@@ -2163,7 +2298,7 @@ export default function AdminPanel() {
       >
         {/* Logo */}
         <div className="h-14 px-5 flex items-center border-b border-white/5">
-          <img src={logoColor} alt="عقارات بنها" className="h-6 w-auto brightness-0 invert opacity-80" />
+          <img src={logos.headerLogo} alt="عقارات بنها" className="h-6 w-auto brightness-0 invert opacity-80" />
           <span className="text-white/40 text-xs mr-2 font-medium">— المسؤول</span>
         </div>
 

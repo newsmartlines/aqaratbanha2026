@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { Eye, EyeOff, ChevronLeft } from "lucide-react";
-import logoColor from "@assets/rgb_1778457941418.png";
-import logoWhite from "@assets/footer_1778457955133.png";
+import { useSiteLogos } from "@/contexts/SiteLogosContext";
 
 export default function LoginPage() {
   const [, navigate] = useLocation();
+  const { logos } = useSiteLogos();
   const [form, setForm] = useState({ email: "", password: "" });
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -37,7 +37,7 @@ export default function LoginPage() {
             العودة إلى الرئيسية
           </button>
           <button onClick={() => navigate("/")}>
-            <img src={logoColor} alt="عقارات بنها" className="h-10 w-auto object-contain" />
+            <img src={logos.headerLogo} alt="عقارات بنها" className="h-10 w-auto object-contain" />
           </button>
         </div>
 
@@ -183,7 +183,7 @@ export default function LoginPage() {
         className="hidden lg:flex w-[45%] flex-col justify-center px-16 py-12"
         style={{ background: "linear-gradient(145deg, #0e4d6e 0%, #1EBFD5 100%)" }}
       >
-        <img src={logoWhite} alt="عقارات بنها" className="h-12 w-auto object-contain mb-12 self-start" />
+        <img src={logos.footerLogo} alt="عقارات بنها" className="h-12 w-auto object-contain mb-12 self-start" />
 
         <h2 className="text-4xl font-black text-white leading-tight mb-4">
           عقارات بنها

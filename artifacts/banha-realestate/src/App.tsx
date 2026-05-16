@@ -20,6 +20,7 @@ import EditListingPage from "@/pages/edit-listing";
 import AdminLogin from "@/pages/admin-login";
 import AdminPanel from "@/pages/admin";
 import { LanguageProvider, useLanguage } from "@/contexts/LanguageContext";
+import { SiteLogosProvider } from "@/contexts/SiteLogosContext";
 
 const queryClient = new QueryClient();
 
@@ -100,7 +101,9 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <LanguageProvider>
-          <AppInner />
+          <SiteLogosProvider>
+            <AppInner />
+          </SiteLogosProvider>
         </LanguageProvider>
       </TooltipProvider>
     </QueryClientProvider>

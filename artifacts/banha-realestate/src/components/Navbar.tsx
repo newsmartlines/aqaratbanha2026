@@ -3,8 +3,7 @@ import { useLocation } from "wouter";
 import { Menu, X, User, Plus, ArrowLeft, Search, LogIn, UserPlus } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/contexts/LanguageContext";
-import logoColor from "@assets/rgb_1778457941418.png";
-import logoWhite from "@assets/footer_1778457955133.png";
+import { useSiteLogos } from "@/contexts/SiteLogosContext";
 
 const PRIMARY = "#123C79";
 
@@ -15,10 +14,11 @@ interface NavbarProps {
 }
 
 function Logo({ light = false }: { light?: boolean }) {
+  const { logos } = useSiteLogos();
   return (
     <div className="flex items-center flex-shrink-0">
       <img
-        src={light ? logoWhite : logoColor}
+        src={light ? logos.footerLogo : logos.headerLogo}
         alt="عقارات بنها"
         className="h-10 w-auto object-contain"
       />

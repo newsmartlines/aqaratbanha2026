@@ -1,8 +1,9 @@
 import { MapPin, Phone, ChevronDown } from "lucide-react";
 import { FaFacebook, FaInstagram, FaYoutube, FaWhatsapp } from "react-icons/fa";
-import logoWhite from "@assets/footer_1778457955133.png";
+import { useSiteLogos } from "@/contexts/SiteLogosContext";
 
 export default function Footer() {
+  const { logos } = useSiteLogos();
   return (
     <footer id="footer" className="bg-[#0a1f3d] text-gray-300 pt-16 pb-8" dir="rtl">
       <div className="container mx-auto px-4 md:px-6">
@@ -10,7 +11,7 @@ export default function Footer() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           <div>
-            <img src={logoWhite} alt="عقارات بنها" className="h-12 w-auto object-contain mb-4" />
+            <img src={logos.footerLogo} alt="عقارات بنها" className="h-12 w-auto object-contain mb-4" />
             <p className="text-gray-400 leading-relaxed mb-6 text-sm">
               المنصة الأولى المخصصة للعقارات في بنها. نهدف لتسهيل عملية البحث عن العقار المناسب بكل شفافية ومصداقية.
             </p>

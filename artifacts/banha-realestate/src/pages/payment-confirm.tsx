@@ -6,7 +6,7 @@ import {
   Building2, Star, Crown, FileText, Sparkles, Lock,
   Clock, Image, TrendingUp, CheckCircle2,
 } from "lucide-react";
-import logoColor from "@assets/rgb_1778457941418.png";
+import { useSiteLogos } from "@/contexts/SiteLogosContext";
 
 const PLAN_META: Record<string, {
   nameAr: string; color: string; icon: React.ReactNode;
@@ -85,6 +85,7 @@ function SuccessScreen({ planName, navigate }: { planColor: string; planName: st
 
 export default function PaymentConfirmPage() {
   const [, navigate] = useLocation();
+  const { logos } = useSiteLogos();
   const params = new URLSearchParams(window.location.search);
   const planId = params.get("plan") || "premium";
   const billing = (params.get("billing") || "monthly") as "monthly" | "yearly";
@@ -120,7 +121,7 @@ export default function PaymentConfirmPage() {
             <ChevronRight className="w-4 h-4" />
             رجوع
           </button>
-          <img src={logoColor} alt="عقارات بنها" className="h-8 w-auto" />
+          <img src={logos.headerLogo} alt="عقارات بنها" className="h-8 w-auto" />
           <div className="flex items-center gap-1.5 text-xs text-green-600 font-medium">
             <Lock className="w-3.5 h-3.5" />
             مشفّر SSL

@@ -11,8 +11,7 @@ import {
   Phone, Eye, Sparkles, Navigation, Info, FileText, Image as ImageIcon,
   ArrowRight,
 } from "lucide-react";
-import logoColor from "@assets/rgb_1778457941418.png";
-import logoWhite from "@assets/footer_1778457955133.png";
+import { useSiteLogos } from "@/contexts/SiteLogosContext";
 import "leaflet/dist/leaflet.css";
 
 const STEPS = ["نوع الصفقة", "الفئة", "النوع", "التفاصيل", "الموقع والسعر", "المزايا"];
@@ -251,6 +250,7 @@ const inputBaseClass = "w-full bg-white border border-gray-200 rounded-xl py-3.5
 
 export default function AddPropertyPage() {
   const [, navigate] = useLocation();
+  const { logos } = useSiteLogos();
   const [step, setStep] = useState(0);
   const [dealType, setDealType] = useState<"بيع" | "إيجار" | "">("");
   const [mainCategory, setMainCategory] = useState("");
@@ -327,7 +327,7 @@ export default function AddPropertyPage() {
             {step > 0 ? "العودة للخطوة السابقة" : "العودة إلى الرئيسية"}
           </button>
           <button onClick={() => navigate("/")}>
-            <img src={logoColor} alt="عقارات بنها" className="h-10 w-auto object-contain" />
+            <img src={logos.headerLogo} alt="عقارات بنها" className="h-10 w-auto object-contain" />
           </button>
         </div>
 
@@ -685,7 +685,7 @@ export default function AddPropertyPage() {
         <div className="absolute -bottom-24 -left-24 w-96 h-96 rounded-full bg-[#123C79]/20 blur-3xl" />
 
         <div className="relative z-10">
-          <img src={logoWhite} alt="عقارات بنها" className="h-12 w-auto object-contain mb-14 self-start" />
+          <img src={logos.footerLogo} alt="عقارات بنها" className="h-12 w-auto object-contain mb-14 self-start" />
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
