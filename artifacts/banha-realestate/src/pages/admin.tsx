@@ -12,6 +12,7 @@ import {
   FileText, Activity, DollarSign, Package, UserPlus, Percent,
 } from "lucide-react";
 import { SEOSection } from "./admin-seo";
+import { IntegrationsSection } from "./admin-integrations";
 import {
   AreaChart, Area, LineChart, Line, BarChart, Bar,
   PieChart, Pie, Cell, XAxis, YAxis, Tooltip,
@@ -154,7 +155,7 @@ const SUBS_DATA = [
   { user: "mona@dalel.sa",    plan: "برونزي",   status: "منته", start: "7 مايو 26",  end: "7 يونيو 26",  amount: "99" },
 ];
 
-type Section = "dashboard" | "users" | "clients" | "properties" | "categories" | "locations" | "messages" | "payments" | "subscriptions" | "commissions" | "reports" | "settings" | "seo";
+type Section = "dashboard" | "users" | "clients" | "properties" | "categories" | "locations" | "messages" | "payments" | "subscriptions" | "commissions" | "reports" | "settings" | "seo" | "integrations";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function Badge({ label, color }: { label: string; color: "green" | "amber" | "red" | "blue" | "gray" }) {
@@ -1147,13 +1148,30 @@ function CategoriesSection() {
 function LocationsSection() {
   const [locs, setLocs] = useState(LOCATIONS);
   const [tab, setTab] = useState<"منطقة" | "مدينة" | "حي">("منطقة");
+
+  // Add modal
+  const [addOpen, setAddOpen] = useState(false);
+  const [addForm, setAddForm] = useState({ name: "", nameEn: "" });
+
+  // Edit modal
   const [editLoc, setEditLoc] = useState<typeof LOCATIONS[0] | null>(null);
   const [editForm, setEditForm] = useState({ name: "", nameEn: "" });
 
-  const toggle = (id: number) => setLocs(prev => prev.map(l => l.id === id ? { ...l, active: !l.active } : l));
+  const toggle = (id: number) =>
+    setLocs(prev => prev.map(l => l.id === id ? { ...l, active: !l.active } : l));
+
   const handleDelete = (id: number) => {
     if (window.confirm("حذف هذا الموقع؟")) setLocs(prev => prev.filter(l => l.id !== id));
   };
+
+  const openAdd = () => { setAddForm({ name: "", nameEn: "" }); setAddOpen(true); };
+  const saveAdd = () => {
+    if (!addForm.name.trim()) return;
+    const newId = Math.max(...locs.map(l => l.id)) + 1;
+    setLocs(prev => [...prev, { id: newId, name: addForm.name, nameEn: addForm.nameEn, type: tab, active: true }]);
+    setAddOpen(false);
+  };
+
   const openEdit = (l: typeof LOCATIONS[0]) => {
     setEditForm({ name: l.name, nameEn: l.nameEn });
     setEditLoc(l);
@@ -1169,10 +1187,10 @@ function LocationsSection() {
     { key: "مدينة" as const, label: "المدن",    bg: "#EFF6FF", clr: "#2563EB" },
     { key: "حي"    as const, label: "الأحياء",  bg: "#F0FDF4", clr: "#16A34A" },
   ];
+  const addLabel = tab === "منطقة" ? "منطقة" : tab === "مدينة" ? "مدينة" : "حي";
 
   return (
     <div className="space-y-5">
-      {/* Page header */}
       <div>
         <h2 className="text-lg font-bold text-gray-900">إدارة المواقع الجغرافية</h2>
         <p className="text-sm text-gray-400 mt-0.5">إدارة المدن والأحياء ومناطق الخدمة</p>
@@ -1185,7 +1203,7 @@ function LocationsSection() {
             onClick={() => setTab(t.key)}>
             <p className="text-3xl font-black text-gray-900">{locs.filter(l => l.type === t.key).length}</p>
             <div className="flex items-center gap-2 mt-1.5">
-              <div className="w-5 h-5 rounded-full flex-shrink-0" style={{ backgroundColor: t.bg, border: `2px solid ${t.clr}22` }}></div>
+              <div className="w-5 h-5 rounded-full flex-shrink-0" style={{ backgroundColor: t.bg, border: `2px solid ${t.clr}44` }}></div>
               <p className="text-sm font-medium text-gray-500">{t.label}</p>
             </div>
           </div>
@@ -1195,7 +1213,6 @@ function LocationsSection() {
       {/* Main card */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-          {/* Pill tabs */}
           <div className="flex gap-1 bg-gray-100 p-1 rounded-xl">
             {tabConfig.map(t => {
               const count = locs.filter(l => l.type === t.key).length;
@@ -1203,16 +1220,17 @@ function LocationsSection() {
                 <button key={t.key} onClick={() => setTab(t.key)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${tab === t.key ? "bg-white shadow-sm text-gray-800" : "text-gray-500 hover:text-gray-700"}`}>
                   {t.label}
-                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${tab === t.key ? "text-white" : "bg-gray-200 text-gray-500"}`}
-                    style={tab === t.key ? { backgroundColor: ACCENT } : {}}>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold text-white"
+                    style={{ backgroundColor: tab === t.key ? ACCENT : "#CBD5E1" }}>
                     {count}
                   </span>
                 </button>
               );
             })}
           </div>
-          <button className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold text-white" style={{ backgroundColor: ACCENT }}>
-            <Plus className="w-3.5 h-3.5" /> إضافة {tab === "منطقة" ? "منطقة" : tab === "مدينة" ? "مدينة" : "حي"}
+          <button onClick={openAdd}
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold text-white" style={{ backgroundColor: ACCENT }}>
+            <Plus className="w-3.5 h-3.5" /> إضافة {addLabel}
           </button>
         </div>
 
@@ -1247,11 +1265,46 @@ function LocationsSection() {
             </div>
           ))}
           {filtered.length === 0 && (
-            <div className="py-12 text-center text-gray-400 text-sm">لا توجد عناصر في هذا التصنيف</div>
+            <div className="py-12 text-center">
+              <MapPin className="w-8 h-8 text-gray-200 mx-auto mb-2" />
+              <p className="text-gray-400 text-sm">لا توجد عناصر — اضغط "إضافة {addLabel}" للبدء</p>
+            </div>
           )}
         </div>
       </div>
 
+      {/* Add Modal */}
+      <AnimatePresence>
+        {addOpen && (
+          <AdminModal title={`إضافة ${addLabel} جديد${tab === "حي" ? "" : "ة"}`} onClose={() => setAddOpen(false)}>
+            <div className="space-y-4">
+              {[
+                { label: "الاسم بالعربي",    key: "name",   ph: `مثل: ${tab === "منطقة" ? "مركز بنها" : tab === "مدينة" ? "بنها" : "ميدان بنها"}` },
+                { label: "الاسم بالإنجليزي", key: "nameEn", ph: tab === "منطقة" ? "Banha Center" : tab === "مدينة" ? "Banha" : "Banha Square" },
+              ].map(f => (
+                <div key={f.key}>
+                  <label className="text-xs font-semibold text-gray-500 block mb-1.5">{f.label}</label>
+                  <input value={(addForm as any)[f.key]} placeholder={f.ph}
+                    onChange={e => setAddForm(p => ({ ...p, [f.key]: e.target.value }))}
+                    onKeyDown={e => e.key === "Enter" && saveAdd()}
+                    className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-teal-300 transition-all" />
+                </div>
+              ))}
+              <div className="p-3 bg-gray-50 rounded-xl flex items-center gap-2 text-xs text-gray-500">
+                <MapPin className="w-3.5 h-3.5 flex-shrink-0" style={{ color: ACCENT }} />
+                سيُضاف كـ <strong>{tab}</strong> ومرئي في الواجهة تلقائياً
+              </div>
+              <button onClick={saveAdd}
+                className="w-full py-2.5 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2"
+                style={{ backgroundColor: ACCENT }}>
+                <Plus className="w-4 h-4" /> إضافة {addLabel}
+              </button>
+            </div>
+          </AdminModal>
+        )}
+      </AnimatePresence>
+
+      {/* Edit Modal */}
       <AnimatePresence>
         {editLoc && (
           <AdminModal title={`تعديل: ${editLoc.name}`} onClose={() => setEditLoc(null)}>
@@ -1264,7 +1317,7 @@ function LocationsSection() {
                   <label className="text-xs font-semibold text-gray-500 block mb-1.5">{f.label}</label>
                   <input value={(editForm as any)[f.key]}
                     onChange={e => setEditForm(p => ({ ...p, [f.key]: e.target.value }))}
-                    className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-gray-300 transition-all" />
+                    className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-teal-300 transition-all" />
                 </div>
               ))}
               <button onClick={saveEdit}
@@ -1898,6 +1951,7 @@ export default function AdminPanel() {
     { id: "subscriptions", label: "الاشتراكات",        icon: Repeat },
     { id: "commissions",   label: "العمولات",          icon: Percent },
     { id: "seo",           label: "إدارة السيو",       icon: Globe },
+    { id: "integrations",  label: "التكاملات",         icon: Zap },
     { id: "reports",       label: "التقارير",          icon: BarChart2 },
     { id: "settings",     label: "الإعدادات",         icon: Settings },
   ];
@@ -1916,6 +1970,7 @@ export default function AdminPanel() {
     subscriptions: <SubscriptionsSection />,
     commissions:   <CommissionsSection />,
     seo:           <SEOSection />,
+    integrations:  <IntegrationsSection />,
     reports:       <ReportsSection />,
     settings:      <SettingsSection />,
   };

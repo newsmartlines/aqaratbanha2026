@@ -1,0 +1,210 @@
+اعمل نظام حماية وأمان متكامل داخل لوحة تحكم الأدمن باسم ZARA Security AI، وأضف لها صفحة مستقلة داخل الـ Admin Navbar بأيقونة حماية احترافية.
+المطلوب يكون نظام أمني ذكي جدًا، حديث، ويعمل تلقائيًا لحماية منصة العقارات بالكامل من أي هجمات أو سبام أو اختراقات.
+
+النظام لازم يكون شبيه بأنظمة:
+
+Cloudflare Security
+Firebase Security
+Vercel Security
+Sucuri
+Wordfence
+AWS Shield
+المطلوب الأساسي
+
+اعمل AI Security System ذكي يراقب الموقع بالكامل لحظيًا ويكتشف أي نشاط مشبوه تلقائيًا.
+
+النظام يعمل تلقائيًا على:
+حماية لوحة الأدمن.
+حماية تسجيل الدخول.
+حماية API.
+حماية رفع الصور والملفات.
+حماية الفورمز.
+حماية الرسائل.
+حماية تسجيل الحسابات.
+حماية صفحات العقارات.
+حماية قواعد البيانات.
+حماية الجلسات Sessions.
+حماية الـ Cookies.
+حماية الـ Tokens.
+حماية الـ SEO Pages.
+المميزات المطلوبة
+1. Smart Firewall
+
+اعمل Web Application Firewall ذكي:
+
+Rate Limiting
+IP Blocking
+Geo Blocking
+Bot Detection
+Spam Protection
+SQL Injection Protection
+XSS Protection
+CSRF Protection
+Brute Force Protection
+DDOS Detection
+Fake Requests Detection
+API Abuse Protection
+Header Validation
+Request Validation
+
+ويكون:
+
+Auto Detect
+Auto Block
+Auto Recover
+2. AI Threat Detection
+
+اعمل AI Security Engine يراقب:
+
+الطلبات المشبوهة.
+تسجيلات الدخول الغريبة.
+كثرة الطلبات.
+السبام.
+محاولات الاختراق.
+رفع ملفات ضارة.
+تعديل URLs بشكل مشبوه.
+
+ويقوم تلقائيًا بـ:
+
+Block IP
+Temporary Ban
+Permanent Ban
+Captcha Trigger
+Admin Alert
+Lock Session
+3. Admin Protection
+حماية لوحة التحكم:
+2FA Authentication
+Email Verification
+Device Verification
+Login Notifications
+Session Timeout
+Login History
+Active Sessions Manager
+Force Logout Devices
+Country Detection
+Suspicious Login Detection
+4. Upload Protection
+
+أي صورة أو ملف يتم رفعه:
+
+يتم فحصه تلقائيًا.
+منع الملفات الضارة.
+منع الملفات التنفيذية.
+التحقق من MIME Type.
+فحص الحجم.
+ضغط الصور.
+تحويل الصور لـ WebP.
+إزالة Metadata الحساسة.
+5. Security Dashboard
+
+اعمل Dashboard احترافي جدًا يحتوي على:
+
+Cards:
+Security Score
+Threats Blocked
+Failed Logins
+Active Sessions
+Firewall Status
+Server Health
+API Requests
+Suspicious Activities
+Charts:
+الهجمات اليومية
+نشاط المستخدمين
+محاولات الاختراق
+الدول المهاجمة
+استهلاك الـ API
+6. Real-time Monitoring
+
+اعمل Live Monitoring:
+
+الطلبات اللحظية.
+المستخدمين النشطين.
+الهجمات المباشرة.
+Logs Live.
+Notifications Live.
+7. Automated Security Actions
+
+لو النظام اكتشف خطر:
+
+يقفل الـ API مؤقتًا.
+يمنع الـ IP.
+يطلب Captcha.
+يوقف الحساب مؤقتًا.
+يرسل إشعار للأدمن.
+يسجل كل شيء في Logs.
+8. Logs & Audit System
+
+اعمل:
+
+Security Logs
+Admin Activity Logs
+Login Logs
+API Logs
+File Upload Logs
+Database Changes Logs
+
+مع:
+
+Search
+Filters
+Export Logs
+9. Backup & Recovery
+Auto Backup
+Database Backup
+Restore Points
+Emergency Recovery
+Backup Scheduler
+10. Performance + Security
+
+النظام لازم:
+
+لا يبطئ الموقع.
+يستخدم Lazy Loading.
+Background Security Workers.
+Smart Caching.
+Edge Security Ready.
+11. Security Settings
+
+اعمل صفحة إعدادات كاملة:
+
+Enable / Disable Features
+Security Levels:
+Low
+Medium
+High
+Extreme
+API Security Keys
+Session Settings
+Cookie Settings
+CSP Headers
+Trusted Devices
+Whitelist / Blacklist
+12. Notifications
+
+يدعم:
+
+Email Alerts
+Telegram Alerts
+WhatsApp Alerts
+Browser Notifications
+التصميم المطلوب
+تصميم Dark Futuristic Security Dashboard.
+احترافي جدًا مثل:
+Cloudflare
+Datadog
+Vercel Security
+Sentry
+Animations خفيفة.
+Live Indicators.
+Modern Charts.
+Glassmorphism Effects.
+Responsive كامل.
+مهم جدًا
+لا تفسد أي تصميم موجود.
+اجعل النظام Modular وقابل للتوسع.
+استخدم أفضل Security Practices.
+اجعل كل شيء أوتوماتيك قدر الإمكان.
+أضف صفحة ZARA Security AI داخل Navbar الأدمن.
+النظام لازم يشعر المستخدم أن المنصة Enterprise Level حقيقية.
