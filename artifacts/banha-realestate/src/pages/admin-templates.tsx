@@ -10,8 +10,8 @@ import {
   Languages, MoreVertical, Save, ExternalLink, Layout,
 } from "lucide-react";
 
-const ACCENT = "#0D9488";
-const SB_ACTIVE = "#123C79";
+const ACCENT = "#2563EB";
+const SB_ACTIVE = "#1E3A8A";
 
 type Channel = "email" | "sms" | "whatsapp" | "push" | "inapp";
 type Lang = "ar" | "en";
@@ -35,7 +35,7 @@ interface Template {
 
 const CATEGORIES = [
   { id: "auth",         label: "المصادقة",             labelEn: "Authentication",  icon: Shield,       color: "#6366F1", count: 6  },
-  { id: "property",     label: "العقارات",              labelEn: "Property",        icon: Building2,    color: "#0D9488", count: 6  },
+  { id: "property",     label: "العقارات",              labelEn: "Property",        icon: Building2,    color: "#2563EB", count: 6  },
   { id: "subscription", label: "الاشتراكات والمدفوعات", labelEn: "Subscriptions",   icon: CreditCard,   color: "#F59E0B", count: 4  },
   { id: "contact",      label: "التواصل والعملاء",      labelEn: "Contact & Leads", icon: User,         color: "#EC4899", count: 3  },
   { id: "admin",        label: "إشعارات الأدمن",        labelEn: "Admin Alerts",    icon: Bell,         color: "#EF4444", count: 3  },
@@ -459,7 +459,7 @@ const DEFAULT_TEMPLATES: Template[] = [
     category: "email",
     subject: "مرحباً بك في عقارات بنها — أهلاً بك!",
     subjectEn: "Welcome to Banha Real Estate!",
-    body: "<!DOCTYPE html>\n<html dir=\"rtl\">\n<body style=\"font-family:Arial;background:#f8fafc;padding:20px\">\n  <div style=\"max-width:600px;margin:auto;background:white;border-radius:16px;overflow:hidden\">\n    <div style=\"background:linear-gradient(135deg,#0D9488,#0891B2);padding:40px;text-align:center\">\n      <h1 style=\"color:white;font-size:28px\">أهلاً {{user_name}}!</h1>\n    </div>\n    <div style=\"padding:32px\">\n      <p>يسعدنا انضمامك إلى عائلة عقارات بنها.</p>\n      <a href=\"{{site_url}}\" style=\"display:inline-block;background:#0D9488;color:white;padding:14px 32px;border-radius:12px;text-decoration:none;font-weight:bold\">ابدأ الآن</a>\n    </div>\n    <div style=\"background:#f8fafc;padding:20px;text-align:center;color:#94a3b8;font-size:12px\">\n      عقارات بنها — المنصة العقارية الأولى في بنها\n    </div>\n  </div>\n</body>\n</html>",
+    body: "<!DOCTYPE html>\n<html dir=\"rtl\">\n<body style=\"font-family:Arial;background:#f8fafc;padding:20px\">\n  <div style=\"max-width:600px;margin:auto;background:white;border-radius:16px;overflow:hidden\">\n    <div style=\"background:linear-gradient(135deg,#1E3A8A,#2563EB);padding:40px;text-align:center\">\n      <h1 style=\"color:white;font-size:28px\">أهلاً {{user_name}}!</h1>\n    </div>\n    <div style=\"padding:32px\">\n      <p>يسعدنا انضمامك إلى عائلة عقارات بنها.</p>\n      <a href=\"{{site_url}}\" style=\"display:inline-block;background:#2563EB;color:white;padding:14px 32px;border-radius:12px;text-decoration:none;font-weight:bold\">ابدأ الآن</a>\n    </div>\n    <div style=\"background:#f8fafc;padding:20px;text-align:center;color:#94a3b8;font-size:12px\">\n      عقارات بنها — المنصة العقارية الأولى في بنها\n    </div>\n  </div>\n</body>\n</html>",
     bodyEn: "",
     channels: ["email"],
     active: true,
@@ -796,7 +796,7 @@ function EditorPanel({ tpl, onClose, onSave }: EditorPanelProps) {
                     </div>
                     <div className={`p-6 ${previewDark ? "bg-gray-800" : "bg-white"}`} dir="rtl">
                       <div className={`rounded-xl overflow-hidden border ${previewDark ? "border-gray-700" : "border-gray-100"}`}>
-                        <div className="h-16 flex items-center justify-center" style={{ background: "linear-gradient(135deg,#0D9488,#0891B2)" }}>
+                        <div className="h-16 flex items-center justify-center" style={{ background: "linear-gradient(135deg,#1E3A8A,#2563EB)" }}>
                           <span className="text-white font-bold text-sm">🏠 عقارات بنها</span>
                         </div>
                         <div className={`p-5 ${previewDark ? "bg-gray-900" : "bg-white"}`}>
@@ -838,7 +838,7 @@ function EditorPanel({ tpl, onClose, onSave }: EditorPanelProps) {
                   </div>
                   <textarea
                     className="w-full bg-transparent text-green-400 font-mono text-xs p-5 outline-none resize-none min-h-[320px] leading-relaxed"
-                    value={`<!DOCTYPE html>\n<html dir="rtl" lang="ar">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width">\n  <title>${draft.subject}</title>\n</head>\n<body style="margin:0;padding:20px;background:#f8fafc;font-family:Arial,sans-serif">\n  <div style="max-width:600px;margin:auto;background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08)">\n    <div style="background:linear-gradient(135deg,#0D9488,#0891B2);padding:32px;text-align:center">\n      <h1 style="color:white;margin:0;font-size:24px">🏠 عقارات بنها</h1>\n    </div>\n    <div style="padding:32px;line-height:1.8;direction:rtl">\n      <p style="color:#374151;white-space:pre-wrap">${draft.body.replace(/</g, "&lt;")}</p>\n    </div>\n    <div style="background:#f8fafc;padding:20px;text-align:center;color:#9ca3af;font-size:12px;border-top:1px solid #f1f5f9">\n      © 2026 عقارات بنها — بنها، القليوبية\n    </div>\n  </div>\n</body>\n</html>`}
+                    value={`<!DOCTYPE html>\n<html dir="rtl" lang="ar">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width">\n  <title>${draft.subject}</title>\n</head>\n<body style="margin:0;padding:20px;background:#f8fafc;font-family:Arial,sans-serif">\n  <div style="max-width:600px;margin:auto;background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08)">\n    <div style="background:linear-gradient(135deg,#1E3A8A,#2563EB);padding:32px;text-align:center">\n      <h1 style="color:white;margin:0;font-size:24px">🏠 عقارات بنها</h1>\n    </div>\n    <div style="padding:32px;line-height:1.8;direction:rtl">\n      <p style="color:#374151;white-space:pre-wrap">${draft.body.replace(/</g, "&lt;")}</p>\n    </div>\n    <div style="background:#f8fafc;padding:20px;text-align:center;color:#9ca3af;font-size:12px;border-top:1px solid #f1f5f9">\n      © 2026 عقارات بنها — بنها، القليوبية\n    </div>\n  </div>\n</body>\n</html>`}
                     readOnly
                   />
                 </div>

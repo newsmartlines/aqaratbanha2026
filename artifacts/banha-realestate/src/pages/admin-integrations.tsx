@@ -7,8 +7,8 @@ import {
   MessageSquare, Image, Brain, Map, BarChart2, Clock,
 } from "lucide-react";
 
-const ACCENT = "#0D9488";
-const ACCENT_LIGHT = "#CCFBF1";
+const ACCENT = "#2563EB";
+const ACCENT_LIGHT = "#DBEAFE";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 type Status = "connected" | "disconnected" | "warning";
@@ -443,7 +443,7 @@ function ConfigModal({ integration, onClose }: { integration: Integration; onClo
                       type={f.type === "password" && !visible[f.key] ? "password" : "text"}
                       value={form[f.key]} placeholder={f.ph}
                       onChange={e => setForm(p => ({ ...p, [f.key]: e.target.value }))}
-                      className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-teal-300 transition-all pr-4"
+                      className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-blue-300 transition-all pr-4"
                       style={{ paddingLeft: f.type === "password" ? "5rem" : "1rem" }}
                     />
                     {f.type === "password" && (
@@ -602,7 +602,7 @@ export function IntegrationsSection() {
             <Search className="w-3.5 h-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input value={search} onChange={e => setSearch(e.target.value)}
               placeholder="ابحث في التكاملات..."
-              className="w-full pr-9 pl-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:bg-white focus:border-teal-300 transition-all" />
+              className="w-full pr-9 pl-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-sm outline-none focus:bg-white focus:border-blue-300 transition-all" />
           </div>
 
           {/* Category tabs */}

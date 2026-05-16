@@ -29,10 +29,10 @@ import {
 import logoColor from "@assets/rgb_1778457941418.png";
 
 // ── Design tokens ────────────────────────────────────────────────────────────
-const SB = "#1E293B";          // sidebar bg
-const SB_ACTIVE = "#123C79";   // active nav item
-const ACCENT = "#0D9488";      // primary accent (teal)
-const ACCENT_LIGHT = "#CCFBF1";
+const SB = "#0F172A";          // sidebar bg  (deep navy)
+const SB_ACTIVE = "#1E3A8A";   // active nav item (navy blue)
+const ACCENT = "#2563EB";      // primary accent (blue-600)
+const ACCENT_LIGHT = "#DBEAFE";
 
 // ── Mock data ────────────────────────────────────────────────────────────────
 const REVENUE_DATA = [
@@ -48,8 +48,8 @@ const WEEKLY_DATA = [
 const CATS_PIE = [
   { name: "شقق", value: 45, color: ACCENT },
   { name: "فيلات", value: 25, color: "#6366F1" },
-  { name: "محلات", value: 18, color: "#F59E0B" },
-  { name: "أراضي", value: 12, color: "#EC4899" },
+  { name: "محلات", value: 18, color: "#0EA5E9" },
+  { name: "أراضي", value: 12, color: "#8B5CF6" },
 ];
 const TOP_CATS = [
   { name: "شقق", count: 184 }, { name: "فيلات", count: 115 },
@@ -58,8 +58,8 @@ const TOP_CATS = [
 const ACTIVITY = [
   { text: "تسجيل مستخدم جديد: محمد علي", time: "منذ ساعتين", dot: ACCENT },
   { text: "تمت الموافقة على إعلان شقة 3 غرف", time: "منذ 4 ساعات", dot: "#6366F1" },
-  { text: "دفعة جديدة بقيمة 2,500 جنيه", time: "منذ 5 ساعات", dot: "#F59E0B" },
-  { text: "تحديث باقة مستخدم إلى البريميوم", time: "أمس", dot: "#EC4899" },
+  { text: "دفعة جديدة بقيمة 2,500 جنيه", time: "منذ 5 ساعات", dot: "#0EA5E9" },
+  { text: "تحديث باقة مستخدم إلى البريميوم", time: "أمس", dot: "#8B5CF6" },
   { text: "إبلاغ عن إعلان رقم #234", time: "أمس", dot: "#EF4444" },
 ];
 
@@ -283,8 +283,8 @@ function DashboardSection() {
         {[
           { label: "إجمالي مقدمي الخدمة", value: "247",    sub: "+12 هذا الشهر", trend: "up" as const,   color: ACCENT },
           { label: "مقدمو الخدمة النشطون", value: "189",   sub: "76.5% نشاط",   trend: "up" as const,   color: "#6366F1" },
-          { label: "إجمالي المستخدمين",    value: "1,842", sub: "+45 هذا الشهر", trend: "up" as const,   color: "#F59E0B" },
-          { label: "إجمالي الخدمات",       value: "534",   sub: "12 بانتظار",    trend: undefined,        color: "#EC4899" },
+          { label: "إجمالي المستخدمين",    value: "1,842", sub: "+45 هذا الشهر", trend: "up" as const,   color: "#0EA5E9" },
+          { label: "إجمالي الخدمات",       value: "534",   sub: "12 بانتظار",    trend: undefined,        color: "#8B5CF6" },
           { label: "إجمالي الإيرادات",     value: "48,320",sub: "+18% هذا الشهر",trend: "up" as const,   color: "#10B981" },
           { label: "بانتظار الموافقة",     value: "12",    sub: "إعلانات معلقة", trend: undefined,        color: "#EF4444" },
         ].map((s, i) => (
@@ -468,7 +468,7 @@ function UsersSection() {
         </div>
         <Table headers={["#", "المستخدم", "البريد الإلكتروني", "الهاتف", "المنطقة", "المدينة", "الدور", "الحالة", "تاريخ الانضمام", "إجراءات"]}>
           {filtered.map((u, i) => {
-            const palette = ["#0D9488","#6366F1","#F59E0B","#EC4899","#3B82F6","#10B981","#EF4444"];
+            const palette = ["#2563EB","#6366F1","#0EA5E9","#8B5CF6","#3B82F6","#10B981","#EF4444"];
             const avatarBg = palette[u.id % palette.length];
             return (
               <Tr key={u.id}>
@@ -613,7 +613,7 @@ function ClientsSection() {
   const regions = ["كل المناطق", ...Array.from(new Set(CLIENTS.map(c => c.region)))];
   const cities  = ["كل المدن",   ...Array.from(new Set(CLIENTS.map(c => c.city)))];
 
-  const palette = ["#0D9488","#6366F1","#F59E0B","#EC4899","#3B82F6","#10B981","#EF4444","#8B5CF6","#F97316","#06B6D4"];
+  const palette = ["#2563EB","#6366F1","#0EA5E9","#8B5CF6","#3B82F6","#10B981","#EF4444","#7C3AED","#F97316","#06B6D4"];
 
   return (
     <div className="space-y-5">
@@ -1002,7 +1002,7 @@ function CategoriesSection() {
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
                         <button onClick={() => { setAddSubCatId(c.id); setAddSubName(""); }}
-                          className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold hover:bg-teal-50 transition-colors" style={{ color: ACCENT }}>
+                          className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold hover:bg-blue-50 transition-colors" style={{ color: ACCENT }}>
                           <Plus className="w-3 h-3" /> إضافة فرعي
                         </button>
                       </div>
@@ -1295,7 +1295,7 @@ function LocationsSection() {
                   <input value={(addForm as any)[f.key]} placeholder={f.ph}
                     onChange={e => setAddForm(p => ({ ...p, [f.key]: e.target.value }))}
                     onKeyDown={e => e.key === "Enter" && saveAdd()}
-                    className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-teal-300 transition-all" />
+                    className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-blue-300 transition-all" />
                 </div>
               ))}
               <div className="p-3 bg-gray-50 rounded-xl flex items-center gap-2 text-xs text-gray-500">
@@ -1325,7 +1325,7 @@ function LocationsSection() {
                   <label className="text-xs font-semibold text-gray-500 block mb-1.5">{f.label}</label>
                   <input value={(editForm as any)[f.key]}
                     onChange={e => setEditForm(p => ({ ...p, [f.key]: e.target.value }))}
-                    className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-teal-300 transition-all" />
+                    className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-blue-300 transition-all" />
                 </div>
               ))}
               <button onClick={saveEdit}
@@ -1920,7 +1920,7 @@ function WatermarkSection() {
                 const active = settings.position === pos.key;
                 return (
                   <button key={i} onClick={() => set("position", pos.key)}
-                    className={`h-12 rounded-xl text-xs font-bold border-2 transition-all ${active ? "text-white border-teal-500 bg-teal-500" : "border-gray-200 text-gray-500 hover:border-teal-300 bg-white"}`}>
+                    className={`h-12 rounded-xl text-xs font-bold border-2 transition-all ${active ? "text-white border-blue-600 bg-blue-600" : "border-gray-200 text-gray-500 hover:border-blue-300 bg-white"}`}>
                     {pos.label}
                   </button>
                 );
@@ -1938,7 +1938,7 @@ function WatermarkSection() {
             </div>
             <input type="range" min={10} max={100} step={5} value={settings.opacity}
               onChange={e => set("opacity", +e.target.value)}
-              className="w-full accent-teal-500 h-2 cursor-pointer" />
+              className="w-full accent-blue-600 h-2 cursor-pointer" />
             <div className="flex justify-between text-xs text-gray-400 mt-1.5">
               <span>شفاف جداً</span>
               <span>واضح تماماً</span>
@@ -1955,7 +1955,7 @@ function WatermarkSection() {
             </div>
             <input type="range" min={5} max={50} step={1} value={settings.size}
               onChange={e => set("size", +e.target.value)}
-              className="w-full accent-teal-500 h-2 cursor-pointer" />
+              className="w-full accent-blue-600 h-2 cursor-pointer" />
             <div className="flex justify-between text-xs text-gray-400 mt-1.5">
               <span>صغير</span>
               <span>كبير</span>

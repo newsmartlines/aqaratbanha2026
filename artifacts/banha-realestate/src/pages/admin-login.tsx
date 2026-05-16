@@ -27,7 +27,7 @@ export default function AdminLogin() {
     <div className="min-h-screen flex" dir="rtl" style={{ background: "linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)" }}>
       {/* Left decorative panel */}
       <div className="hidden lg:flex lg:w-1/2 flex-col items-center justify-center p-12 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 30% 50%, #123C79 0%, transparent 60%), radial-gradient(circle at 70% 20%, #0D9488 0%, transparent 50%)" }} />
+        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: "radial-gradient(circle at 30% 50%, #1E3A8A 0%, transparent 60%), radial-gradient(circle at 70% 20%, #2563EB 0%, transparent 50%)" }} />
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="relative z-10 text-center">
           <img src={logoColor} alt="عقارات بنها" className="h-16 w-auto mx-auto mb-8 brightness-0 invert opacity-90" />
           <h1 className="text-4xl font-bold text-white mb-4">لوحة تحكم المسؤول</h1>
@@ -52,7 +52,7 @@ export default function AdminLogin() {
           className="w-full max-w-md">
           <div className="bg-white rounded-3xl shadow-2xl p-8">
             <div className="flex items-center gap-3 mb-8">
-              <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#123C79" }}>
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{ backgroundColor: "#1E3A8A" }}>
                 <Shield className="w-6 h-6 text-white" />
               </div>
               <div>
@@ -94,7 +94,7 @@ export default function AdminLogin() {
 
               <motion.button type="submit" whileTap={{ scale: 0.98 }} disabled={loading}
                 className="w-full py-3.5 rounded-xl font-bold text-white text-sm flex items-center justify-center gap-2 transition-all"
-                style={{ backgroundColor: "#123C79" }}>
+                style={{ backgroundColor: "#1E3A8A" }}>
                 {loading ? (
                   <><svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" strokeOpacity="0.25"/><path d="M4 12a8 8 0 018-8" stroke="currentColor" strokeWidth="4" strokeLinecap="round"/></svg> جاري الدخول...</>
                 ) : "دخول إلى لوحة التحكم"}

@@ -12,8 +12,8 @@ import {
   ResponsiveContainer, CartesianGrid,
 } from "recharts";
 
-const ACCENT = "#0D9488";
-const ACCENT_LIGHT = "#CCFBF1";
+const ACCENT = "#2563EB";
+const ACCENT_LIGHT = "#DBEAFE";
 
 // ── SEO Mock Data ─────────────────────────────────────────────────────────────
 const SEO_PROPERTIES = [
@@ -143,7 +143,7 @@ function GooglePreview({ title, slug, description }: { title: string; slug: stri
 function OGPreview({ title, description }: { title: string; description: string }) {
   return (
     <div className="border border-gray-200 rounded-xl overflow-hidden max-w-lg">
-      <div className="h-[140px] bg-gradient-to-br from-teal-600 to-blue-700 flex items-center justify-center">
+      <div className="h-[140px] bg-gradient-to-br from-blue-900 to-blue-700 flex items-center justify-center">
         <Globe className="w-12 h-12 text-white/40" />
       </div>
       <div className="bg-gray-50 px-4 py-3 border-t border-gray-200">
@@ -191,19 +191,19 @@ function GeneralSeoTab() {
             <div>
               <label className="text-xs font-semibold text-gray-500 block mb-1">عنوان الموقع الرئيسي</label>
               <input value={form.siteTitle} onChange={e => set("siteTitle", e.target.value)}
-                className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-teal-300 transition-all" />
+                className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-blue-300 transition-all" />
               <p className="text-xs text-gray-400 mt-1">{form.siteTitle.length}/60 حرف</p>
             </div>
             <div>
               <label className="text-xs font-semibold text-gray-500 block mb-1">الوصف العام (Meta Description)</label>
               <textarea value={form.metaDesc} onChange={e => set("metaDesc", e.target.value)} rows={3}
-                className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-teal-300 transition-all resize-none" />
+                className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-blue-300 transition-all resize-none" />
               <p className="text-xs text-gray-400 mt-1">{form.metaDesc.length}/160 حرف</p>
             </div>
             <div>
               <label className="text-xs font-semibold text-gray-500 block mb-1">الكلمات المفتاحية</label>
               <input value={form.keywords} onChange={e => set("keywords", e.target.value)}
-                className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-teal-300 transition-all" />
+                className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-blue-300 transition-all" />
             </div>
           </div>
 
@@ -215,13 +215,13 @@ function GeneralSeoTab() {
               <label className="text-xs font-semibold text-gray-500 block mb-1">Google Site Verification</label>
               <input value={form.googleVerify} onChange={e => set("googleVerify", e.target.value)}
                 placeholder="أدخل كود التحقق"
-                className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-teal-300 transition-all" />
+                className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-blue-300 transition-all" />
             </div>
             <div>
               <label className="text-xs font-semibold text-gray-500 block mb-1">Bing Webmaster Verification</label>
               <input value={form.bingVerify} onChange={e => set("bingVerify", e.target.value)}
                 placeholder="أدخل كود التحقق"
-                className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-teal-300 transition-all" />
+                className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-blue-300 transition-all" />
             </div>
           </div>
 
@@ -355,7 +355,7 @@ function PropertySeoTab() {
                   <td className="px-4 py-3 text-xs text-gray-500 font-medium">{p.views.toLocaleString()}</td>
                   <td className="px-4 py-3">
                     <button onClick={() => openEdit(p)}
-                      className="w-7 h-7 rounded-lg hover:bg-teal-50 flex items-center justify-center" style={{ color: ACCENT }}>
+                      className="w-7 h-7 rounded-lg hover:bg-blue-50 flex items-center justify-center" style={{ color: ACCENT }}>
                       <Edit2 className="w-3.5 h-3.5" />
                     </button>
                   </td>
@@ -390,7 +390,7 @@ function PropertySeoTab() {
                     <label className="text-xs font-semibold text-gray-500 block mb-1.5">{f.label}</label>
                     <input value={(editForm as any)[f.key]}
                       onChange={e => setEditForm(p => ({ ...p, [f.key]: e.target.value }))}
-                      className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-teal-300 transition-all" />
+                      className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-blue-300 transition-all" />
                     <p className="text-xs text-gray-400 mt-0.5">{(editForm as any)[f.key].length}/{f.max}</p>
                   </div>
                 ))}
@@ -686,7 +686,7 @@ function RedirectTab() {
         </div>
 
         {adding && (
-          <div className="px-5 py-4 bg-teal-50/40 border-b border-gray-100">
+          <div className="px-5 py-4 bg-blue-50/40 border-b border-gray-100">
             <div className="grid grid-cols-3 gap-3">
               <div>
                 <label className="text-xs font-semibold text-gray-500 block mb-1">من (From)</label>
@@ -782,7 +782,7 @@ function BrokenLinksTab() {
         </div>
 
         {scanning && (
-          <div className="mb-4 p-3 bg-teal-50 rounded-xl flex items-center gap-3">
+          <div className="mb-4 p-3 bg-blue-50 rounded-xl flex items-center gap-3">
             <RefreshCw className="w-4 h-4 animate-spin" style={{ color: ACCENT }} />
             <p className="text-sm text-gray-600">جاري فحص كافة الروابط...</p>
           </div>
@@ -966,7 +966,7 @@ function AiSeoTab() {
             <label className="text-xs font-semibold text-gray-500 block mb-1.5">عنوان العقار *</label>
             <input value={input.title} onChange={e => setInput(p => ({ ...p, title: e.target.value }))}
               placeholder="مثل: شقة 3 غرف في ميدان بنها"
-              className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-teal-300 transition-all" />
+              className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-blue-300 transition-all" />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -990,14 +990,14 @@ function AiSeoTab() {
             <label className="text-xs font-semibold text-gray-500 block mb-1.5">السعر (اختياري)</label>
             <input value={input.price} onChange={e => setInput(p => ({ ...p, price: e.target.value }))}
               placeholder="850,000"
-              className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-teal-300 transition-all" />
+              className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-blue-300 transition-all" />
           </div>
 
           <div>
             <label className="text-xs font-semibold text-gray-500 block mb-1.5">الوصف (اختياري)</label>
             <textarea value={input.desc} onChange={e => setInput(p => ({ ...p, desc: e.target.value }))}
               rows={3} placeholder="وصف مختصر للعقار..."
-              className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-teal-300 transition-all resize-none" />
+              className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-blue-300 transition-all resize-none" />
           </div>
 
           <button onClick={generate} disabled={generating || !input.title}
@@ -1122,7 +1122,7 @@ export function SEOSection() {
   const [tab, setTab] = useState<SeoTab>("general");
 
   const STAT_CARDS = [
-    { icon: Globe,         label: "الصفحات المؤرشفة",       value: "247",  sub: "+12 هذا الأسبوع",   color: "#0D9488" },
+    { icon: Globe,         label: "الصفحات المؤرشفة",       value: "247",  sub: "+12 هذا الأسبوع",   color: "#2563EB" },
     { icon: AlertCircle,   label: "عقارات بدون SEO",        value: "8",    sub: "تحتاج اهتمام فوري", color: "#EF4444", warn: true },
     { icon: AlertTriangle, label: "مشاكل SEO",              value: "14",   sub: "4 حرجة",             color: "#F59E0B", warn: true },
     { icon: Zap,           label: "سرعة الموقع",            value: "92",   sub: "PageSpeed Score",    color: "#10B981" },
