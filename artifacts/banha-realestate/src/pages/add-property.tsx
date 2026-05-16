@@ -1,4 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from "react";
+import { applyWatermark } from "../utils/watermark";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation } from "wouter";
 import {
@@ -288,7 +289,11 @@ export default function AddPropertyPage() {
     const files = Array.from(e.target.files || []);
     files.forEach((file) => {
       const reader = new FileReader();
-      reader.onload = (ev) => setPhotos((prev) => [...prev, ev.target?.result as string]);
+      reader.onload = async (ev) => {
+        const raw = ev.target?.result as string;
+        const stamped = await applyWatermark(raw);
+        setPhotos((prev) => [...prev, stamped]);
+      };
       reader.readAsDataURL(file);
     });
   };

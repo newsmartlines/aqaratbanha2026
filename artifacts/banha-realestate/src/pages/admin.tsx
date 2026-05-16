@@ -10,9 +10,15 @@ import {
   AlertCircle, CheckCircle, Clock, XCircle, Zap, Crown,
   Phone, Mail, User, ChevronDown, MoreVertical, Map,
   FileText, Activity, DollarSign, Package, UserPlus, Percent,
+  Stamp,
 } from "lucide-react";
 import { SEOSection } from "./admin-seo";
 import { IntegrationsSection } from "./admin-integrations";
+import {
+  getWatermarkSettings, saveWatermarkSettings,
+  DEFAULT_WATERMARK,
+} from "../utils/watermark";
+import type { WatermarkSettings, WatermarkPosition } from "../utils/watermark";
 import {
   AreaChart, Area, LineChart, Line, BarChart, Bar,
   PieChart, Pie, Cell, XAxis, YAxis, Tooltip,
@@ -155,7 +161,7 @@ const SUBS_DATA = [
   { user: "mona@dalel.sa",    plan: "برونزي",   status: "منته", start: "7 مايو 26",  end: "7 يونيو 26",  amount: "99" },
 ];
 
-type Section = "dashboard" | "users" | "clients" | "properties" | "categories" | "locations" | "messages" | "payments" | "subscriptions" | "commissions" | "reports" | "settings" | "seo" | "integrations";
+type Section = "dashboard" | "users" | "clients" | "properties" | "categories" | "locations" | "messages" | "payments" | "subscriptions" | "commissions" | "reports" | "settings" | "seo" | "integrations" | "watermark";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function Badge({ label, color }: { label: string; color: "green" | "amber" | "red" | "blue" | "gray" }) {
@@ -1826,6 +1832,196 @@ function ReportsSection() {
 }
 
 // ── Settings Section ─────────────────────────────────────────────────────────
+// ── Watermark Section ─────────────────────────────────────────────────────────
+function WatermarkSection() {
+  const [settings, setSettings] = useState<WatermarkSettings>(getWatermarkSettings);
+  const [saved, setSaved] = useState(false);
+
+  const set = <K extends keyof WatermarkSettings>(k: K, v: WatermarkSettings[K]) =>
+    setSettings(p => ({ ...p, [k]: v }));
+
+  const handleSave = () => {
+    saveWatermarkSettings(settings);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2500);
+  };
+
+  const handleReset = () => {
+    setSettings({ ...DEFAULT_WATERMARK });
+  };
+
+  const POSITIONS: Array<{ key: WatermarkPosition; label: string; row: number; col: number }> = [
+    { key: "top-left",     label: "أعلى يسار",  row: 1, col: 1 },
+    { key: "top-right",    label: "أعلى يمين",  row: 1, col: 3 },
+    { key: "center",       label: "المنتصف",    row: 2, col: 2 },
+    { key: "bottom-left",  label: "أسفل يسار",  row: 3, col: 1 },
+    { key: "bottom-right", label: "أسفل يمين",  row: 3, col: 3 },
+  ];
+
+  const logoPreviewStyle = (): React.CSSProperties => {
+    const w = `${Math.round(settings.size * 0.45)}%`;
+    const base: React.CSSProperties = {
+      position: "absolute",
+      width: w,
+      opacity: settings.opacity / 100,
+      pointerEvents: "none",
+    };
+    switch (settings.position) {
+      case "top-left":     return { ...base, top: "5%",  left:  "5%" };
+      case "top-right":    return { ...base, top: "5%",  right: "5%" };
+      case "center":       return { ...base, top: "50%", left:  "50%", transform: "translate(-50%,-50%)" };
+      case "bottom-left":  return { ...base, bottom: "5%", left: "5%" };
+      case "bottom-right": return { ...base, bottom: "5%", right: "5%" };
+    }
+  };
+
+  return (
+    <div className="space-y-5">
+      <div>
+        <h2 className="text-lg font-bold text-gray-900">إعدادات العلامة المائية</h2>
+        <p className="text-sm text-gray-400 mt-0.5">تُطبَّق تلقائياً على صور العقارات عند رفعها من أي مستخدم</p>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
+
+        {/* Controls column */}
+        <div className="space-y-4">
+
+          {/* Enable / disable */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="font-bold text-gray-800">تفعيل العلامة المائية</p>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  {settings.enabled ? "✅ مفعّلة — اللوجو يُضاف على كل صورة" : "⛔ معطّلة — لا يُضاف شيء على الصور"}
+                </p>
+              </div>
+              <button onClick={() => set("enabled", !settings.enabled)}>
+                {settings.enabled
+                  ? <ToggleRight className="w-12 h-12" style={{ color: ACCENT }} />
+                  : <ToggleLeft  className="w-12 h-12 text-gray-300" />}
+              </button>
+            </div>
+          </div>
+
+          {/* Position picker */}
+          <div className={`bg-white rounded-2xl border border-gray-100 shadow-sm p-5 transition-opacity ${!settings.enabled ? "opacity-40 pointer-events-none" : ""}`}>
+            <p className="font-bold text-gray-800 mb-3">موضع اللوجو على الصورة</p>
+            <div className="grid grid-cols-3 gap-2" style={{ gridTemplateRows: "repeat(3,3rem)" }}>
+              {Array.from({ length: 9 }).map((_, i) => {
+                const row = Math.floor(i / 3) + 1;
+                const col = (i % 3) + 1;
+                const pos = POSITIONS.find(p => p.row === row && p.col === col);
+                if (!pos) return (
+                  <div key={i} className="rounded-xl bg-gray-50 border border-dashed border-gray-200" />
+                );
+                const active = settings.position === pos.key;
+                return (
+                  <button key={i} onClick={() => set("position", pos.key)}
+                    className={`h-12 rounded-xl text-xs font-bold border-2 transition-all ${active ? "text-white border-teal-500 bg-teal-500" : "border-gray-200 text-gray-500 hover:border-teal-300 bg-white"}`}>
+                    {pos.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Opacity */}
+          <div className={`bg-white rounded-2xl border border-gray-100 shadow-sm p-5 transition-opacity ${!settings.enabled ? "opacity-40 pointer-events-none" : ""}`}>
+            <div className="flex items-center justify-between mb-3">
+              <p className="font-bold text-gray-800">درجة الوضوح</p>
+              <span className="text-sm font-black px-3 py-1 rounded-full text-white" style={{ backgroundColor: ACCENT }}>
+                {settings.opacity}%
+              </span>
+            </div>
+            <input type="range" min={10} max={100} step={5} value={settings.opacity}
+              onChange={e => set("opacity", +e.target.value)}
+              className="w-full accent-teal-500 h-2 cursor-pointer" />
+            <div className="flex justify-between text-xs text-gray-400 mt-1.5">
+              <span>شفاف جداً</span>
+              <span>واضح تماماً</span>
+            </div>
+          </div>
+
+          {/* Size */}
+          <div className={`bg-white rounded-2xl border border-gray-100 shadow-sm p-5 transition-opacity ${!settings.enabled ? "opacity-40 pointer-events-none" : ""}`}>
+            <div className="flex items-center justify-between mb-3">
+              <p className="font-bold text-gray-800">حجم اللوجو</p>
+              <span className="text-sm font-black px-3 py-1 rounded-full text-white" style={{ backgroundColor: ACCENT }}>
+                {settings.size}%
+              </span>
+            </div>
+            <input type="range" min={5} max={50} step={1} value={settings.size}
+              onChange={e => set("size", +e.target.value)}
+              className="w-full accent-teal-500 h-2 cursor-pointer" />
+            <div className="flex justify-between text-xs text-gray-400 mt-1.5">
+              <span>صغير</span>
+              <span>كبير</span>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Preview + Save column */}
+        <div className="space-y-4">
+
+          {/* Live preview */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+            <p className="font-bold text-gray-800 mb-3">معاينة مباشرة</p>
+            <div className="relative w-full rounded-xl overflow-hidden bg-gray-200" style={{ paddingTop: "66%" }}>
+              <img
+                src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&q=75"
+                alt="sample"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              {settings.enabled && (
+                <img src="/logo-house-nobg.png" alt="watermark" style={logoPreviewStyle()} />
+              )}
+              {!settings.enabled && (
+                <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                  <span className="bg-black/60 text-white text-xs font-bold px-4 py-2 rounded-full">
+                    العلامة المائية معطّلة
+                  </span>
+                </div>
+              )}
+            </div>
+            <p className="text-xs text-gray-400 text-center mt-2">
+              هكذا ستبدو صور العقارات بعد رفعها
+            </p>
+          </div>
+
+          {/* Info box */}
+          <div className="bg-blue-50 rounded-2xl border border-blue-100 p-4 space-y-2">
+            <p className="text-xs font-bold text-blue-700">كيف يعمل؟</p>
+            <ul className="text-xs text-blue-600 space-y-1 list-disc list-inside">
+              <li>عند رفع أي صورة عقار من المستخدمين</li>
+              <li>يُطبَّق اللوجو تلقائياً على الصورة</li>
+              <li>يُحفظ الإعداد فوراً لكل الأجهزة</li>
+              <li>لا يؤثر على الصور المرفوعة مسبقاً</li>
+            </ul>
+          </div>
+
+          {/* Buttons */}
+          <div className="flex gap-3">
+            <button onClick={handleReset}
+              className="flex-1 py-3 rounded-xl font-bold text-sm border-2 border-gray-200 text-gray-600 hover:bg-gray-50 transition-all flex items-center justify-center gap-2">
+              <RefreshCw className="w-4 h-4" /> استعادة الافتراضي
+            </button>
+            <button onClick={handleSave}
+              className="flex-[2] py-3 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2 transition-all"
+              style={{ backgroundColor: saved ? "#16A34A" : ACCENT }}>
+              {saved
+                ? <><CheckCircle className="w-4 h-4" /> تم الحفظ!</>
+                : <><Check className="w-4 h-4" /> حفظ الإعدادات</>}
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function SettingsSection() {
   const [tab, setTab] = useState("عام");
   const tabs = ["عام", "التواصل", "محتوى الصفحات", "الأمان", "الأسئلة الشائعة"];
@@ -1952,6 +2148,7 @@ export default function AdminPanel() {
     { id: "commissions",   label: "العمولات",          icon: Percent },
     { id: "seo",           label: "إدارة السيو",       icon: Globe },
     { id: "integrations",  label: "التكاملات",         icon: Zap },
+    { id: "watermark",     label: "العلامة المائية",   icon: Stamp },
     { id: "reports",       label: "التقارير",          icon: BarChart2 },
     { id: "settings",     label: "الإعدادات",         icon: Settings },
   ];
@@ -1971,6 +2168,7 @@ export default function AdminPanel() {
     commissions:   <CommissionsSection />,
     seo:           <SEOSection />,
     integrations:  <IntegrationsSection />,
+    watermark:     <WatermarkSection />,
     reports:       <ReportsSection />,
     settings:      <SettingsSection />,
   };
