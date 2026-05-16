@@ -9,7 +9,7 @@ import {
   ToggleLeft, ToggleRight, Download, RefreshCw, Filter,
   AlertCircle, CheckCircle, Clock, XCircle, Zap, Crown,
   Phone, Mail, User, ChevronDown, MoreVertical, Map,
-  FileText, Activity, DollarSign, Package,
+  FileText, Activity, DollarSign, Package, UserPlus, Percent,
 } from "lucide-react";
 import {
   AreaChart, Area, LineChart, Line, BarChart, Bar,
@@ -74,23 +74,44 @@ const PROPERTIES = [
 ];
 
 const CATEGORIES = [
-  { id: 1, name: "شقق",    nameEn: "Apartments",  slug: "apartments", icon: "Home",     count: 184, active: true  },
-  { id: 2, name: "فيلات",  nameEn: "Villas",       slug: "villas",     icon: "Building", count: 115, active: true  },
-  { id: 3, name: "محلات",  nameEn: "Shops",        slug: "shops",      icon: "Store",    count: 95,  active: true  },
-  { id: 4, name: "أراضي",  nameEn: "Land",         slug: "land",       icon: "Map",      count: 78,  active: true  },
-  { id: 5, name: "مكاتب",  nameEn: "Offices",      slug: "offices",    icon: "Briefcase",count: 36,  active: false },
-  { id: 6, name: "مستودعات",nameEn:"Warehouses",   slug: "warehouses", icon: "Package",  count: 12,  active: false },
+  { id: 1, name: "شقق",     nameEn: "Apartments", slug: "apartments", icon: "Home",     count: 184, active: true,  subs: ["شقق مفروشة", "شقق للإيجار"] },
+  { id: 2, name: "فيلات",   nameEn: "Villas",     slug: "villas",     icon: "Building", count: 115, active: true,  subs: [] },
+  { id: 3, name: "محلات",   nameEn: "Shops",      slug: "shops",      icon: "Store",    count: 95,  active: true,  subs: ["محلات تجارية"] },
+  { id: 4, name: "أراضي",   nameEn: "Land",       slug: "land",       icon: "Map",      count: 78,  active: true,  subs: [] },
+  { id: 5, name: "مكاتب",   nameEn: "Offices",    slug: "offices",    icon: "Briefcase",count: 36,  active: false, subs: [] },
+  { id: 6, name: "مستودعات",nameEn: "Warehouses", slug: "warehouses", icon: "Package",  count: 12,  active: false, subs: [] },
 ];
 
 const LOCATIONS = [
-  { id: 1, name: "بنها",          nameEn: "Banha",          type: "حي",    active: true  },
-  { id: 2, name: "منية القمح",    nameEn: "Minyet El-Qamh", type: "مدينة", active: true  },
-  { id: 3, name: "شبين الكنائر", nameEn: "Shebin El-Kanater",type: "مدينة",active: true  },
-  { id: 4, name: "طوخ",           nameEn: "Tookh",          type: "مدينة", active: true  },
-  { id: 5, name: "قليوب",         nameEn: "Qaliub",         type: "مدينة", active: false },
-  { id: 6, name: "كفر شكر",       nameEn: "Kafr Shukr",     type: "مدينة", active: true  },
-  { id: 7, name: "ميدان بنها",    nameEn: "Banha Square",   type: "حي",    active: true  },
-  { id: 8, name: "الشروق",        nameEn: "El-Shorouk",     type: "حي",    active: true  },
+  { id: 1,  name: "محافظة القليوبية", nameEn: "Qalyubia Governorate",  type: "منطقة", active: true  },
+  { id: 2,  name: "مركز بنها",        nameEn: "Banha Center",          type: "منطقة", active: true  },
+  { id: 3,  name: "مركز طوخ",         nameEn: "Tookh Center",          type: "منطقة", active: true  },
+  { id: 4,  name: "بنها",             nameEn: "Banha",                 type: "مدينة", active: true  },
+  { id: 5,  name: "منية القمح",       nameEn: "Minyet El-Qamh",        type: "مدينة", active: true  },
+  { id: 6,  name: "شبين الكنائر",    nameEn: "Shebin El-Kanater",     type: "مدينة", active: true  },
+  { id: 7,  name: "طوخ",              nameEn: "Tookh",                 type: "مدينة", active: true  },
+  { id: 8,  name: "قليوب",            nameEn: "Qaliub",                type: "مدينة", active: false },
+  { id: 9,  name: "كفر شكر",          nameEn: "Kafr Shukr",            type: "مدينة", active: true  },
+  { id: 10, name: "ميدان بنها",       nameEn: "Banha Square",          type: "حي",    active: true  },
+  { id: 11, name: "الشروق",           nameEn: "El-Shorouk",            type: "حي",    active: true  },
+  { id: 12, name: "وسط البلد",        nameEn: "Downtown",              type: "حي",    active: true  },
+  { id: 13, name: "كفر سعد",          nameEn: "Kafr Saad",             type: "حي",    active: false },
+  { id: 14, name: "سراي القبة",       nameEn: "Saraya Al-Qobba",       type: "حي",    active: true  },
+];
+
+const COMMISSION_PLANS = [
+  { id: 1, name: "مجاني",    nameEn: "Free",    price: 0,   days: 30, limit: "3",  featured: "0",  commPct: 15, priority: "—" },
+  { id: 2, name: "برونزي",   nameEn: "Bronze",  price: 99,  days: 30, limit: "10", featured: "3",  commPct: 10, priority: "1" },
+  { id: 3, name: "بريميوم",  nameEn: "Premium", price: 349, days: 30, limit: "∞",  featured: "∞",  commPct: 7,  priority: "2" },
+];
+
+const CATEGORY_COMMISSIONS = [
+  { name: "شقق",      nameEn: "Apartments", pct: 15 },
+  { name: "فيلات",    nameEn: "Villas",      pct: 15 },
+  { name: "محلات",    nameEn: "Shops",       pct: 15 },
+  { name: "أراضي",    nameEn: "Land",        pct: 15 },
+  { name: "مكاتب",    nameEn: "Offices",     pct: 15 },
+  { name: "مستودعات", nameEn: "Warehouses",  pct: 15 },
 ];
 
 const MESSAGES_DATA = [
@@ -119,7 +140,7 @@ const SUBS_DATA = [
   { user: "mona@dalel.sa",    plan: "برونزي",   status: "منته", start: "7 مايو 26",  end: "7 يونيو 26",  amount: "99" },
 ];
 
-type Section = "dashboard" | "users" | "properties" | "categories" | "locations" | "messages" | "payments" | "subscriptions" | "reports" | "settings";
+type Section = "dashboard" | "users" | "properties" | "categories" | "locations" | "messages" | "payments" | "subscriptions" | "commissions" | "reports" | "settings";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 function Badge({ label, color }: { label: string; color: "green" | "amber" | "red" | "blue" | "gray" }) {
@@ -375,48 +396,98 @@ function UsersSection() {
 
   return (
     <div className="space-y-5">
+      {/* Stat Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
-          { label: "إجمالي المستخدمين", value: String(userList.length), color: ACCENT },
-          { label: "النشطون",           value: String(userList.filter(u => u.status === "نشط").length),    color: "#10B981" },
-          { label: "الموقوفون",         value: String(userList.filter(u => u.status === "موقوف").length),  color: "#EF4444" },
-          { label: "جدد هذا الشهر",    value: "1",  color: "#6366F1" },
-        ].map((s, i) => <StatCard key={i} {...s} />)}
+          { label: "إجمالي المستخدمين", value: userList.length,                                     Icon: Users,        bg: "#EFF6FF", clr: "#2563EB" },
+          { label: "النشطون",           value: userList.filter(u => u.status === "نشط").length,    Icon: CheckCircle,  bg: "#F0FDF4", clr: "#16A34A" },
+          { label: "الموقوفون",         value: userList.filter(u => u.status === "موقوف").length,  Icon: XCircle,      bg: "#FEF2F2", clr: "#DC2626" },
+          { label: "جدد هذا الشهر",    value: 1,                                                    Icon: UserPlus,     bg: "#F5F3FF", clr: "#7C3AED" },
+        ].map((s, i) => (
+          <div key={i} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex items-center gap-4">
+            <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: s.bg }}>
+              <s.Icon className="w-5 h-5" style={{ color: s.clr }} />
+            </div>
+            <div>
+              <p className="text-2xl font-black text-gray-900">{s.value}</p>
+              <p className="text-xs text-gray-400 mt-0.5">{s.label}</p>
+            </div>
+          </div>
+        ))}
       </div>
+
+      {/* Table Card */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-gray-100">
-          <h3 className="font-bold text-gray-900 text-sm">المستخدمون المسجّلون <span className="text-gray-400 font-normal ml-1">({filtered.length} مستخدم)</span></h3>
+          <div>
+            <h3 className="font-bold text-gray-900 text-sm">المستخدمون المسجّلون</h3>
+            <p className="text-xs text-gray-400 mt-0.5">عرض {filtered.length} مستخدم بعد التصفية والبحث</p>
+          </div>
           <div className="flex items-center gap-2">
             <div className="relative">
               <Search className="w-3.5 h-3.5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="بحث..." className="pr-9 pl-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl outline-none w-44" />
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="بحث بالاسم أو البريد..." className="pr-9 pl-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-xl outline-none w-52" />
             </div>
-            <button className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold text-white" style={{ backgroundColor: ACCENT }}>
-              <Plus className="w-3.5 h-3.5" /> إضافة
+            <select className="py-2 px-3 text-sm bg-gray-50 border border-gray-200 rounded-xl outline-none text-gray-600">
+              <option>كل المناطق</option>
+              <option>بنها</option>
+              <option>القاهرة</option>
+            </select>
+            <select className="py-2 px-3 text-sm bg-gray-50 border border-gray-200 rounded-xl outline-none text-gray-600">
+              <option>كل المدن</option>
+              <option>طوخ</option>
+              <option>قليوب</option>
+            </select>
+            <button className="w-9 h-9 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-500">
+              <RefreshCw className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
-        <Table headers={["#", "المستخدم", "البريد الإلكتروني", "الهاتف", "المنطقة", "الدور", "الحالة", "تاريخ الانضمام", "إجراءات"]}>
-          {filtered.map(u => (
-            <Tr key={u.id}>
-              <Td className="text-gray-400 text-xs">{u.id}</Td>
-              <Td>
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg flex items-center justify-center text-white text-xs font-bold flex-shrink-0" style={{ backgroundColor: ACCENT }}>
-                    {u.name[0].toUpperCase()}
+        <Table headers={["#", "المستخدم", "البريد الإلكتروني", "الهاتف", "المنطقة", "المدينة", "الدور", "الحالة", "تاريخ الانضمام", "إجراءات"]}>
+          {filtered.map((u, i) => {
+            const palette = ["#0D9488","#6366F1","#F59E0B","#EC4899","#3B82F6","#10B981","#EF4444"];
+            const avatarBg = palette[u.id % palette.length];
+            return (
+              <Tr key={u.id}>
+                <Td className="text-gray-400 text-xs">{i + 1}</Td>
+                <Td>
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0" style={{ backgroundColor: avatarBg }}>
+                      {u.name[0].toUpperCase()}
+                    </div>
+                    <span className="font-semibold text-gray-800 text-sm">{u.name}</span>
                   </div>
-                  <span className="font-medium text-gray-800">{u.name}</span>
-                </div>
-              </Td>
-              <Td className="text-gray-500 text-xs">{u.email}</Td>
-              <Td className="text-gray-400 text-xs">{u.phone}</Td>
-              <Td className="text-gray-500 text-xs">{u.region}</Td>
-              <Td><span className="text-xs font-medium text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full">{u.role}</span></Td>
-              <Td><Badge label={u.status} color={u.status === "نشط" ? "green" : "red"} /></Td>
-              <Td className="text-gray-400 text-xs">{u.date}</Td>
-              <Td><ActionBtns onView={() => setViewUser(u)} onEdit={() => openEdit(u)} onDelete={() => handleDelete(u.id)} /></Td>
-            </Tr>
-          ))}
+                </Td>
+                <Td className="text-gray-500 text-xs">{u.email}</Td>
+                <Td className="text-gray-400 text-xs">{u.phone}</Td>
+                <Td className="text-gray-500 text-xs">{u.region || "—"}</Td>
+                <Td className="text-gray-400 text-xs">—</Td>
+                <Td>
+                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${u.role === "مسؤول" ? "bg-purple-50 text-purple-700" : "bg-gray-100 text-gray-600"}`}>
+                    {u.role}
+                  </span>
+                </Td>
+                <Td><Badge label={u.status} color={u.status === "نشط" ? "green" : "red"} /></Td>
+                <Td className="text-gray-400 text-xs">{u.date}</Td>
+                <Td>
+                  <div className="flex items-center gap-1">
+                    <button onClick={() => setViewUser(u)} className="w-7 h-7 rounded-lg hover:bg-blue-50 text-blue-400 flex items-center justify-center" title="عرض">
+                      <Eye className="w-3.5 h-3.5" />
+                    </button>
+                    <button onClick={() => openEdit(u)} className="w-7 h-7 rounded-lg hover:bg-green-50 text-green-500 flex items-center justify-center" title="تعديل">
+                      <Edit2 className="w-3.5 h-3.5" />
+                    </button>
+                    <button className="w-7 h-7 rounded-lg hover:bg-blue-50 text-blue-500 flex items-center justify-center" title="إدارة">
+                      <UserPlus className="w-3.5 h-3.5" />
+                    </button>
+                    <button onClick={() => handleDelete(u.id)} className="w-7 h-7 rounded-lg hover:bg-red-50 text-red-400 flex items-center justify-center" title="حذف">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </Td>
+              </Tr>
+            );
+          })}
         </Table>
       </div>
 
@@ -426,7 +497,7 @@ function UsersSection() {
           <AdminModal title="تفاصيل المستخدم" onClose={() => setViewUser(null)}>
             <div className="space-y-3">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-lg flex-shrink-0" style={{ backgroundColor: ACCENT }}>
+                <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0" style={{ backgroundColor: ACCENT }}>
                   {viewUser.name[0].toUpperCase()}
                 </div>
                 <div>
@@ -457,9 +528,9 @@ function UsersSection() {
           <AdminModal title="تعديل المستخدم" onClose={() => setEditUser(null)}>
             <div className="space-y-4">
               {[
-                { label: "الاسم",             key: "name",   type: "text" },
-                { label: "البريد الإلكتروني", key: "email",  type: "email" },
-                { label: "الهاتف",            key: "phone",  type: "tel" },
+                { label: "الاسم",             key: "name",  type: "text" },
+                { label: "البريد الإلكتروني", key: "email", type: "email" },
+                { label: "الهاتف",            key: "phone", type: "tel" },
               ].map(f => (
                 <div key={f.key}>
                   <label className="text-xs font-semibold text-gray-500 block mb-1.5">{f.label}</label>
@@ -565,10 +636,12 @@ function PropertiesSection() {
 // ── Categories Section ───────────────────────────────────────────────────────
 function CategoriesSection() {
   const [cats, setCats] = useState(CATEGORIES);
+  const [expanded, setExpanded] = useState<number[]>([]);
   const [editCat, setEditCat] = useState<typeof CATEGORIES[0] | null>(null);
   const [editForm, setEditForm] = useState({ name: "", nameEn: "", slug: "" });
 
-  const toggleCat = (id: number) => setCats(prev => prev.map(c => c.id === id ? { ...c, active: !c.active } : c));
+  const toggleExpand = (id: number) =>
+    setExpanded(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   const handleDelete = (id: number) => {
     if (window.confirm("حذف هذا التصنيف؟")) setCats(prev => prev.filter(c => c.id !== id));
   };
@@ -581,44 +654,104 @@ function CategoriesSection() {
     setEditCat(null);
   };
 
+  const totalSubs = cats.reduce((acc, c) => acc + c.subs.length, 0);
+
   return (
     <div className="space-y-5">
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
           <div>
-            <h3 className="font-bold text-gray-900 text-sm">تصنيفات العقارات</h3>
-            <p className="text-xs text-gray-400 mt-0.5">{cats.length} تصنيف · {cats.filter(c => c.active).length} نشط</p>
+            <h3 className="font-bold text-gray-900">تصنيفات العقارات</h3>
+            <p className="text-xs text-gray-400 mt-0.5">{cats.length} تصنيف · {totalSubs} تصنيف فرعي</p>
           </div>
           <div className="flex items-center gap-2">
-            <button className="w-8 h-8 rounded-xl bg-gray-50 hover:bg-gray-100 flex items-center justify-center text-gray-500 border border-gray-200"><RefreshCw className="w-3.5 h-3.5" /></button>
+            <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-gray-500 border border-gray-200 hover:bg-gray-50">
+              <RefreshCw className="w-3.5 h-3.5" /> تحديث
+            </button>
             <button className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold text-white" style={{ backgroundColor: ACCENT }}>
               <Plus className="w-3.5 h-3.5" /> إضافة تصنيف
             </button>
           </div>
         </div>
-        <Table headers={["#", "الاسم بالعربي", "الاسم بالإنجليزي", "المعرّف (Slug)", "عدد العقارات", "الظهور", "إجراءات"]}>
-          {cats.map(c => (
-            <Tr key={c.id}>
-              <Td className="text-gray-400 text-xs">{c.id}</Td>
-              <Td><span className="font-semibold text-gray-800">{c.name}</span></Td>
-              <Td className="text-gray-500">{c.nameEn}</Td>
-              <Td><code className="text-xs bg-gray-100 px-2 py-0.5 rounded text-gray-600">{c.slug}</code></Td>
-              <Td>
-                <span className="text-xs font-bold px-2 py-0.5 rounded-full" style={{ backgroundColor: ACCENT_LIGHT, color: ACCENT }}>
-                  {c.count} عقار
-                </span>
-              </Td>
-              <Td>
-                <button onClick={() => toggleCat(c.id)}>
-                  {c.active
-                    ? <ToggleRight className="w-8 h-8" style={{ color: ACCENT }} />
-                    : <ToggleLeft className="w-8 h-8 text-gray-300" />}
-                </button>
-              </Td>
-              <Td><ActionBtns onEdit={() => openEdit(c)} onDelete={() => handleDelete(c.id)} /></Td>
-            </Tr>
-          ))}
-        </Table>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-gray-100 bg-gray-50/60">
+                <th className="w-10 px-4 py-3"></th>
+                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500">الاسم بالعربي</th>
+                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500">الاسم بالإنجليزي</th>
+                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500">الأيقونة</th>
+                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500">المعرّف (Slug)</th>
+                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500">التصنيفات الفرعية</th>
+                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500">إجراءات</th>
+              </tr>
+            </thead>
+            <tbody>
+              {cats.map(c => (
+                <>
+                  <tr key={c.id} className="border-b border-gray-50 hover:bg-gray-50/60 transition-colors">
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={() => toggleExpand(c.id)}
+                        className="w-6 h-6 rounded-md hover:bg-gray-100 flex items-center justify-center text-gray-400 transition-all"
+                        style={{ transform: expanded.includes(c.id) ? "rotate(90deg)" : "rotate(0deg)" }}
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </td>
+                    <td className="px-4 py-3 font-semibold text-gray-800">{c.name}</td>
+                    <td className="px-4 py-3 text-gray-500 text-sm">{c.nameEn}</td>
+                    <td className="px-4 py-3">
+                      <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded font-medium">{c.icon}</span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <code className="text-xs bg-gray-100 px-2 py-0.5 rounded text-gray-600">{c.slug}</code>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="text-xs font-semibold px-2.5 py-1 rounded-full" style={{ backgroundColor: ACCENT_LIGHT, color: ACCENT }}>
+                        {c.subs.length} فرعي
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-1.5">
+                        <button onClick={() => handleDelete(c.id)} className="w-7 h-7 rounded-lg hover:bg-red-50 text-red-400 flex items-center justify-center">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={() => openEdit(c)} className="w-7 h-7 rounded-lg hover:bg-green-50 text-green-500 flex items-center justify-center">
+                          <Edit2 className="w-3.5 h-3.5" />
+                        </button>
+                        <button className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold hover:bg-teal-50 transition-colors" style={{ color: ACCENT }}>
+                          <Plus className="w-3 h-3" /> إضافة فرعي
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  {expanded.includes(c.id) && c.subs.map((sub, si) => (
+                    <tr key={`${c.id}-${si}`} className="border-b border-gray-50 bg-gray-50/40">
+                      <td className="px-4 py-2.5"></td>
+                      <td className="px-4 py-2.5" colSpan={5}>
+                        <div className="flex items-center gap-2 mr-3">
+                          <div className="w-1 h-4 rounded-full bg-gray-300"></div>
+                          <span className="text-sm text-gray-600">{sub}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-2.5">
+                        <div className="flex items-center gap-1">
+                          <button className="w-6 h-6 rounded hover:bg-red-50 text-red-300 flex items-center justify-center">
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                          <button className="w-6 h-6 rounded hover:bg-green-50 text-green-400 flex items-center justify-center">
+                            <Edit2 className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <AnimatePresence>
@@ -653,13 +786,13 @@ function CategoriesSection() {
 // ── Locations Section ────────────────────────────────────────────────────────
 function LocationsSection() {
   const [locs, setLocs] = useState(LOCATIONS);
-  const [tab, setTab] = useState<"حي" | "مدينة">("مدينة");
+  const [tab, setTab] = useState<"منطقة" | "مدينة" | "حي">("منطقة");
   const [editLoc, setEditLoc] = useState<typeof LOCATIONS[0] | null>(null);
   const [editForm, setEditForm] = useState({ name: "", nameEn: "" });
 
   const toggle = (id: number) => setLocs(prev => prev.map(l => l.id === id ? { ...l, active: !l.active } : l));
   const handleDelete = (id: number) => {
-    if (window.confirm("حذف هذه المنطقة؟")) setLocs(prev => prev.filter(l => l.id !== id));
+    if (window.confirm("حذف هذا الموقع؟")) setLocs(prev => prev.filter(l => l.id !== id));
   };
   const openEdit = (l: typeof LOCATIONS[0]) => {
     setEditForm({ name: l.name, nameEn: l.nameEn });
@@ -671,62 +804,91 @@ function LocationsSection() {
   };
 
   const filtered = locs.filter(l => l.type === tab);
+  const tabConfig = [
+    { key: "منطقة" as const, label: "المناطق",  bg: "#FFF7ED", clr: "#EA580C" },
+    { key: "مدينة" as const, label: "المدن",    bg: "#EFF6FF", clr: "#2563EB" },
+    { key: "حي"    as const, label: "الأحياء",  bg: "#F0FDF4", clr: "#16A34A" },
+  ];
 
   return (
     <div className="space-y-5">
+      {/* Page header */}
+      <div>
+        <h2 className="text-lg font-bold text-gray-900">إدارة المواقع الجغرافية</h2>
+        <p className="text-sm text-gray-400 mt-0.5">إدارة المدن والأحياء ومناطق الخدمة</p>
+      </div>
+
+      {/* Stat cards */}
       <div className="grid grid-cols-3 gap-4">
-        {[
-          { label: "الأحياء",  value: String(locs.filter(l => l.type === "حي").length),    icon: MapPin },
-          { label: "المدن",    value: String(locs.filter(l => l.type === "مدينة").length),  icon: Map },
-          { label: "النشطة",  value: String(locs.filter(l => l.active).length),             icon: CheckCircle },
-        ].map((s, i) => (
-          <div key={i} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ backgroundColor: ACCENT_LIGHT }}>
-              <s.icon className="w-5 h-5" style={{ color: ACCENT }} />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-gray-900">{s.value}</p>
-              <p className="text-xs text-gray-400">{s.label}</p>
+        {tabConfig.map((t, i) => (
+          <div key={i} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+            onClick={() => setTab(t.key)}>
+            <p className="text-3xl font-black text-gray-900">{locs.filter(l => l.type === t.key).length}</p>
+            <div className="flex items-center gap-2 mt-1.5">
+              <div className="w-5 h-5 rounded-full flex-shrink-0" style={{ backgroundColor: t.bg, border: `2px solid ${t.clr}22` }}></div>
+              <p className="text-sm font-medium text-gray-500">{t.label}</p>
             </div>
           </div>
         ))}
       </div>
+
+      {/* Main card */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-          <div className="flex gap-1">
-            {(["مدينة", "حي"] as const).map(t => (
-              <button key={t} onClick={() => setTab(t)}
-                className={`px-4 py-1.5 rounded-xl text-xs font-semibold transition-all ${tab === t ? "text-white" : "text-gray-500 hover:bg-gray-50"}`}
-                style={tab === t ? { backgroundColor: ACCENT } : {}}>
-                {t === "مدينة" ? "المدن" : "الأحياء"}
-              </button>
-            ))}
+          {/* Pill tabs */}
+          <div className="flex gap-1 bg-gray-100 p-1 rounded-xl">
+            {tabConfig.map(t => {
+              const count = locs.filter(l => l.type === t.key).length;
+              return (
+                <button key={t.key} onClick={() => setTab(t.key)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${tab === t.key ? "bg-white shadow-sm text-gray-800" : "text-gray-500 hover:text-gray-700"}`}>
+                  {t.label}
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${tab === t.key ? "text-white" : "bg-gray-200 text-gray-500"}`}
+                    style={tab === t.key ? { backgroundColor: ACCENT } : {}}>
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
           </div>
           <button className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold text-white" style={{ backgroundColor: ACCENT }}>
-            <Plus className="w-3.5 h-3.5" /> إضافة {tab === "مدينة" ? "مدينة" : "حي"}
+            <Plus className="w-3.5 h-3.5" /> إضافة {tab === "منطقة" ? "منطقة" : tab === "مدينة" ? "مدينة" : "حي"}
           </button>
         </div>
+
         <div className="divide-y divide-gray-50">
           {filtered.map((l, i) => (
-            <div key={l.id} className="flex items-center justify-between px-5 py-3.5 hover:bg-gray-50/60 transition-colors">
-              <div className="flex items-center gap-3">
-                <span className="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500">{i + 1}</span>
-                <div>
-                  <p className="font-semibold text-gray-800 text-sm">{l.name}</p>
-                  <p className="text-xs text-gray-400">{l.nameEn}</p>
-                </div>
+            <div key={l.id} className="flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50/60 transition-colors">
+              <span className="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500 flex-shrink-0">
+                {i + 1}
+              </span>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-gray-800 text-sm">{l.name}</p>
+                <p className="text-xs text-gray-400">{l.nameEn}</p>
               </div>
               <div className="flex items-center gap-3">
                 <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${l.active ? "bg-emerald-50 text-emerald-600" : "bg-gray-100 text-gray-400"}`}>
                   {l.active ? "في الواجهة" : "مخفي"}
                 </span>
                 <button onClick={() => toggle(l.id)}>
-                  {l.active ? <ToggleRight className="w-8 h-8" style={{ color: ACCENT }} /> : <ToggleLeft className="w-8 h-8 text-gray-300" />}
+                  {l.active
+                    ? <ToggleRight className="w-8 h-8" style={{ color: ACCENT }} />
+                    : <ToggleLeft className="w-8 h-8 text-gray-300" />}
                 </button>
-                <ActionBtns onEdit={() => openEdit(l)} onDelete={() => handleDelete(l.id)} />
+                <button onClick={() => openEdit(l)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-gray-200 hover:bg-gray-50 text-gray-600 transition-colors">
+                  <Edit2 className="w-3 h-3" /> تعديل
+                </button>
+                <button onClick={() => handleDelete(l.id)}
+                  className="w-7 h-7 rounded-lg hover:bg-red-50 text-red-400 flex items-center justify-center">
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
               </div>
             </div>
           ))}
+          {filtered.length === 0 && (
+            <div className="py-12 text-center text-gray-400 text-sm">لا توجد عناصر في هذا التصنيف</div>
+          )}
         </div>
       </div>
 
@@ -748,6 +910,177 @@ function LocationsSection() {
               <button onClick={saveEdit}
                 className="w-full py-2.5 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2"
                 style={{ backgroundColor: ACCENT }}>
+                <CheckCircle className="w-4 h-4" /> حفظ التغييرات
+              </button>
+            </div>
+          </AdminModal>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// ── Commissions Section ───────────────────────────────────────────────────────
+function CommissionsSection() {
+  const [plans, setPlans] = useState(COMMISSION_PLANS);
+  const [catComms, setCatComms] = useState(CATEGORY_COMMISSIONS);
+  const [featPrices, setFeatPrices] = useState({ d7: 99, d14: 149, d30: 249 });
+  const [editPlan, setEditPlan] = useState<typeof COMMISSION_PLANS[0] | null>(null);
+  const [editPlanForm, setEditPlanForm] = useState({ price: 0, commPct: 0 });
+
+  const planStyle = (id: number) =>
+    id === 1 ? "bg-gray-100 text-gray-600" :
+    id === 2 ? "bg-amber-50 text-amber-700" :
+               "bg-purple-50 text-purple-700";
+
+  return (
+    <div className="space-y-6">
+
+      {/* ── Section 1: Subscription Plans ── */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ backgroundColor: ACCENT_LIGHT }}>
+              <Package className="w-4 h-4" style={{ color: ACCENT }} />
+            </div>
+            <div>
+              <h3 className="font-bold text-gray-900 text-sm">خطط الاشتراك</h3>
+              <p className="text-xs text-gray-400">إدارة الباقات الشهرية ونسب العمولة</p>
+            </div>
+          </div>
+          <button className="w-8 h-8 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-200 flex items-center justify-center text-gray-500">
+            <RefreshCw className="w-3.5 h-3.5" />
+          </button>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-gray-100 bg-gray-50/60">
+                {["الباقة", "السعر/شهر (ج.م)", "المدة (يوم)", "حد العقارات", "خانات التميز", "العمولة %", "الأولوية", "إجراءات"].map(h => (
+                  <th key={h} className="px-4 py-3 text-right text-xs font-semibold text-gray-500 whitespace-nowrap">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {plans.map(p => (
+                <tr key={p.id} className="border-b border-gray-50 hover:bg-gray-50/60 transition-colors">
+                  <td className="px-4 py-4">
+                    <span className={`text-sm font-bold px-3 py-1 rounded-full ${planStyle(p.id)}`}>{p.name}</span>
+                  </td>
+                  <td className="px-4 py-4 font-bold text-gray-800">{p.price.toFixed(2)}</td>
+                  <td className="px-4 py-4 text-gray-600">{p.days}</td>
+                  <td className="px-4 py-4 text-gray-600">{p.limit}</td>
+                  <td className="px-4 py-4 text-gray-600">{p.featured}</td>
+                  <td className="px-4 py-4">
+                    <span className="font-bold text-emerald-600">{p.commPct}.00%</span>
+                  </td>
+                  <td className="px-4 py-4 text-gray-400">{p.priority}</td>
+                  <td className="px-4 py-4">
+                    <button onClick={() => { setEditPlanForm({ price: p.price, commPct: p.commPct }); setEditPlan(p); }}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-gray-200 hover:bg-gray-50 text-gray-600 transition-colors">
+                      <Edit2 className="w-3 h-3" /> تعديل
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* ── Section 2: Per-category commission ── */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="px-5 py-4 border-b border-gray-100 flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ backgroundColor: ACCENT_LIGHT }}>
+            <Percent className="w-4 h-4" style={{ color: ACCENT }} />
+          </div>
+          <div>
+            <h3 className="font-bold text-gray-900 text-sm">إعدادات العمولة لكل تصنيف</h3>
+            <p className="text-xs text-gray-400">اضبط نسب عمولة مختلفة لكل تصنيف، تُحفظ التغييرات على كل تصنيف على حدة.</p>
+          </div>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-gray-100 bg-gray-50/60">
+                {["التصنيف", "الاسم بالإنجليزي", "العمولة %", "حفظ"].map(h => (
+                  <th key={h} className="px-5 py-3 text-right text-xs font-semibold text-gray-500">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {catComms.map((c, i) => (
+                <tr key={i} className="border-b border-gray-50 hover:bg-gray-50/60 transition-colors">
+                  <td className="px-5 py-3 font-semibold text-gray-800 text-sm">{c.name}</td>
+                  <td className="px-5 py-3 text-gray-500 text-sm">{c.nameEn}</td>
+                  <td className="px-5 py-3">
+                    <input type="number" value={c.pct} min={0} max={100}
+                      onChange={e => setCatComms(prev => prev.map((cc, ii) => ii === i ? { ...cc, pct: Number(e.target.value) } : cc))}
+                      className="w-20 py-1.5 px-3 border border-gray-200 rounded-xl text-sm outline-none focus:border-gray-300 bg-gray-50 text-center font-bold" />
+                  </td>
+                  <td className="px-5 py-3">
+                    <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white" style={{ backgroundColor: ACCENT }}>
+                      <CheckCircle className="w-3 h-3" /> حفظ
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* ── Section 3: Featured pricing ── */}
+      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center">
+            <Star className="w-4 h-4 text-amber-500" />
+          </div>
+          <div>
+            <h3 className="font-bold text-gray-900 text-sm">تسعير العقارات المميزة</h3>
+            <p className="text-xs text-gray-400">حدد رسوم تمييز العقارات في نتائج البحث</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-3 gap-4">
+          {[
+            { label: "تمييز 7 أيام (ج.م)",  key: "d7"  as const },
+            { label: "تمييز 14 يوم (ج.م)", key: "d14" as const },
+            { label: "تمييز 30 يوم (ج.م)", key: "d30" as const },
+          ].map(f => (
+            <div key={f.key}>
+              <label className="text-xs font-semibold text-gray-500 block mb-2">{f.label}</label>
+              <input type="number" value={featPrices[f.key]}
+                onChange={e => setFeatPrices(p => ({ ...p, [f.key]: Number(e.target.value) }))}
+                className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-gray-300 transition-all text-center font-bold" />
+            </div>
+          ))}
+        </div>
+        <button className="mt-5 flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold text-white" style={{ backgroundColor: ACCENT }}>
+          <CheckCircle className="w-4 h-4" /> حفظ التسعير
+        </button>
+      </div>
+
+      {/* Edit Plan Modal */}
+      <AnimatePresence>
+        {editPlan && (
+          <AdminModal title={`تعديل خطة: ${editPlan.name}`} onClose={() => setEditPlan(null)}>
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-semibold text-gray-500 block mb-1.5">السعر/شهر (ج.م)</label>
+                <input type="number" value={editPlanForm.price}
+                  onChange={e => setEditPlanForm(p => ({ ...p, price: Number(e.target.value) }))}
+                  className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white transition-all" />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-gray-500 block mb-1.5">نسبة العمولة %</label>
+                <input type="number" value={editPlanForm.commPct}
+                  onChange={e => setEditPlanForm(p => ({ ...p, commPct: Number(e.target.value) }))}
+                  className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white transition-all" />
+              </div>
+              <button onClick={() => {
+                setPlans(prev => prev.map(p => p.id === editPlan.id ? { ...p, ...editPlanForm } : p));
+                setEditPlan(null);
+              }} className="w-full py-2.5 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2" style={{ backgroundColor: ACCENT }}>
                 <CheckCircle className="w-4 h-4" /> حفظ التغييرات
               </button>
             </div>
@@ -1200,9 +1533,10 @@ export default function AdminPanel() {
     { id: "categories",   label: "التصنيفات",         icon: Tag },
     { id: "locations",    label: "المناطق والأحياء",  icon: MapPin },
     { id: "messages",     label: "الرسائل",           icon: MessageSquare, badge: 2 },
-    { id: "payments",     label: "المدفوعات",         icon: CreditCard },
-    { id: "subscriptions",label: "الاشتراكات",        icon: Repeat },
-    { id: "reports",      label: "التقارير",          icon: BarChart2 },
+    { id: "payments",      label: "المدفوعات",         icon: CreditCard },
+    { id: "subscriptions", label: "الاشتراكات",        icon: Repeat },
+    { id: "commissions",   label: "العمولات",          icon: Percent },
+    { id: "reports",       label: "التقارير",          icon: BarChart2 },
     { id: "settings",     label: "الإعدادات",         icon: Settings },
   ];
 
@@ -1217,6 +1551,7 @@ export default function AdminPanel() {
     messages:      <MessagesSection />,
     payments:      <PaymentsSection />,
     subscriptions: <SubscriptionsSection />,
+    commissions:   <CommissionsSection />,
     reports:       <ReportsSection />,
     settings:      <SettingsSection />,
   };
