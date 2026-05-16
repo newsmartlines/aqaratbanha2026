@@ -1,15 +1,14 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  MapPin, ChevronRight, ChevronLeft, Plus, Edit2, Trash2,
-  Search, ToggleLeft, ToggleRight, X, Check, Home,
-  Building2, Map, Layers, Eye, EyeOff, MoreVertical,
-  Download, Upload, RefreshCw, Filter, Globe, Flag,
-  ArrowRight, Hash, Star,
+  MapPin, Plus, Edit2, Trash2, Search, ToggleLeft, ToggleRight,
+  X, Check, Flag, Building2, Download, Star, Eye, EyeOff,
+  CheckSquare, Square, ChevronLeft, ChevronRight, Hash,
+  Globe, Activity, Layers, AlertCircle,
 } from "lucide-react";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
-type Level = 0 | 1 | 2 | 3;
+type Level = 0 | 1 | 2;
 
 interface GeoItem {
   id: string;
@@ -22,564 +21,622 @@ interface GeoItem {
   featured?: boolean;
 }
 
-// ── Seed data ─────────────────────────────────────────────────────────────────
-const SEED: GeoItem[] = [
-  // ── Level 0 — محافظات ──────────────────────────────────────────────────────
-  { id: "g1", name: "القليوبية",     nameEn: "Qalyubia",     parentId: null, level: 0, active: true,  order: 1, featured: true  },
-  { id: "g2", name: "القاهرة",       nameEn: "Cairo",        parentId: null, level: 0, active: true,  order: 2 },
-  { id: "g3", name: "الجيزة",        nameEn: "Giza",         parentId: null, level: 0, active: true,  order: 3 },
-  { id: "g4", name: "الإسكندرية",   nameEn: "Alexandria",   parentId: null, level: 0, active: true,  order: 4 },
-  { id: "g5", name: "المنوفية",      nameEn: "Monufia",      parentId: null, level: 0, active: false, order: 5 },
-  { id: "g6", name: "الشرقية",       nameEn: "Sharqia",      parentId: null, level: 0, active: false, order: 6 },
-  { id: "g7", name: "الغربية",       nameEn: "Gharbia",      parentId: null, level: 0, active: false, order: 7 },
-  { id: "g8", name: "البحيرة",       nameEn: "Beheira",      parentId: null, level: 0, active: false, order: 8 },
-
-  // ── Level 1 — مناطق/مراكز inside القليوبية ────────────────────────────────
-  { id: "r1", name: "مركز بنها",              nameEn: "Banha Center",         parentId: "g1", level: 1, active: true,  order: 1, featured: true },
-  { id: "r2", name: "مركز شبين القناطر",       nameEn: "Shebin Al-Qanatir",    parentId: "g1", level: 1, active: true,  order: 2 },
-  { id: "r3", name: "مركز طوخ",               nameEn: "Toukh",                parentId: "g1", level: 1, active: true,  order: 3 },
-  { id: "r4", name: "مركز قليوب",             nameEn: "Qalyoub",              parentId: "g1", level: 1, active: true,  order: 4 },
-  { id: "r5", name: "مركز الخانكة",           nameEn: "El-Khanka",            parentId: "g1", level: 1, active: false, order: 5 },
-  { id: "r6", name: "مركز كفر شكر",           nameEn: "Kafr Shukr",           parentId: "g1", level: 1, active: true,  order: 6 },
-
-  // مناطق inside القاهرة
-  { id: "r10", name: "مدينة نصر",    nameEn: "Nasr City",   parentId: "g2", level: 1, active: true,  order: 1 },
-  { id: "r11", name: "المعادي",      nameEn: "Maadi",       parentId: "g2", level: 1, active: true,  order: 2 },
-  { id: "r12", name: "مصر الجديدة", nameEn: "Heliopolis",  parentId: "g2", level: 1, active: true,  order: 3 },
-
-  // مناطق inside الجيزة
-  { id: "r20", name: "الشيخ زايد",   nameEn: "Sheikh Zayed", parentId: "g3", level: 1, active: true, order: 1 },
-  { id: "r21", name: "أكتوبر",       nameEn: "October",      parentId: "g3", level: 1, active: true, order: 2 },
-
-  // ── Level 2 — مدن inside مراكز ───────────────────────────────────────────
-  // inside مركز بنها
-  { id: "c1", name: "بنها",              nameEn: "Banha",           parentId: "r1", level: 2, active: true,  order: 1, featured: true },
-  { id: "c2", name: "كفر شكر",          nameEn: "Kafr Shukr",      parentId: "r1", level: 2, active: true,  order: 2 },
-  { id: "c3", name: "أبو زعبل",         nameEn: "Abu Zabal",       parentId: "r1", level: 2, active: true,  order: 3 },
-
-  // inside مركز شبين القناطر
-  { id: "c10", name: "شبين القناطر",    nameEn: "Shebin Al-Qanatir", parentId: "r2", level: 2, active: true, order: 1 },
-  { id: "c11", name: "قها",             nameEn: "Qaha",              parentId: "r2", level: 2, active: true, order: 2 },
-
-  // inside مركز طوخ
-  { id: "c20", name: "طوخ",             nameEn: "Toukh",             parentId: "r3", level: 2, active: true, order: 1 },
-  { id: "c21", name: "خوشة",            nameEn: "Khousha",           parentId: "r3", level: 2, active: true, order: 2 },
-
-  // inside مركز قليوب
-  { id: "c30", name: "قليوب",           nameEn: "Qalyoub",           parentId: "r4", level: 2, active: true, order: 1 },
-  { id: "c31", name: "شبرا الخيمة",    nameEn: "Shubra El-Kheima",  parentId: "r4", level: 2, active: true, order: 2 },
-
-  // ── Level 3 — أحياء inside مدن ───────────────────────────────────────────
-  // inside بنها
-  { id: "n1",  name: "ميدان بنها",      nameEn: "Banha Square",     parentId: "c1", level: 3, active: true,  order: 1, featured: true },
-  { id: "n2",  name: "الزهراء",          nameEn: "Al-Zahraa",        parentId: "c1", level: 3, active: true,  order: 2 },
-  { id: "n3",  name: "المطرية",          nameEn: "Al-Matareya",      parentId: "c1", level: 3, active: true,  order: 3 },
-  { id: "n4",  name: "الملك فيصل",      nameEn: "King Faisal",      parentId: "c1", level: 3, active: true,  order: 4 },
-  { id: "n5",  name: "عزبة النخل",       nameEn: "Izbat Al-Nakhl",   parentId: "c1", level: 3, active: false, order: 5 },
-  { id: "n6",  name: "الإسكندرية",      nameEn: "Alexandria St.",   parentId: "c1", level: 3, active: true,  order: 6 },
-  { id: "n7",  name: "عين شمس",          nameEn: "Ain Shams",        parentId: "c1", level: 3, active: true,  order: 7 },
-  { id: "n8",  name: "الكورنيش",         nameEn: "Al-Corniche",      parentId: "c1", level: 3, active: true,  order: 8 },
-
-  // inside كفر شكر
-  { id: "n20", name: "وسط كفر شكر",    nameEn: "Kafr Shukr Center", parentId: "c2", level: 3, active: true, order: 1 },
-
-  // inside شبين القناطر
-  { id: "n30", name: "حي الخدمات",      nameEn: "Services District", parentId: "c10", level: 3, active: true, order: 1 },
-  { id: "n31", name: "حي النيل",        nameEn: "Nile District",     parentId: "c10", level: 3, active: true, order: 2 },
-];
-
 // ── Level config ──────────────────────────────────────────────────────────────
-const LEVEL_CONFIG = [
-  { label: "المحافظات",  labelSingle: "محافظة",  icon: Flag,     color: "#7C3AED", bg: "#7C3AED15", border: "#7C3AED33" },
-  { label: "المناطق",   labelSingle: "منطقة",   icon: Map,      color: "#0D9488", bg: "#0D948815", border: "#0D948833" },
-  { label: "المدن",     labelSingle: "مدينة",   icon: Building2,color: "#2563EB", bg: "#2563EB15", border: "#2563EB33" },
-  { label: "الأحياء",   labelSingle: "حي",      icon: MapPin,   color: "#D97706", bg: "#D9770615", border: "#D9770633" },
+const LEVELS = [
+  {
+    label: "المحافظات", singular: "محافظة", singularF: "محافظة",
+    icon: Flag, color: "#7C3AED", bg: "#7C3AED10", border: "#7C3AED28",
+    placeholder: "مثل: القاهرة", placeholderEn: "e.g. Cairo",
+  },
+  {
+    label: "المدن", singular: "مدينة", singularF: "مدينة",
+    icon: Building2, color: "#2563EB", bg: "#2563EB10", border: "#2563EB28",
+    placeholder: "مثل: بنها", placeholderEn: "e.g. Banha",
+  },
+  {
+    label: "المناطق", singular: "منطقة", singularF: "منطقة",
+    icon: MapPin, color: "#0EA5E9", bg: "#0EA5E910", border: "#0EA5E928",
+    placeholder: "مثل: ميدان بنها", placeholderEn: "e.g. Banha Square",
+  },
+] as const;
+
+// ── Seed data ─────────────────────────────────────────────────────────────────
+function genId() { return `geo_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`; }
+
+const SEED: GeoItem[] = [
+  // محافظات
+  { id: "gov1", name: "القليوبية",    nameEn: "Qalyubia",       parentId: null, level: 0, active: true,  order: 1, featured: true },
+  { id: "gov2", name: "القاهرة",      nameEn: "Cairo",          parentId: null, level: 0, active: true,  order: 2 },
+  { id: "gov3", name: "الجيزة",       nameEn: "Giza",           parentId: null, level: 0, active: true,  order: 3 },
+  { id: "gov4", name: "الإسكندرية",  nameEn: "Alexandria",     parentId: null, level: 0, active: true,  order: 4 },
+  { id: "gov5", name: "المنوفية",     nameEn: "Monufia",        parentId: null, level: 0, active: false, order: 5 },
+  { id: "gov6", name: "الشرقية",      nameEn: "Sharqia",        parentId: null, level: 0, active: false, order: 6 },
+  { id: "gov7", name: "الغربية",      nameEn: "Gharbia",        parentId: null, level: 0, active: false, order: 7 },
+  { id: "gov8", name: "البحيرة",      nameEn: "Beheira",        parentId: null, level: 0, active: false, order: 8 },
+
+  // مدن — القليوبية
+  { id: "cty1", name: "بنها",               nameEn: "Banha",             parentId: "gov1", level: 1, active: true,  order: 1, featured: true },
+  { id: "cty2", name: "شبين القناطر",       nameEn: "Shebin Al-Qanatir", parentId: "gov1", level: 1, active: true,  order: 2 },
+  { id: "cty3", name: "طوخ",                nameEn: "Toukh",             parentId: "gov1", level: 1, active: true,  order: 3 },
+  { id: "cty4", name: "قليوب",              nameEn: "Qalyoub",           parentId: "gov1", level: 1, active: true,  order: 4 },
+  { id: "cty5", name: "الخانكة",            nameEn: "El-Khanka",         parentId: "gov1", level: 1, active: false, order: 5 },
+  { id: "cty6", name: "كفر شكر",            nameEn: "Kafr Shukr",        parentId: "gov1", level: 1, active: true,  order: 6 },
+  { id: "cty7", name: "أبو زعبل",           nameEn: "Abu Zabal",         parentId: "gov1", level: 1, active: false, order: 7 },
+
+  // مدن — القاهرة
+  { id: "cty10", name: "مدينة نصر",         nameEn: "Nasr City",   parentId: "gov2", level: 1, active: true, order: 1 },
+  { id: "cty11", name: "المعادي",            nameEn: "Maadi",       parentId: "gov2", level: 1, active: true, order: 2 },
+  { id: "cty12", name: "مصر الجديدة",       nameEn: "Heliopolis",  parentId: "gov2", level: 1, active: true, order: 3 },
+  { id: "cty13", name: "الزمالك",            nameEn: "Zamalek",     parentId: "gov2", level: 1, active: true, order: 4 },
+  { id: "cty14", name: "شبرا",              nameEn: "Shubra",      parentId: "gov2", level: 1, active: true, order: 5 },
+
+  // مدن — الجيزة
+  { id: "cty20", name: "الشيخ زايد",        nameEn: "Sheikh Zayed", parentId: "gov3", level: 1, active: true, order: 1 },
+  { id: "cty21", name: "أكتوبر",            nameEn: "6th October",  parentId: "gov3", level: 1, active: true, order: 2 },
+  { id: "cty22", name: "الهرم",             nameEn: "Al-Haram",     parentId: "gov3", level: 1, active: true, order: 3 },
+
+  // مدن — الإسكندرية
+  { id: "cty30", name: "محرم بك",           nameEn: "Moharam Bek",   parentId: "gov4", level: 1, active: true, order: 1 },
+  { id: "cty31", name: "سموحة",             nameEn: "Smouha",        parentId: "gov4", level: 1, active: true, order: 2 },
+  { id: "cty32", name: "العجمي",            nameEn: "Agami",         parentId: "gov4", level: 1, active: false, order: 3 },
+
+  // مناطق — بنها
+  { id: "dst1",  name: "ميدان بنها",        nameEn: "Banha Square",    parentId: "cty1", level: 2, active: true,  order: 1, featured: true },
+  { id: "dst2",  name: "الزهراء",            nameEn: "Al-Zahraa",       parentId: "cty1", level: 2, active: true,  order: 2 },
+  { id: "dst3",  name: "المطرية",            nameEn: "Al-Matareya",     parentId: "cty1", level: 2, active: true,  order: 3 },
+  { id: "dst4",  name: "الملك فيصل",        nameEn: "King Faisal St.", parentId: "cty1", level: 2, active: true,  order: 4 },
+  { id: "dst5",  name: "عزبة النخل",         nameEn: "Izbat Al-Nakhl",  parentId: "cty1", level: 2, active: false, order: 5 },
+  { id: "dst6",  name: "الكورنيش",           nameEn: "Al-Corniche",     parentId: "cty1", level: 2, active: true,  order: 6 },
+  { id: "dst7",  name: "عين شمس",            nameEn: "Ain Shams",       parentId: "cty1", level: 2, active: true,  order: 7 },
+  { id: "dst8",  name: "حي النيل",           nameEn: "Nile District",   parentId: "cty1", level: 2, active: true,  order: 8 },
+  { id: "dst9",  name: "المنطقة الصناعية",   nameEn: "Industrial Zone", parentId: "cty1", level: 2, active: false, order: 9 },
+
+  // مناطق — شبين القناطر
+  { id: "dst20", name: "حي الخدمات",        nameEn: "Services Dist.", parentId: "cty2", level: 2, active: true, order: 1 },
+  { id: "dst21", name: "حي النيل",           nameEn: "Nile District",  parentId: "cty2", level: 2, active: true, order: 2 },
+  { id: "dst22", name: "القرية الجديدة",     nameEn: "New Village",    parentId: "cty2", level: 2, active: true, order: 3 },
+
+  // مناطق — طوخ
+  { id: "dst30", name: "وسط طوخ",           nameEn: "Toukh Center",  parentId: "cty3", level: 2, active: true, order: 1 },
+  { id: "dst31", name: "حي الشباب",         nameEn: "Youth District", parentId: "cty3", level: 2, active: true, order: 2 },
+  { id: "dst32", name: "المنطقة العمرانية", nameEn: "Urban Zone",    parentId: "cty3", level: 2, active: false, order: 3 },
+
+  // مناطق — مدينة نصر
+  { id: "dst40", name: "الحي الأول",        nameEn: "Zone 1",   parentId: "cty10", level: 2, active: true, order: 1 },
+  { id: "dst41", name: "الحي السابع",       nameEn: "Zone 7",   parentId: "cty10", level: 2, active: true, order: 2 },
+  { id: "dst42", name: "الحي الثامن",       nameEn: "Zone 8",   parentId: "cty10", level: 2, active: true, order: 3 },
+  { id: "dst43", name: "حي المساجد",        nameEn: "Mosques District", parentId: "cty10", level: 2, active: false, order: 4 },
 ];
 
-// ── Helpers ───────────────────────────────────────────────────────────────────
-function genId() { return `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`; }
-
-function childCount(items: GeoItem[], parentId: string, level: Level) {
-  if (level >= 3) return 0;
-  return items.filter(i => i.parentId === parentId && i.level === (level + 1) as Level).length;
-}
-
-// ── Modal ─────────────────────────────────────────────────────────────────────
-function GeoModal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
-  return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <motion.div initial={{ scale: 0.94, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.94, opacity: 0 }}
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-md" dir="rtl">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <h3 className="font-bold text-gray-900">{title}</h3>
-          <button onClick={onClose} className="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center transition-colors">
-            <X className="w-4 h-4 text-gray-500" />
-          </button>
-        </div>
-        <div className="p-6">{children}</div>
-      </motion.div>
-    </motion.div>
-  );
-}
-
-// ── Item Card ─────────────────────────────────────────────────────────────────
-function GeoCard({
-  item, level, items, onDrillDown, onEdit, onDelete, onToggle,
+// ── Inline form component ─────────────────────────────────────────────────────
+function InlineForm({
+  level, onSave, onCancel, initialName = "", initialNameEn = "",
 }: {
-  item: GeoItem; level: Level; items: GeoItem[];
-  onDrillDown: (id: string) => void;
-  onEdit: (item: GeoItem) => void;
-  onDelete: (id: string) => void;
-  onToggle: (id: string) => void;
+  level: Level; onSave: (name: string, nameEn: string) => void;
+  onCancel: () => void; initialName?: string; initialNameEn?: string;
 }) {
-  const cfg = LEVEL_CONFIG[level];
-  const nextCfg = level < 3 ? LEVEL_CONFIG[level + 1] : null;
-  const children = level < 3 ? childCount(items, item.id, level) : 0;
-  const LevelIcon = cfg.icon;
+  const [name, setName] = useState(initialName);
+  const [nameEn, setNameEn] = useState(initialNameEn);
+  const nameRef = useRef<HTMLInputElement>(null);
+  const lc = LEVELS[level];
+
+  useEffect(() => { nameRef.current?.focus(); }, []);
+
+  const handleSave = () => { if (name.trim()) onSave(name.trim(), nameEn.trim()); };
+  const handleKey = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") handleSave();
+    if (e.key === "Escape") onCancel();
+  };
 
   return (
-    <motion.div layout initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group overflow-hidden">
-
-      {/* Color bar */}
-      <div className="h-1 w-full" style={{ backgroundColor: cfg.color }} />
-
-      <div className="p-4">
-        <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-            style={{ backgroundColor: cfg.bg, border: `1px solid ${cfg.border}` }}>
-            <LevelIcon className="w-5 h-5" style={{ color: cfg.color }} />
-          </div>
-
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-1.5">
-              <h3 className="font-bold text-gray-900 text-sm truncate">{item.name}</h3>
-              {item.featured && (
-                <Star className="w-3 h-3 fill-amber-400 text-amber-400 flex-shrink-0" />
-              )}
-            </div>
-            <p className="text-xs text-gray-400 mt-0.5">{item.nameEn}</p>
-            {nextCfg && (
-              <p className="text-xs mt-1.5 font-medium" style={{ color: children > 0 ? cfg.color : "#CBD5E1" }}>
-                {children} {nextCfg.label}
-              </p>
-            )}
-          </div>
-
-          <div className="flex flex-col items-end gap-1">
-            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${item.active ? "bg-emerald-50 text-emerald-600" : "bg-gray-100 text-gray-400"}`}>
-              {item.active ? "ظاهر" : "مخفي"}
-            </span>
-            <span className="text-[10px] text-gray-300 font-medium">#{item.order}</span>
-          </div>
-        </div>
-
-        {/* Actions */}
-        <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-gray-50">
-          {level < 3 && (
-            <button onClick={() => onDrillDown(item.id)}
-              className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-bold transition-all hover:opacity-80"
-              style={{ backgroundColor: cfg.bg, color: cfg.color, border: `1px solid ${cfg.border}` }}>
-              <span>عرض {nextCfg?.label}</span>
-              <ChevronLeft className="w-3 h-3" />
-            </button>
-          )}
-          <button onClick={() => onToggle(item.id)}
-            className="w-8 h-8 rounded-lg hover:bg-gray-50 flex items-center justify-center transition-colors">
-            {item.active
-              ? <ToggleRight className="w-5 h-5" style={{ color: "#0D9488" }} />
-              : <ToggleLeft  className="w-5 h-5 text-gray-300" />}
-          </button>
-          <button onClick={() => onEdit(item)}
-            className="w-8 h-8 rounded-lg hover:bg-blue-50 flex items-center justify-center transition-colors">
-            <Edit2 className="w-3.5 h-3.5 text-blue-400" />
-          </button>
-          <button onClick={() => onDelete(item.id)}
-            className="w-8 h-8 rounded-lg hover:bg-red-50 flex items-center justify-center transition-colors">
-            <Trash2 className="w-3.5 h-3.5 text-red-400" />
-          </button>
-        </div>
+    <motion.div initial={{ opacity: 0, y: -8, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -8, scale: 0.97 }} transition={{ duration: 0.15 }}
+      className="mx-2 mb-2 rounded-xl border p-3 space-y-2"
+      style={{ backgroundColor: lc.bg, borderColor: lc.border }}>
+      <input ref={nameRef} value={name} onChange={e => setName(e.target.value)} onKeyDown={handleKey}
+        placeholder={lc.placeholder}
+        className="w-full px-3 py-2 rounded-lg text-sm border border-gray-200 bg-white outline-none focus:border-blue-300 transition-colors font-medium" />
+      <input value={nameEn} onChange={e => setNameEn(e.target.value)} onKeyDown={handleKey}
+        placeholder={lc.placeholderEn}
+        className="w-full px-3 py-2 rounded-lg text-xs border border-gray-200 bg-white outline-none focus:border-blue-300 transition-colors text-gray-500 dir-ltr" />
+      <div className="flex gap-2">
+        <button onClick={handleSave}
+          className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-bold text-white transition-colors"
+          style={{ backgroundColor: lc.color }}>
+          <Check className="w-3.5 h-3.5" /> حفظ
+        </button>
+        <button onClick={onCancel}
+          className="w-9 h-8 rounded-lg hover:bg-white flex items-center justify-center transition-colors text-gray-400">
+          <X className="w-4 h-4" />
+        </button>
       </div>
     </motion.div>
   );
 }
 
-// ── Main Component ────────────────────────────────────────────────────────────
+// ── Column row item ────────────────────────────────────────────────────────────
+function GeoRow({
+  item, level, isSelected, childCount, isEditing,
+  onSelect, onToggle, onEdit, onDelete, onSaveEdit, onCancelEdit,
+}: {
+  item: GeoItem; level: Level; isSelected: boolean; childCount: number; isEditing: boolean;
+  onSelect: () => void; onToggle: () => void;
+  onEdit: () => void; onDelete: () => void;
+  onSaveEdit: (name: string, nameEn: string) => void;
+  onCancelEdit: () => void;
+}) {
+  const lc = LEVELS[level];
+  const IconComp = lc.icon;
+
+  if (isEditing) {
+    return (
+      <AnimatePresence>
+        <InlineForm level={level} initialName={item.name} initialNameEn={item.nameEn}
+          onSave={onSaveEdit} onCancel={onCancelEdit} />
+      </AnimatePresence>
+    );
+  }
+
+  return (
+    <motion.div layout initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }}
+      className={`group mx-2 mb-1 rounded-xl border transition-all cursor-pointer select-none
+        ${isSelected
+          ? "border-opacity-40 shadow-sm"
+          : "border-transparent hover:border-gray-100 hover:bg-gray-50/60"
+        }`}
+      style={isSelected ? {
+        backgroundColor: `${lc.color}08`,
+        borderColor: `${lc.color}40`,
+        borderLeftWidth: 3,
+        borderLeftColor: lc.color,
+      } : {}}
+      onClick={onSelect}>
+      <div className="flex items-center gap-2.5 px-3 py-2.5">
+        {/* Icon */}
+        <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
+          style={{
+            backgroundColor: isSelected ? `${lc.color}18` : "#F8FAFC",
+            border: `1px solid ${isSelected ? `${lc.color}30` : "#E2E8F0"}`,
+          }}>
+          <IconComp className="w-3.5 h-3.5" style={{ color: isSelected ? lc.color : "#94A3B8" }} />
+        </div>
+
+        {/* Name */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5">
+            <span className={`text-sm font-semibold truncate ${isSelected ? "text-gray-900" : "text-gray-700"}`}>
+              {item.name}
+            </span>
+            {item.featured && <Star className="w-3 h-3 fill-amber-400 text-amber-400 flex-shrink-0" />}
+          </div>
+          {item.nameEn && (
+            <p className="text-[11px] text-gray-400 truncate leading-tight">{item.nameEn}</p>
+          )}
+        </div>
+
+        {/* Child count badge */}
+        {level < 2 && childCount > 0 && (
+          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md text-gray-400 bg-gray-100 flex-shrink-0">
+            {childCount}
+          </span>
+        )}
+
+        {/* Active badge */}
+        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex-shrink-0 ${
+          item.active ? "bg-emerald-50 text-emerald-600" : "bg-gray-100 text-gray-400"
+        }`}>
+          {item.active ? "ظاهر" : "مخفي"}
+        </span>
+      </div>
+
+      {/* Action row — visible on hover or when selected */}
+      <div className={`flex items-center gap-1 px-3 pb-2.5 transition-all ${
+        isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100 h-0 group-hover:h-auto overflow-hidden"
+      }`}>
+        <button onClick={e => { e.stopPropagation(); onToggle(); }}
+          title={item.active ? "إخفاء" : "إظهار"}
+          className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold border transition-all hover:shadow-sm"
+          style={item.active
+            ? { color: "#10B981", borderColor: "#D1FAE5", backgroundColor: "#F0FDF4" }
+            : { color: "#94A3B8", borderColor: "#E2E8F0", backgroundColor: "#F8FAFC" }
+          }>
+          {item.active ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+          {item.active ? "ظاهر" : "مخفي"}
+        </button>
+        <button onClick={e => { e.stopPropagation(); onEdit(); }}
+          className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold border border-blue-100 bg-blue-50 text-blue-500 transition-all hover:bg-blue-100">
+          <Edit2 className="w-3 h-3" /> تعديل
+        </button>
+        <button onClick={e => { e.stopPropagation(); onDelete(); }}
+          className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold border border-red-100 bg-red-50 text-red-500 transition-all hover:bg-red-100">
+          <Trash2 className="w-3 h-3" /> حذف
+        </button>
+
+        {/* Drill-right indicator for level < 2 */}
+        {level < 2 && (
+          <ChevronLeft className="w-3.5 h-3.5 text-gray-300 mr-auto flex-shrink-0" />
+        )}
+      </div>
+    </motion.div>
+  );
+}
+
+// ── Column ─────────────────────────────────────────────────────────────────────
+function GeoColumn({
+  level, items, selectedId, parentLabel, onSelectItem, onToggle, onAdd, onEdit, onDelete, allItems,
+}: {
+  level: Level; items: GeoItem[]; selectedId: string | null; parentLabel?: string;
+  onSelectItem: (id: string) => void; onToggle: (id: string) => void;
+  onAdd: (name: string, nameEn: string) => void;
+  onEdit: (id: string, name: string, nameEn: string) => void;
+  onDelete: (id: string) => void;
+  allItems: GeoItem[];
+}) {
+  const lc = LEVELS[level];
+  const Icon = lc.icon;
+  const [search, setSearch] = useState("");
+  const [adding, setAdding] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [filterHidden, setFilterHidden] = useState(false);
+
+  const filtered = useMemo(() =>
+    items.filter(i => {
+      if (filterHidden && i.active) return false;
+      if (!search) return true;
+      return i.name.includes(search) || i.nameEn.toLowerCase().includes(search.toLowerCase());
+    }), [items, search, filterHidden]);
+
+  const activeCount = items.filter(i => i.active).length;
+  const hiddenCount = items.length - activeCount;
+
+  const getChildCount = (id: string) =>
+    allItems.filter(i => i.parentId === id && i.level === (level + 1) as Level).length;
+
+  return (
+    <div className="flex flex-col bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden min-h-[600px]">
+      {/* Column header */}
+      <div className="px-4 pt-4 pb-3 border-b border-gray-50">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg flex items-center justify-center"
+              style={{ backgroundColor: lc.bg, border: `1px solid ${lc.border}` }}>
+              <Icon className="w-3.5 h-3.5" style={{ color: lc.color }} />
+            </div>
+            <div>
+              <p className="text-xs font-bold text-gray-900">{lc.label}</p>
+              {parentLabel && (
+                <p className="text-[10px] text-gray-400 truncate max-w-[100px]">داخل: {parentLabel}</p>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5">
+            {/* Stats pills */}
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600">
+              {activeCount} ظاهر
+            </span>
+            {hiddenCount > 0 && (
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-400">
+                {hiddenCount} مخفي
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Search */}
+        <div className="flex items-center gap-2">
+          <div className="flex-1 relative">
+            <Search className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+            <input value={search} onChange={e => setSearch(e.target.value)}
+              placeholder={`بحث...`}
+              className="w-full pr-8 pl-3 py-1.5 rounded-lg border border-gray-200 bg-gray-50 text-xs outline-none focus:border-blue-300 focus:bg-white transition-all" />
+            {search && (
+              <button onClick={() => setSearch("")}
+                className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                <X className="w-3 h-3" />
+              </button>
+            )}
+          </div>
+          <button onClick={() => setFilterHidden(f => !f)}
+            title={filterHidden ? "عرض الكل" : "عرض المخفية فقط"}
+            className={`w-7 h-7 rounded-lg border flex items-center justify-center transition-all ${
+              filterHidden ? "bg-gray-800 border-gray-700 text-white" : "bg-white border-gray-200 text-gray-400 hover:border-gray-300"
+            }`}>
+            <EyeOff className="w-3.5 h-3.5" />
+          </button>
+          <button onClick={() => { setAdding(true); setEditingId(null); }}
+            className="w-7 h-7 rounded-lg flex items-center justify-center text-white transition-all hover:opacity-90"
+            style={{ backgroundColor: lc.color }}
+            title={`إضافة ${lc.singular}`}>
+            <Plus className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      {/* List */}
+      <div className="flex-1 overflow-y-auto py-2 scrollbar-thin">
+        <AnimatePresence>
+          {adding && (
+            <InlineForm key="add-form" level={level}
+              onSave={(name, nameEn) => { onAdd(name, nameEn); setAdding(false); }}
+              onCancel={() => setAdding(false)} />
+          )}
+        </AnimatePresence>
+
+        {filtered.length === 0 && !adding ? (
+          <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3"
+              style={{ backgroundColor: lc.bg }}>
+              <Icon className="w-5 h-5" style={{ color: lc.color }} />
+            </div>
+            <p className="text-xs font-semibold text-gray-500 mb-1">
+              {search ? "لا توجد نتائج" : items.length === 0 ? `لا توجد ${lc.label} بعد` : "كلها مخفية"}
+            </p>
+            {!search && items.length === 0 && (
+              <button onClick={() => setAdding(true)}
+                className="mt-2 text-xs font-bold px-3 py-1.5 rounded-lg text-white transition-all hover:opacity-90"
+                style={{ backgroundColor: lc.color }}>
+                + إضافة {lc.singular}
+              </button>
+            )}
+          </div>
+        ) : (
+          <AnimatePresence>
+            {filtered.map(item => (
+              <GeoRow key={item.id}
+                item={item} level={level}
+                isSelected={selectedId === item.id}
+                childCount={getChildCount(item.id)}
+                isEditing={editingId === item.id}
+                onSelect={() => { onSelectItem(item.id); setEditingId(null); }}
+                onToggle={() => onToggle(item.id)}
+                onEdit={() => { setEditingId(item.id); }}
+                onDelete={() => onDelete(item.id)}
+                onSaveEdit={(name, nameEn) => { onEdit(item.id, name, nameEn); setEditingId(null); }}
+                onCancelEdit={() => setEditingId(null)}
+              />
+            ))}
+          </AnimatePresence>
+        )}
+      </div>
+
+      {/* Column footer */}
+      <div className="px-4 py-3 border-t border-gray-50 flex items-center justify-between">
+        <span className="text-[11px] text-gray-400">{items.length} إجمالي</span>
+        {items.length > 0 && (
+          <button
+            onClick={() => {
+              const allActive = items.every(i => i.active);
+              items.forEach(i => { if (allActive ? i.active : !i.active) onToggle(i.id); });
+            }}
+            className="text-[11px] font-semibold text-gray-400 hover:text-gray-600 transition-colors">
+            {items.every(i => i.active) ? "إخفاء الكل" : "إظهار الكل"}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── Main Section ──────────────────────────────────────────────────────────────
 export function GeoManagerSection() {
-  const [items, setItems]     = useState<GeoItem[]>(SEED);
-  const [path, setPath]       = useState<string[]>([]);    // IDs from root → current parent
-  const [search, setSearch]   = useState("");
-  const [filterStatus, setFilterStatus] = useState<"all" | "active" | "hidden">("all");
+  const [items, setItems] = useState<GeoItem[]>(SEED);
+  const [selGov, setSelGov] = useState<string | null>("gov1");
+  const [selCity, setSelCity] = useState<string | null>("cty1");
 
-  // Modal state
-  const [addOpen, setAddOpen]   = useState(false);
-  const [editItem, setEditItem] = useState<GeoItem | null>(null);
-  const [form, setForm]         = useState({ name: "", nameEn: "", featured: false, order: 1 });
+  // ── Computed lists ────────────────────────────────────────────────────────
+  const govs = useMemo(() =>
+    items.filter(i => i.level === 0).sort((a, b) => a.order - b.order), [items]);
 
-  // ── Derived ───────────────────────────────────────────────────────────────
-  const currentLevel = path.length as Level;
-  const parentId     = path.length > 0 ? path[path.length - 1] : null;
-  const cfg          = LEVEL_CONFIG[currentLevel];
-  const LevelIcon    = cfg.icon;
+  const cities = useMemo(() =>
+    selGov ? items.filter(i => i.level === 1 && i.parentId === selGov).sort((a, b) => a.order - b.order) : [],
+    [items, selGov]);
 
-  const breadcrumb = path.map(id => items.find(i => i.id === id)).filter(Boolean) as GeoItem[];
-
-  const currentItems = useMemo(() => {
-    return items
-      .filter(i => {
-        if (i.level !== currentLevel) return false;
-        if (i.parentId !== parentId)  return false;
-        if (filterStatus === "active" && !i.active)  return false;
-        if (filterStatus === "hidden" && i.active)   return false;
-        if (search && !i.name.includes(search) && !i.nameEn.toLowerCase().includes(search.toLowerCase())) return false;
-        return true;
-      })
-      .sort((a, b) => a.order - b.order);
-  }, [items, currentLevel, parentId, search, filterStatus]);
+  const districts = useMemo(() =>
+    selCity ? items.filter(i => i.level === 2 && i.parentId === selCity).sort((a, b) => a.order - b.order) : [],
+    [items, selCity]);
 
   // ── Stats ─────────────────────────────────────────────────────────────────
-  const stats = LEVEL_CONFIG.map((_, l) => ({
-    total:  items.filter(i => i.level === l).length,
+  const stats = [0, 1, 2].map(l => ({
+    total: items.filter(i => i.level === l).length,
     active: items.filter(i => i.level === l && i.active).length,
   }));
 
+  const totalActive = items.filter(i => i.active).length;
+  const coverage = Math.round((totalActive / items.length) * 100);
+
   // ── Handlers ──────────────────────────────────────────────────────────────
-  const drillDown = (id: string) => {
-    if (currentLevel < 3) setPath(p => [...p, id]);
-    setSearch("");
+  const toggle = (id: string) =>
+    setItems(p => p.map(i => i.id === id ? { ...i, active: !i.active } : i));
+
+  const addItem = (level: Level, parentId: string | null, name: string, nameEn: string) => {
+    const siblings = items.filter(i => i.level === level && i.parentId === parentId);
+    setItems(p => [...p, {
+      id: genId(), name, nameEn, parentId, level, active: true, order: siblings.length + 1,
+    }]);
   };
 
-  const goUp = () => {
-    setPath(p => p.slice(0, -1));
-    setSearch("");
-  };
+  const editItem = (id: string, name: string, nameEn: string) =>
+    setItems(p => p.map(i => i.id === id ? { ...i, name, nameEn } : i));
 
-  const goTo = (index: number) => {
-    setPath(p => p.slice(0, index));
-    setSearch("");
-  };
-
-  const openAdd = () => {
-    const maxOrder = Math.max(0, ...items.filter(i => i.level === currentLevel && i.parentId === parentId).map(i => i.order));
-    setForm({ name: "", nameEn: "", featured: false, order: maxOrder + 1 });
-    setAddOpen(true);
-  };
-
-  const saveAdd = () => {
-    if (!form.name.trim()) return;
-    const newItem: GeoItem = {
-      id: genId(),
-      name: form.name.trim(),
-      nameEn: form.nameEn.trim(),
-      parentId,
-      level: currentLevel,
-      active: true,
-      order: form.order,
-      featured: form.featured,
-    };
-    setItems(p => [...p, newItem]);
-    setAddOpen(false);
-  };
-
-  const openEdit = (item: GeoItem) => {
-    setForm({ name: item.name, nameEn: item.nameEn, featured: !!item.featured, order: item.order });
-    setEditItem(item);
-  };
-
-  const saveEdit = () => {
-    if (!editItem || !form.name.trim()) return;
-    setItems(p => p.map(i => i.id === editItem.id
-      ? { ...i, name: form.name.trim(), nameEn: form.nameEn.trim(), featured: form.featured, order: form.order }
-      : i));
-    setEditItem(null);
-  };
-
-  const handleDelete = (id: string) => {
-    // Collect all descendant IDs recursively
+  const deleteItem = (id: string) => {
     const toDelete = new Set<string>();
     const collect = (pid: string) => {
       toDelete.add(pid);
       items.filter(i => i.parentId === pid).forEach(c => collect(c.id));
     };
     collect(id);
-    if (!window.confirm(`حذف هذا العنصر وكل ما يحتويه (${toDelete.size - 1} عنصر فرعي)؟`)) return;
+    const childCount = toDelete.size - 1;
+    const label = childCount > 0 ? `حذف هذا العنصر وكل ما يحتويه (${childCount} عنصر فرعي)؟` : "حذف هذا العنصر؟";
+    if (!window.confirm(label)) return;
+    if (selGov && toDelete.has(selGov)) { setSelGov(null); setSelCity(null); }
+    if (selCity && toDelete.has(selCity)) setSelCity(null);
     setItems(p => p.filter(i => !toDelete.has(i.id)));
   };
 
-  const handleToggle = (id: string) =>
-    setItems(p => p.map(i => i.id === id ? { ...i, active: !i.active } : i));
+  const selGovItem = items.find(i => i.id === selGov);
+  const selCityItem = items.find(i => i.id === selCity);
 
-  // ── Render ────────────────────────────────────────────────────────────────
+  // Export
+  const handleExport = () => {
+    const blob = new Blob([JSON.stringify(items, null, 2)], { type: "application/json" });
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+    a.download = "geo-data.json"; a.click();
+  };
+
   return (
     <div className="space-y-5" dir="rtl">
 
       {/* ── Header ── */}
-      <div className="flex items-start justify-between gap-4 flex-wrap">
-        <div>
-          <h2 className="text-lg font-bold text-gray-900">إدارة المناطق الجغرافية</h2>
-          <p className="text-sm text-gray-400 mt-0.5">
-            نظام هرمي متكامل: محافظات → مناطق → مدن → أحياء
-          </p>
+      <div className="bg-white rounded-2xl border border-gray-100 px-6 py-5 flex items-center justify-between gap-4 flex-wrap">
+        <div className="flex items-center gap-3">
+          <div className="w-11 h-11 rounded-xl flex items-center justify-center"
+            style={{ backgroundColor: "#2563EB12", border: "1px solid #2563EB28" }}>
+            <Layers className="w-5 h-5 text-blue-600" />
+          </div>
+          <div>
+            <h2 className="text-base font-bold text-gray-900">إدارة المناطق الجغرافية</h2>
+            <p className="text-xs text-gray-400 mt-0.5">نظام هرمي ثلاثي المستويات: محافظات ← مدن ← مناطق</p>
+          </div>
         </div>
-        <div className="flex gap-2">
-          <button className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
-            <Download className="w-3.5 h-3.5" /> تصدير
-          </button>
-          <button className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
-            <Upload className="w-3.5 h-3.5" /> استيراد
+        <div className="flex items-center gap-2">
+          <button onClick={handleExport}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
+            <Download className="w-3.5 h-3.5" /> تصدير JSON
           </button>
         </div>
       </div>
 
-      {/* ── Global stats strip ── */}
-      <div className="grid grid-cols-4 gap-3">
-        {LEVEL_CONFIG.map((lc, l) => {
+      {/* ── Stats strip ── */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {LEVELS.map((lc, l) => {
           const Icon = lc.icon;
-          const isActive = l === currentLevel;
           return (
-            <button key={l} onClick={() => { setPath([]); setSearch(""); }}
-              className="rounded-2xl p-4 border text-right transition-all hover:shadow-sm"
-              style={{
-                backgroundColor: isActive ? lc.bg : "white",
-                borderColor: isActive ? lc.border : "#F1F5F9",
-              }}>
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center"
-                  style={{ backgroundColor: lc.bg }}>
-                  <Icon className="w-3.5 h-3.5" style={{ color: lc.color }} />
+            <div key={l} className="bg-white rounded-2xl border border-gray-100 p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-8 h-8 rounded-xl flex items-center justify-center"
+                  style={{ backgroundColor: lc.bg, border: `1px solid ${lc.border}` }}>
+                  <Icon className="w-4 h-4" style={{ color: lc.color }} />
                 </div>
                 <span className="text-xs font-semibold text-gray-500">{lc.label}</span>
               </div>
               <p className="text-2xl font-black text-gray-900">{stats[l].total}</p>
-              <p className="text-[11px] text-gray-400 mt-0.5">{stats[l].active} ظاهر</p>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* ── Breadcrumb ── */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm px-4 py-3 flex items-center gap-1.5 flex-wrap">
-        <button onClick={() => { setPath([]); setSearch(""); }}
-          className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold hover:bg-gray-100 transition-colors text-gray-600">
-          <Home className="w-3.5 h-3.5" />
-          الرئيسية
-        </button>
-
-        {breadcrumb.map((b, i) => {
-          const bc = LEVEL_CONFIG[b.level];
-          return (
-            <span key={b.id} className="flex items-center gap-1.5">
-              <ChevronLeft className="w-3.5 h-3.5 text-gray-300" />
-              <button onClick={() => goTo(i + 1)}
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold hover:bg-gray-100 transition-colors"
-                style={{ color: bc.color }}>
-                <bc.icon className="w-3 h-3" />
-                {b.name}
-              </button>
-            </span>
+              <div className="flex items-center gap-2 mt-1.5">
+                <div className="flex-1 h-1 rounded-full bg-gray-100 overflow-hidden">
+                  <div className="h-full rounded-full transition-all" style={{
+                    width: stats[l].total ? `${(stats[l].active / stats[l].total) * 100}%` : "0%",
+                    backgroundColor: lc.color,
+                  }} />
+                </div>
+                <span className="text-[10px] text-gray-400 font-medium flex-shrink-0">
+                  {stats[l].active} ظاهر
+                </span>
+              </div>
+            </div>
           );
         })}
 
-        <span className="flex items-center gap-1.5 mr-auto">
-          <div className="w-5 h-5 rounded-md flex items-center justify-center"
-            style={{ backgroundColor: cfg.bg }}>
-            <LevelIcon className="w-3 h-3" style={{ color: cfg.color }} />
+        {/* Coverage card */}
+        <div className="bg-white rounded-2xl border border-gray-100 p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-8 h-8 rounded-xl flex items-center justify-center bg-emerald-50 border border-emerald-100">
+              <Activity className="w-4 h-4 text-emerald-600" />
+            </div>
+            <span className="text-xs font-semibold text-gray-500">نسبة الظهور</span>
           </div>
-          <span className="text-xs font-bold" style={{ color: cfg.color }}>{cfg.label}</span>
-          <span className="text-xs text-gray-400">({currentItems.length})</span>
-        </span>
+          <p className="text-2xl font-black text-gray-900">{coverage}%</p>
+          <div className="flex items-center gap-2 mt-1.5">
+            <div className="flex-1 h-1 rounded-full bg-gray-100 overflow-hidden">
+              <div className="h-full rounded-full bg-emerald-500 transition-all" style={{ width: `${coverage}%` }} />
+            </div>
+            <span className="text-[10px] text-gray-400 font-medium flex-shrink-0">{totalActive}/{items.length}</span>
+          </div>
+        </div>
       </div>
 
-      {/* ── Toolbar ── */}
-      <div className="flex items-center gap-3 flex-wrap">
-        {path.length > 0 && (
-          <button onClick={goUp}
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-bold border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors">
-            <ChevronRight className="w-4 h-4" />
-            رجوع
-          </button>
-        )}
-
-        <div className="flex-1 min-w-48 relative">
-          <Search className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder={`بحث في ${cfg.label}...`}
-            className="w-full pr-9 pl-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm outline-none focus:border-teal-300 focus:bg-white transition-all" />
+      {/* ── Breadcrumb trail ── */}
+      <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-100 text-xs font-semibold text-gray-500">
+          <Globe className="w-3.5 h-3.5" /> مصر
         </div>
-
-        <div className="flex gap-1 bg-gray-100 p-1 rounded-xl">
-          {(["all", "active", "hidden"] as const).map(s => (
-            <button key={s} onClick={() => setFilterStatus(s)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${filterStatus === s ? "bg-white shadow-sm text-gray-800" : "text-gray-500"}`}>
-              {s === "all" ? "الكل" : s === "active" ? "الظاهر" : "المخفي"}
-            </button>
-          ))}
-        </div>
-
-        <button onClick={openAdd}
-          className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-sm font-bold text-white transition-colors"
-          style={{ backgroundColor: cfg.color }}>
-          <Plus className="w-4 h-4" />
-          إضافة {cfg.labelSingle}
-        </button>
-      </div>
-
-      {/* ── Context info (inside a parent) ── */}
-      {path.length > 0 && (
-        <div className="rounded-xl px-4 py-3 flex items-center gap-2 text-sm"
-          style={{ backgroundColor: `${cfg.color}0D`, border: `1px solid ${cfg.border}` }}>
-          <LevelIcon className="w-4 h-4 flex-shrink-0" style={{ color: cfg.color }} />
-          <span className="font-medium text-gray-700">
-            تعرض الآن {cfg.label} داخل:
-          </span>
-          {breadcrumb.map((b, i) => (
-            <span key={b.id} className="flex items-center gap-1">
-              {i > 0 && <span className="text-gray-300 mx-1">›</span>}
-              <span className="font-bold" style={{ color: LEVEL_CONFIG[b.level].color }}>{b.name}</span>
-            </span>
-          ))}
-        </div>
-      )}
-
-      {/* ── Grid ── */}
-      <AnimatePresence mode="popLayout">
-        {currentItems.length > 0 ? (
-          <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {currentItems.map(item => (
-              <GeoCard key={item.id} item={item} level={currentLevel} items={items}
-                onDrillDown={drillDown} onEdit={openEdit}
-                onDelete={handleDelete} onToggle={handleToggle} />
-            ))}
-          </motion.div>
+        <ChevronLeft className="w-4 h-4 text-gray-300" />
+        {selGovItem ? (
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold"
+            style={{ backgroundColor: "#7C3AED12", color: "#7C3AED", border: "1px solid #7C3AED28" }}>
+            <Flag className="w-3.5 h-3.5" /> {selGovItem.name}
+          </div>
         ) : (
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-            className="bg-white rounded-2xl border border-dashed border-gray-200 py-16 text-center">
-            <div className="w-14 h-14 rounded-2xl mx-auto flex items-center justify-center mb-4"
-              style={{ backgroundColor: cfg.bg }}>
-              <LevelIcon className="w-7 h-7" style={{ color: cfg.color }} />
-            </div>
-            <p className="font-semibold text-gray-700 mb-1">لا توجد {cfg.label} {search ? "تطابق البحث" : "بعد"}</p>
-            <p className="text-sm text-gray-400 mb-5">
-              {search ? "جرب كلمة بحث مختلفة" : `اضغط "إضافة ${cfg.labelSingle}" للبدء`}
-            </p>
-            {!search && (
-              <button onClick={openAdd}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white"
-                style={{ backgroundColor: cfg.color }}>
-                <Plus className="w-4 h-4" />
-                إضافة {cfg.labelSingle}
-              </button>
-            )}
-          </motion.div>
+          <span className="text-xs text-gray-400">اختر محافظة</span>
         )}
-      </AnimatePresence>
-
-      {/* ── Add Modal ── */}
-      <AnimatePresence>
-        {addOpen && (
-          <GeoModal title={`إضافة ${cfg.labelSingle} جديد${["ة","ة","ة",""][currentLevel]}`} onClose={() => setAddOpen(false)}>
-            <div className="space-y-4">
-              {/* Parent context */}
-              {path.length > 0 && (
-                <div className="flex items-center gap-2 p-3 rounded-xl text-xs font-semibold"
-                  style={{ backgroundColor: cfg.bg, color: cfg.color }}>
-                  <LevelIcon className="w-3.5 h-3.5" />
-                  داخل: {breadcrumb.map(b => b.name).join(" › ")}
-                </div>
-              )}
-
-              <div>
-                <label className="text-xs font-semibold text-gray-500 block mb-1.5">الاسم بالعربي *</label>
-                <input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
-                  placeholder={`مثل: ${currentLevel === 0 ? "القاهرة" : currentLevel === 1 ? "مركز بنها" : currentLevel === 2 ? "بنها" : "ميدان بنها"}`}
-                  className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-teal-300 transition-all" />
-              </div>
-
-              <div>
-                <label className="text-xs font-semibold text-gray-500 block mb-1.5">الاسم بالإنجليزي</label>
-                <input value={form.nameEn} onChange={e => setForm(p => ({ ...p, nameEn: e.target.value }))}
-                  placeholder={`e.g. ${currentLevel === 0 ? "Cairo" : currentLevel === 1 ? "Banha Center" : currentLevel === 2 ? "Banha" : "Banha Square"}`}
-                  className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-teal-300 transition-all" />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs font-semibold text-gray-500 block mb-1.5">ترتيب الظهور</label>
-                  <input type="number" min={1} value={form.order}
-                    onChange={e => setForm(p => ({ ...p, order: +e.target.value }))}
-                    className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-teal-300 transition-all" />
-                </div>
-                <div className="flex items-end pb-0.5">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" checked={form.featured}
-                      onChange={e => setForm(p => ({ ...p, featured: e.target.checked }))}
-                      className="w-4 h-4 accent-amber-400" />
-                    <span className="text-xs font-semibold text-gray-600 flex items-center gap-1">
-                      <Star className="w-3.5 h-3.5 text-amber-400" /> مميز
-                    </span>
-                  </label>
-                </div>
-              </div>
-
-              <button onClick={saveAdd}
-                className="w-full py-2.5 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2"
-                style={{ backgroundColor: cfg.color }}>
-                <Plus className="w-4 h-4" /> إضافة {cfg.labelSingle}
-              </button>
-            </div>
-          </GeoModal>
+        {selGovItem && <ChevronLeft className="w-4 h-4 text-gray-300" />}
+        {selCityItem ? (
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold"
+            style={{ backgroundColor: "#2563EB12", color: "#2563EB", border: "1px solid #2563EB28" }}>
+            <Building2 className="w-3.5 h-3.5" /> {selCityItem.name}
+          </div>
+        ) : selGovItem ? (
+          <span className="text-xs text-gray-400">اختر مدينة</span>
+        ) : null}
+        {selCityItem && <ChevronLeft className="w-4 h-4 text-gray-300" />}
+        {selCityItem && (
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold"
+            style={{ backgroundColor: "#0EA5E912", color: "#0EA5E9", border: "1px solid #0EA5E928" }}>
+            <MapPin className="w-3.5 h-3.5" /> {districts.length} منطقة
+          </div>
         )}
-      </AnimatePresence>
+      </div>
 
-      {/* ── Edit Modal ── */}
-      <AnimatePresence>
-        {editItem && (
-          <GeoModal title={`تعديل ${LEVEL_CONFIG[editItem.level].labelSingle}`} onClose={() => setEditItem(null)}>
-            <div className="space-y-4">
-              <div>
-                <label className="text-xs font-semibold text-gray-500 block mb-1.5">الاسم بالعربي *</label>
-                <input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
-                  className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-teal-300 transition-all" />
-              </div>
-              <div>
-                <label className="text-xs font-semibold text-gray-500 block mb-1.5">الاسم بالإنجليزي</label>
-                <input value={form.nameEn} onChange={e => setForm(p => ({ ...p, nameEn: e.target.value }))}
-                  className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-teal-300 transition-all" />
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs font-semibold text-gray-500 block mb-1.5">ترتيب الظهور</label>
-                  <input type="number" min={1} value={form.order}
-                    onChange={e => setForm(p => ({ ...p, order: +e.target.value }))}
-                    className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-teal-300 transition-all" />
-                </div>
-                <div className="flex items-end pb-1">
-                  <label className="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" checked={form.featured}
-                      onChange={e => setForm(p => ({ ...p, featured: e.target.checked }))}
-                      className="w-4 h-4 accent-amber-400" />
-                    <span className="text-xs font-semibold text-gray-600 flex items-center gap-1">
-                      <Star className="w-3.5 h-3.5 text-amber-400" /> مميز
-                    </span>
-                  </label>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <button onClick={() => setEditItem(null)}
-                  className="flex-1 py-2.5 rounded-xl font-bold text-sm border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
-                  إلغاء
-                </button>
-                <button onClick={saveEdit}
-                  className="flex-[2] py-2.5 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2"
-                  style={{ backgroundColor: LEVEL_CONFIG[editItem.level].color }}>
-                  <Check className="w-4 h-4" /> حفظ التعديل
-                </button>
-              </div>
-            </div>
-          </GeoModal>
-        )}
-      </AnimatePresence>
+      {/* ── Three-column layout ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+        {/* Column 1 — محافظات */}
+        <GeoColumn
+          level={0}
+          items={govs}
+          selectedId={selGov}
+          allItems={items}
+          onSelectItem={id => { setSelGov(id); setSelCity(null); }}
+          onToggle={toggle}
+          onAdd={(name, nameEn) => addItem(0, null, name, nameEn)}
+          onEdit={(id, name, nameEn) => editItem(id, name, nameEn)}
+          onDelete={deleteItem}
+        />
+
+        {/* Column 2 — مدن */}
+        <GeoColumn
+          level={1}
+          items={cities}
+          selectedId={selCity}
+          parentLabel={selGovItem?.name}
+          allItems={items}
+          onSelectItem={id => setSelCity(id)}
+          onToggle={toggle}
+          onAdd={(name, nameEn) => selGov && addItem(1, selGov, name, nameEn)}
+          onEdit={(id, name, nameEn) => editItem(id, name, nameEn)}
+          onDelete={deleteItem}
+        />
+
+        {/* Column 3 — مناطق */}
+        <GeoColumn
+          level={2}
+          items={districts}
+          selectedId={null}
+          parentLabel={selCityItem?.name}
+          allItems={items}
+          onSelectItem={() => {}}
+          onToggle={toggle}
+          onAdd={(name, nameEn) => selCity && addItem(2, selCity, name, nameEn)}
+          onEdit={(id, name, nameEn) => editItem(id, name, nameEn)}
+          onDelete={deleteItem}
+        />
+      </div>
+
+      {/* ── Info bar ── */}
+      <div className="flex items-center gap-2 p-4 rounded-2xl border border-blue-100 bg-blue-50/40">
+        <AlertCircle className="w-4 h-4 text-blue-400 flex-shrink-0" />
+        <p className="text-xs text-blue-700">
+          اضغط على أي محافظة لعرض مدنها · اضغط على أي مدينة لعرض مناطقها · التغييرات تُطبَّق فوراً على الموقع
+        </p>
+      </div>
     </div>
   );
 }

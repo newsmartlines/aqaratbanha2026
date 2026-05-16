@@ -16,6 +16,7 @@ import { SEOSection } from "./admin-seo";
 import { IntegrationsSection } from "./admin-integrations";
 import { ZARASecuritySection } from "./admin-zara-security";
 import { TemplatesSection } from "./admin-templates";
+import { GeoManagerSection } from "./admin-geo-manager";
 import {
   getWatermarkSettings, saveWatermarkSettings,
   DEFAULT_WATERMARK,
@@ -105,22 +106,6 @@ const CATEGORIES = [
   { id: 6, name: "مستودعات",nameEn: "Warehouses", slug: "warehouses", icon: "Package",  count: 12,  active: false, subs: [] },
 ];
 
-const LOCATIONS = [
-  { id: 1,  name: "محافظة القليوبية", nameEn: "Qalyubia Governorate",  type: "منطقة", active: true  },
-  { id: 2,  name: "مركز بنها",        nameEn: "Banha Center",          type: "منطقة", active: true  },
-  { id: 3,  name: "مركز طوخ",         nameEn: "Tookh Center",          type: "منطقة", active: true  },
-  { id: 4,  name: "بنها",             nameEn: "Banha",                 type: "مدينة", active: true  },
-  { id: 5,  name: "منية القمح",       nameEn: "Minyet El-Qamh",        type: "مدينة", active: true  },
-  { id: 6,  name: "شبين الكنائر",    nameEn: "Shebin El-Kanater",     type: "مدينة", active: true  },
-  { id: 7,  name: "طوخ",              nameEn: "Tookh",                 type: "مدينة", active: true  },
-  { id: 8,  name: "قليوب",            nameEn: "Qaliub",                type: "مدينة", active: false },
-  { id: 9,  name: "كفر شكر",          nameEn: "Kafr Shukr",            type: "مدينة", active: true  },
-  { id: 10, name: "ميدان بنها",       nameEn: "Banha Square",          type: "حي",    active: true  },
-  { id: 11, name: "الشروق",           nameEn: "El-Shorouk",            type: "حي",    active: true  },
-  { id: 12, name: "وسط البلد",        nameEn: "Downtown",              type: "حي",    active: true  },
-  { id: 13, name: "كفر سعد",          nameEn: "Kafr Saad",             type: "حي",    active: false },
-  { id: 14, name: "سراي القبة",       nameEn: "Saraya Al-Qobba",       type: "حي",    active: true  },
-];
 
 const COMMISSION_PLANS = [
   { id: 1, name: "مجاني",    nameEn: "Free",    price: 0,   days: 30, limit: "3",  featured: "0",  commPct: 15, priority: "—" },
@@ -1152,193 +1137,9 @@ function CategoriesSection() {
   );
 }
 
-// ── Locations Section ────────────────────────────────────────────────────────
+// ── Locations Section — delegates to GeoManagerSection ───────────────────────
 function LocationsSection() {
-  const [locs, setLocs] = useState(LOCATIONS);
-  const [tab, setTab] = useState<"منطقة" | "مدينة" | "حي">("منطقة");
-
-  // Add modal
-  const [addOpen, setAddOpen] = useState(false);
-  const [addForm, setAddForm] = useState({ name: "", nameEn: "" });
-
-  // Edit modal
-  const [editLoc, setEditLoc] = useState<typeof LOCATIONS[0] | null>(null);
-  const [editForm, setEditForm] = useState({ name: "", nameEn: "" });
-
-  const toggle = (id: number) =>
-    setLocs(prev => prev.map(l => l.id === id ? { ...l, active: !l.active } : l));
-
-  const handleDelete = (id: number) => {
-    if (window.confirm("حذف هذا الموقع؟")) setLocs(prev => prev.filter(l => l.id !== id));
-  };
-
-  const openAdd = () => { setAddForm({ name: "", nameEn: "" }); setAddOpen(true); };
-  const saveAdd = () => {
-    if (!addForm.name.trim()) return;
-    const newId = Math.max(...locs.map(l => l.id)) + 1;
-    setLocs(prev => [...prev, { id: newId, name: addForm.name, nameEn: addForm.nameEn, type: tab, active: true }]);
-    setAddOpen(false);
-  };
-
-  const openEdit = (l: typeof LOCATIONS[0]) => {
-    setEditForm({ name: l.name, nameEn: l.nameEn });
-    setEditLoc(l);
-  };
-  const saveEdit = () => {
-    setLocs(prev => prev.map(l => l.id === editLoc!.id ? { ...l, ...editForm } : l));
-    setEditLoc(null);
-  };
-
-  const filtered = locs.filter(l => l.type === tab);
-  const tabConfig = [
-    { key: "منطقة" as const, label: "المناطق",  bg: "#FFF7ED", clr: "#EA580C" },
-    { key: "مدينة" as const, label: "المدن",    bg: "#EFF6FF", clr: "#2563EB" },
-    { key: "حي"    as const, label: "الأحياء",  bg: "#F0FDF4", clr: "#16A34A" },
-  ];
-  const addLabel = tab === "منطقة" ? "منطقة" : tab === "مدينة" ? "مدينة" : "حي";
-
-  return (
-    <div className="space-y-5">
-      <div>
-        <h2 className="text-lg font-bold text-gray-900">إدارة المواقع الجغرافية</h2>
-        <p className="text-sm text-gray-400 mt-0.5">إدارة المدن والأحياء ومناطق الخدمة</p>
-      </div>
-
-      {/* Stat cards */}
-      <div className="grid grid-cols-3 gap-4">
-        {tabConfig.map((t, i) => (
-          <div key={i} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
-            onClick={() => setTab(t.key)}>
-            <p className="text-3xl font-black text-gray-900">{locs.filter(l => l.type === t.key).length}</p>
-            <div className="flex items-center gap-2 mt-1.5">
-              <div className="w-5 h-5 rounded-full flex-shrink-0" style={{ backgroundColor: t.bg, border: `2px solid ${t.clr}44` }}></div>
-              <p className="text-sm font-medium text-gray-500">{t.label}</p>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Main card */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-          <div className="flex gap-1 bg-gray-100 p-1 rounded-xl">
-            {tabConfig.map(t => {
-              const count = locs.filter(l => l.type === t.key).length;
-              return (
-                <button key={t.key} onClick={() => setTab(t.key)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${tab === t.key ? "bg-white shadow-sm text-gray-800" : "text-gray-500 hover:text-gray-700"}`}>
-                  {t.label}
-                  <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold text-white"
-                    style={{ backgroundColor: tab === t.key ? ACCENT : "#CBD5E1" }}>
-                    {count}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-          <button onClick={openAdd}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-bold text-white" style={{ backgroundColor: ACCENT }}>
-            <Plus className="w-3.5 h-3.5" /> إضافة {addLabel}
-          </button>
-        </div>
-
-        <div className="divide-y divide-gray-50">
-          {filtered.map((l, i) => (
-            <div key={l.id} className="flex items-center gap-4 px-5 py-3.5 hover:bg-gray-50/60 transition-colors">
-              <span className="w-7 h-7 rounded-lg bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500 flex-shrink-0">
-                {i + 1}
-              </span>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-gray-800 text-sm">{l.name}</p>
-                <p className="text-xs text-gray-400">{l.nameEn}</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${l.active ? "bg-emerald-50 text-emerald-600" : "bg-gray-100 text-gray-400"}`}>
-                  {l.active ? "في الواجهة" : "مخفي"}
-                </span>
-                <button onClick={() => toggle(l.id)}>
-                  {l.active
-                    ? <ToggleRight className="w-8 h-8" style={{ color: ACCENT }} />
-                    : <ToggleLeft className="w-8 h-8 text-gray-300" />}
-                </button>
-                <button onClick={() => openEdit(l)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-gray-200 hover:bg-gray-50 text-gray-600 transition-colors">
-                  <Edit2 className="w-3 h-3" /> تعديل
-                </button>
-                <button onClick={() => handleDelete(l.id)}
-                  className="w-7 h-7 rounded-lg hover:bg-red-50 text-red-400 flex items-center justify-center">
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-          ))}
-          {filtered.length === 0 && (
-            <div className="py-12 text-center">
-              <MapPin className="w-8 h-8 text-gray-200 mx-auto mb-2" />
-              <p className="text-gray-400 text-sm">لا توجد عناصر — اضغط "إضافة {addLabel}" للبدء</p>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Add Modal */}
-      <AnimatePresence>
-        {addOpen && (
-          <AdminModal title={`إضافة ${addLabel} جديد${tab === "حي" ? "" : "ة"}`} onClose={() => setAddOpen(false)}>
-            <div className="space-y-4">
-              {[
-                { label: "الاسم بالعربي",    key: "name",   ph: `مثل: ${tab === "منطقة" ? "مركز بنها" : tab === "مدينة" ? "بنها" : "ميدان بنها"}` },
-                { label: "الاسم بالإنجليزي", key: "nameEn", ph: tab === "منطقة" ? "Banha Center" : tab === "مدينة" ? "Banha" : "Banha Square" },
-              ].map(f => (
-                <div key={f.key}>
-                  <label className="text-xs font-semibold text-gray-500 block mb-1.5">{f.label}</label>
-                  <input value={(addForm as any)[f.key]} placeholder={f.ph}
-                    onChange={e => setAddForm(p => ({ ...p, [f.key]: e.target.value }))}
-                    onKeyDown={e => e.key === "Enter" && saveAdd()}
-                    className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-blue-300 transition-all" />
-                </div>
-              ))}
-              <div className="p-3 bg-gray-50 rounded-xl flex items-center gap-2 text-xs text-gray-500">
-                <MapPin className="w-3.5 h-3.5 flex-shrink-0" style={{ color: ACCENT }} />
-                سيُضاف كـ <strong>{tab}</strong> ومرئي في الواجهة تلقائياً
-              </div>
-              <button onClick={saveAdd}
-                className="w-full py-2.5 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2"
-                style={{ backgroundColor: ACCENT }}>
-                <Plus className="w-4 h-4" /> إضافة {addLabel}
-              </button>
-            </div>
-          </AdminModal>
-        )}
-      </AnimatePresence>
-
-      {/* Edit Modal */}
-      <AnimatePresence>
-        {editLoc && (
-          <AdminModal title={`تعديل: ${editLoc.name}`} onClose={() => setEditLoc(null)}>
-            <div className="space-y-4">
-              {[
-                { label: "الاسم بالعربي",    key: "name" },
-                { label: "الاسم بالإنجليزي", key: "nameEn" },
-              ].map(f => (
-                <div key={f.key}>
-                  <label className="text-xs font-semibold text-gray-500 block mb-1.5">{f.label}</label>
-                  <input value={(editForm as any)[f.key]}
-                    onChange={e => setEditForm(p => ({ ...p, [f.key]: e.target.value }))}
-                    className="w-full py-2.5 px-4 rounded-xl border border-gray-200 bg-gray-50 text-sm outline-none focus:bg-white focus:border-blue-300 transition-all" />
-                </div>
-              ))}
-              <button onClick={saveEdit}
-                className="w-full py-2.5 rounded-xl font-bold text-sm text-white flex items-center justify-center gap-2"
-                style={{ backgroundColor: ACCENT }}>
-                <CheckCircle className="w-4 h-4" /> حفظ التغييرات
-              </button>
-            </div>
-          </AdminModal>
-        )}
-      </AnimatePresence>
-    </div>
-  );
+  return <GeoManagerSection />;
 }
 
 // ── Commissions Section ───────────────────────────────────────────────────────
