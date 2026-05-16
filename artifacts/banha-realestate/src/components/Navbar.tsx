@@ -86,52 +86,45 @@ export default function Navbar({ transparent = false, scrolled = false, showSear
           )}
 
           {/* Right actions — Desktop */}
-          <div className="hidden md:flex items-center gap-2 mr-auto">
+          <div className="hidden md:flex items-center gap-3 mr-auto">
 
-            {/* Language toggle */}
-            <button
-              onClick={() => setLang(lang === "ar" ? "en" : "ar")}
-              className={`text-xs font-bold px-3 py-1.5 rounded-lg border transition-all ${
-                isLight
-                  ? "border-white/30 text-white hover:bg-white/10"
-                  : "border-gray-200 text-gray-500 hover:border-gray-300"
-              }`}
-            >
-              {lang === "ar" ? "EN" : "ع"}
-            </button>
-
-            {/* Login */}
-            <button
-              onClick={() => navigate("/login")}
-              className={`flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-xl border transition-all ${
-                isLight
-                  ? "border-white/30 text-white hover:bg-white/10"
-                  : "border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50"
-              }`}
-            >
-              <LogIn className="w-3.5 h-3.5" />
-              {t("login")}
-            </button>
-
-            {/* Register */}
-            <button
-              onClick={() => navigate("/register")}
-              className="flex items-center gap-1.5 text-sm font-semibold px-4 py-2 rounded-xl text-white transition-all hover:opacity-90"
-              style={{ backgroundColor: PRIMARY }}
-            >
-              <UserPlus className="w-3.5 h-3.5" />
-              {t("register")}
-            </button>
-
-            {/* Add Property */}
+            {/* Add Property button */}
             <button
               onClick={() => navigate("/add-property")}
-              className="flex items-center gap-1.5 text-sm font-bold px-4 py-2 rounded-xl text-white transition-all hover:opacity-90 border border-white/20"
-              style={{ backgroundColor: "#0D9488" }}
+              className="flex items-center gap-2 text-sm font-bold px-5 py-2.5 rounded-xl text-white transition-all hover:opacity-90 active:scale-95"
+              style={{ backgroundColor: "#1EBFD5" }}
             >
-              <Plus className="w-4 h-4" />
-              {t("addProperty")}
+              <Plus className="w-4 h-4 flex-shrink-0" />
+              <span>{t("addProperty")}</span>
             </button>
+
+            {/* Divider + auth links */}
+            <div className={`flex items-center gap-3 ${isLight ? "text-white/90" : "text-gray-700"}`}>
+
+              {/* Register */}
+              <button
+                onClick={() => navigate("/register")}
+                className={`text-sm font-semibold transition-colors hover:opacity-70 ${isLight ? "text-white/90" : "text-gray-700"}`}
+              >
+                {t("register")}
+              </button>
+
+              {/* Separator */}
+              <span className={`text-sm ${isLight ? "text-white/30" : "text-gray-200"}`}>|</span>
+
+              {/* Login + user icon */}
+              <button
+                onClick={() => navigate("/login")}
+                className={`flex items-center gap-1.5 text-sm font-semibold transition-colors hover:opacity-70 ${isLight ? "text-white/90" : "text-gray-700"}`}
+              >
+                <span>{t("login")}</span>
+                <div className={`w-8 h-8 rounded-full border flex items-center justify-center flex-shrink-0 transition-colors ${
+                  isLight ? "border-white/40 text-white hover:bg-white/10" : "border-gray-200 text-gray-500 hover:bg-gray-50"
+                }`}>
+                  <User className="w-4 h-4" />
+                </div>
+              </button>
+            </div>
           </div>
 
           {/* Mobile hamburger */}
