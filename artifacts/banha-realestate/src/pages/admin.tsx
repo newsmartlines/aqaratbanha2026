@@ -11,7 +11,7 @@ import {
   AlertCircle, CheckCircle, Clock, XCircle, Zap, Crown,
   Phone, Mail, User, ChevronDown, MoreVertical, Map,
   FileText, Activity, DollarSign, Package, UserPlus, Percent,
-  Stamp,
+  Stamp, Type, Upload, Image,
 } from "lucide-react";
 import { SEOSection } from "./admin-seo";
 import { IntegrationsSection } from "./admin-integrations";
@@ -22,7 +22,7 @@ import {
   getWatermarkSettings, saveWatermarkSettings,
   DEFAULT_WATERMARK,
 } from "../utils/watermark";
-import type { WatermarkSettings, WatermarkPosition } from "../utils/watermark";
+import type { WatermarkSettings, WatermarkPosition, WatermarkType } from "../utils/watermark";
 import {
   AreaChart, Area, LineChart, Line, BarChart, Bar,
   PieChart, Pie, Cell, XAxis, YAxis, Tooltip,
@@ -1682,6 +1682,7 @@ function ReportsSection() {
 function WatermarkSection() {
   const [settings, setSettings] = useState<WatermarkSettings>(getWatermarkSettings);
   const [saved, setSaved] = useState(false);
+  const [logoPreviewUrl, setLogoPreviewUrl] = useState<string>(settings.logoUrl);
 
   const set = <K extends keyof WatermarkSettings>(k: K, v: WatermarkSettings[K]) =>
     setSettings(p => ({ ...p, [k]: v }));
@@ -1694,6 +1695,19 @@ function WatermarkSection() {
 
   const handleReset = () => {
     setSettings({ ...DEFAULT_WATERMARK });
+    setLogoPreviewUrl(DEFAULT_WATERMARK.logoUrl);
+  };
+
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const url = ev.target?.result as string;
+      setLogoPreviewUrl(url);
+      set("logoUrl", url);
+    };
+    reader.readAsDataURL(file);
   };
 
   const POSITIONS: Array<{ key: WatermarkPosition; label: string; row: number; col: number }> = [
@@ -1704,22 +1718,39 @@ function WatermarkSection() {
     { key: "bottom-right", label: "أسفل يمين",  row: 3, col: 3 },
   ];
 
-  const logoPreviewStyle = (): React.CSSProperties => {
-    const w = `${Math.round(settings.size * 0.45)}%`;
-    const base: React.CSSProperties = {
-      position: "absolute",
-      width: w,
-      opacity: settings.opacity / 100,
-      pointerEvents: "none",
-    };
+  const TYPE_TABS: Array<{ key: WatermarkType; label: string; icon: React.ReactNode }> = [
+    { key: "image", label: "صورة / لوجو", icon: <Image className="w-4 h-4" /> },
+    { key: "text",  label: "نص",           icon: <Type  className="w-4 h-4" /> },
+  ];
+
+  const disabled = !settings.enabled;
+
+  // CSS position for preview overlay
+  const previewOverlayStyle = (): React.CSSProperties => {
+    const base: React.CSSProperties = { position: "absolute", pointerEvents: "none", opacity: settings.opacity / 100 };
     switch (settings.position) {
-      case "top-left":     return { ...base, top: "5%",  left:  "5%" };
-      case "top-right":    return { ...base, top: "5%",  right: "5%" };
-      case "center":       return { ...base, top: "50%", left:  "50%", transform: "translate(-50%,-50%)" };
-      case "bottom-left":  return { ...base, bottom: "5%", left: "5%" };
+      case "top-left":     return { ...base, top: "5%",    left:  "5%" };
+      case "top-right":    return { ...base, top: "5%",    right: "5%" };
+      case "center":       return { ...base, top: "50%",   left:  "50%", transform: "translate(-50%,-50%)" };
+      case "bottom-left":  return { ...base, bottom: "5%", left:  "5%" };
       case "bottom-right": return { ...base, bottom: "5%", right: "5%" };
     }
   };
+
+  const logoStyle = (): React.CSSProperties => ({
+    ...previewOverlayStyle(),
+    width: `${Math.round(settings.size * 0.45)}%`,
+  });
+
+  const textStyle = (): React.CSSProperties => ({
+    ...previewOverlayStyle(),
+    color: settings.textColor,
+    fontSize: `${settings.fontSize * 0.18}rem`,
+    fontWeight: 800,
+    textShadow: "0 1px 4px rgba(0,0,0,0.7)",
+    whiteSpace: "nowrap",
+    maxWidth: "90%",
+  });
 
   return (
     <div className="space-y-5">
@@ -1730,7 +1761,7 @@ function WatermarkSection() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
 
-        {/* Controls column */}
+        {/* ── Controls column ── */}
         <div className="space-y-4">
 
           {/* Enable / disable */}
@@ -1739,16 +1770,106 @@ function WatermarkSection() {
               <div>
                 <p className="font-bold text-gray-800">تفعيل العلامة المائية</p>
                 <p className="text-xs text-gray-400 mt-0.5">
-                  {settings.enabled ? "✅ مفعّلة — اللوجو يُضاف على كل صورة" : "⛔ معطّلة — لا يُضاف شيء على الصور"}
+                  {settings.enabled ? "✅ مفعّلة — تُضاف على كل صورة" : "⛔ معطّلة — لا يُضاف شيء على الصور"}
                 </p>
               </div>
               <SlimToggle on={settings.enabled} onToggle={() => set("enabled", !settings.enabled)} color={ACCENT} size="lg" />
             </div>
           </div>
 
+          {/* Type switcher */}
+          <div className={`bg-white rounded-2xl border border-gray-100 shadow-sm p-5 transition-opacity ${disabled ? "opacity-40 pointer-events-none" : ""}`}>
+            <p className="font-bold text-gray-800 mb-3">نوع العلامة المائية</p>
+            <div className="grid grid-cols-2 gap-2">
+              {TYPE_TABS.map(tab => {
+                const active = settings.type === tab.key;
+                return (
+                  <button key={tab.key} onClick={() => set("type", tab.key)}
+                    className={`flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold border-2 transition-all ${active ? "text-white border-blue-600 bg-blue-600" : "border-gray-200 text-gray-500 hover:border-blue-300 bg-white"}`}>
+                    {tab.icon} {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* ── IMAGE mode: logo upload ── */}
+          {settings.type === "image" && (
+            <div className={`bg-white rounded-2xl border border-gray-100 shadow-sm p-5 transition-opacity ${disabled ? "opacity-40 pointer-events-none" : ""}`}>
+              <p className="font-bold text-gray-800 mb-3">صورة اللوجو</p>
+              <label className="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-gray-200 rounded-xl cursor-pointer hover:border-blue-400 hover:bg-blue-50/40 transition-all p-4">
+                {logoPreviewUrl
+                  ? <img src={logoPreviewUrl} alt="logo preview" className="h-14 object-contain" onError={() => setLogoPreviewUrl("")} />
+                  : <Upload className="w-7 h-7 text-gray-300" />}
+                <span className="text-xs text-gray-500 font-medium">اضغط لرفع لوجو (PNG بخلفية شفافة)</span>
+                <input type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+              </label>
+              {settings.logoUrl !== DEFAULT_WATERMARK.logoUrl && (
+                <button onClick={() => { set("logoUrl", DEFAULT_WATERMARK.logoUrl); setLogoPreviewUrl(DEFAULT_WATERMARK.logoUrl); }}
+                  className="mt-2 w-full text-xs text-gray-400 hover:text-red-500 transition-colors">
+                  ← استعادة اللوجو الافتراضي
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* ── TEXT mode: text input + color + font size ── */}
+          {settings.type === "text" && (
+            <div className={`bg-white rounded-2xl border border-gray-100 shadow-sm p-5 space-y-4 transition-opacity ${disabled ? "opacity-40 pointer-events-none" : ""}`}>
+              {/* Text content */}
+              <div>
+                <p className="font-bold text-gray-800 mb-2">نص العلامة المائية</p>
+                <input
+                  type="text"
+                  value={settings.text}
+                  onChange={e => set("text", e.target.value)}
+                  maxLength={60}
+                  placeholder="مثال: عقارات بنها"
+                  className="w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm font-bold text-gray-800 focus:outline-none focus:border-blue-500 transition-all text-right"
+                  dir="auto"
+                />
+                <p className="text-xs text-gray-400 mt-1 text-left">{settings.text.length}/60</p>
+              </div>
+
+              {/* Color picker */}
+              <div>
+                <p className="font-bold text-gray-800 mb-2">لون النص</p>
+                <div className="flex items-center gap-3">
+                  <input type="color" value={settings.textColor}
+                    onChange={e => set("textColor", e.target.value)}
+                    className="w-10 h-10 rounded-lg border-2 border-gray-200 cursor-pointer p-0.5 bg-white" />
+                  <div className="flex gap-2 flex-wrap">
+                    {["#ffffff", "#000000", "#1E3A8A", "#16A34A", "#DC2626", "#F59E0B", "#0891B2"].map(c => (
+                      <button key={c} onClick={() => set("textColor", c)}
+                        className={`w-7 h-7 rounded-full border-2 transition-all ${settings.textColor === c ? "border-blue-600 scale-110" : "border-gray-200 hover:scale-105"}`}
+                        style={{ backgroundColor: c }} />
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Font size */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="font-bold text-gray-800">حجم الخط</p>
+                  <span className="text-sm font-black px-3 py-1 rounded-full text-white" style={{ backgroundColor: ACCENT }}>
+                    {settings.fontSize}%
+                  </span>
+                </div>
+                <input type="range" min={3} max={20} step={1} value={settings.fontSize}
+                  onChange={e => set("fontSize", +e.target.value)}
+                  className="w-full accent-blue-600 h-2 cursor-pointer" />
+                <div className="flex justify-between text-xs text-gray-400 mt-1.5">
+                  <span>صغير</span>
+                  <span>كبير</span>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Position picker */}
-          <div className={`bg-white rounded-2xl border border-gray-100 shadow-sm p-5 transition-opacity ${!settings.enabled ? "opacity-40 pointer-events-none" : ""}`}>
-            <p className="font-bold text-gray-800 mb-3">موضع اللوجو على الصورة</p>
+          <div className={`bg-white rounded-2xl border border-gray-100 shadow-sm p-5 transition-opacity ${disabled ? "opacity-40 pointer-events-none" : ""}`}>
+            <p className="font-bold text-gray-800 mb-3">موضع العلامة على الصورة</p>
             <div className="grid grid-cols-3 gap-2" style={{ gridTemplateRows: "repeat(3,3rem)" }}>
               {Array.from({ length: 9 }).map((_, i) => {
                 const row = Math.floor(i / 3) + 1;
@@ -1769,7 +1890,7 @@ function WatermarkSection() {
           </div>
 
           {/* Opacity */}
-          <div className={`bg-white rounded-2xl border border-gray-100 shadow-sm p-5 transition-opacity ${!settings.enabled ? "opacity-40 pointer-events-none" : ""}`}>
+          <div className={`bg-white rounded-2xl border border-gray-100 shadow-sm p-5 transition-opacity ${disabled ? "opacity-40 pointer-events-none" : ""}`}>
             <div className="flex items-center justify-between mb-3">
               <p className="font-bold text-gray-800">درجة الوضوح</p>
               <span className="text-sm font-black px-3 py-1 rounded-full text-white" style={{ backgroundColor: ACCENT }}>
@@ -1785,26 +1906,28 @@ function WatermarkSection() {
             </div>
           </div>
 
-          {/* Size */}
-          <div className={`bg-white rounded-2xl border border-gray-100 shadow-sm p-5 transition-opacity ${!settings.enabled ? "opacity-40 pointer-events-none" : ""}`}>
-            <div className="flex items-center justify-between mb-3">
-              <p className="font-bold text-gray-800">حجم اللوجو</p>
-              <span className="text-sm font-black px-3 py-1 rounded-full text-white" style={{ backgroundColor: ACCENT }}>
-                {settings.size}%
-              </span>
+          {/* Size (image mode only) */}
+          {settings.type === "image" && (
+            <div className={`bg-white rounded-2xl border border-gray-100 shadow-sm p-5 transition-opacity ${disabled ? "opacity-40 pointer-events-none" : ""}`}>
+              <div className="flex items-center justify-between mb-3">
+                <p className="font-bold text-gray-800">حجم اللوجو</p>
+                <span className="text-sm font-black px-3 py-1 rounded-full text-white" style={{ backgroundColor: ACCENT }}>
+                  {settings.size}%
+                </span>
+              </div>
+              <input type="range" min={5} max={50} step={1} value={settings.size}
+                onChange={e => set("size", +e.target.value)}
+                className="w-full accent-blue-600 h-2 cursor-pointer" />
+              <div className="flex justify-between text-xs text-gray-400 mt-1.5">
+                <span>صغير</span>
+                <span>كبير</span>
+              </div>
             </div>
-            <input type="range" min={5} max={50} step={1} value={settings.size}
-              onChange={e => set("size", +e.target.value)}
-              className="w-full accent-blue-600 h-2 cursor-pointer" />
-            <div className="flex justify-between text-xs text-gray-400 mt-1.5">
-              <span>صغير</span>
-              <span>كبير</span>
-            </div>
-          </div>
+          )}
 
         </div>
 
-        {/* Preview + Save column */}
+        {/* ── Preview + Save column ── */}
         <div className="space-y-4">
 
           {/* Live preview */}
@@ -1816,8 +1939,11 @@ function WatermarkSection() {
                 alt="sample"
                 className="absolute inset-0 w-full h-full object-cover"
               />
-              {settings.enabled && (
-                <img src="/logo-house-nobg.png" alt="watermark" style={logoPreviewStyle()} />
+              {settings.enabled && settings.type === "image" && (
+                <img src={logoPreviewUrl || settings.logoUrl} alt="watermark" style={logoStyle()} />
+              )}
+              {settings.enabled && settings.type === "text" && settings.text && (
+                <span style={textStyle()}>{settings.text}</span>
               )}
               {!settings.enabled && (
                 <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
@@ -1837,7 +1963,7 @@ function WatermarkSection() {
             <p className="text-xs font-bold text-blue-700">كيف يعمل؟</p>
             <ul className="text-xs text-blue-600 space-y-1 list-disc list-inside">
               <li>عند رفع أي صورة عقار من المستخدمين</li>
-              <li>يُطبَّق اللوجو تلقائياً على الصورة</li>
+              <li>{settings.type === "text" ? "يُطبع النص" : "يُطبَّق اللوجو"} تلقائياً على الصورة</li>
               <li>يُحفظ الإعداد فوراً لكل الأجهزة</li>
               <li>لا يؤثر على الصور المرفوعة مسبقاً</li>
             </ul>
